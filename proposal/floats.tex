@@ -1,0 +1,391 @@
+\newcommand{\x}{$\times$}
+
+\newcommand{\figBootstrapping}{
+    \begin{figure}[t]
+        \begin{center}
+            \includegraphics[width=\columnwidth]{figures/ag_bootstrapping.pdf}
+            \caption{Multiplicative budget over time. Bootstrapping can be used to reset a ciphertext's multiplicative budget.}
+            \label{fig:bootstrapping}
+        \end{center}
+    \end{figure}
+}
+\newcommand{\figKScompare}{
+  \begin{figure}[t]
+    \begin{center}
+        \includegraphics[width=\columnwidth]{plots/ks_comparison.pdf}
+	\vspace{-0.25in}
+	\caption{Comparison of footprint and compute for standard and boosted keyswitching.}
+        \label{fig:ksCompare}
+    \end{center}
+  \end{figure}
+}
+
+\newcommand{\tblOpBalance}{
+    \begin{table}[t]
+            \begin{footnotesize}
+        \begin{center}
+            \begin{tabular}{lrclr}
+                \toprule
+                         & \multicolumn{3}{c}{\textbf{Boosted keyswitching}} & \textbf{Standard} \\
+                Ops      & changeRNSBase  & + & other &  \textbf{keyswitching}\\
+                % alex: Changed the numbers to reflect only keyswitching; not
+                %       full homomorphic multiply. This is a homomorphic rotate
+                %       minus one add.
+                % alex: Technically, the L^2 Add terms in both boosted and
+                %       standard should be L(L-1) as it takes L-1 additions to
+                %       sum up L numbers. But, we probably don't care...
+                \midrule
+                Mult     & $3L^2$  & + & $4L$    & $2L^2$ \\
+                Add      & $3L^2$  & + & $2L$    & $2L^2$ \\
+                NTT      &         &   & $6L$    & $L^2$ \\
+                \midrule
+                % alex: I don't think it N=64K is necessary as N doesn't appear
+                %       anywhere in the formulas. Alternatively, we should
+                %       multiply everything by N.
+                %\multicolumn{3}{l}{At $N$=64K, $L$=64:} \\
+                \multicolumn{3}{l}{At $L$=60:} \\
+                \midrule
+                Mult     & 10,800 & + & 240         & 7,200 \\
+                Add      & 10,800 & + & 120         & 7,200 \\
+                NTT      &        &   & 360         & 3,600 \\
+                \bottomrule
+            \end{tabular}
+        \end{center}
+            \end{footnotesize}
+            \vspace{-0.12in}
+            \caption{Operation breakdown for boosted vs.\ standard keyswitching as a function of multiplicative budget ($L$), and for $L$=60. Boosted keyswitching operations are split by whether they happen within or outside \texttt{changeRNSBase()}.}
+        \label{tbl:opBalance}
+    \end{table}
+}
+
+\newcommand{\figPipeline}{
+    \begin{figure}[t]
+        \begin{center}
+            \includegraphics[width=\columnwidth]{figures/ag_pipeline.pdf}
+            \caption{Illustration of how vector chaining is used for part of a homomorphic multiply.}
+            \label{fig:pipeline}
+        \end{center}
+    \end{figure}
+}
+
+\newcommand{\figInterClusterTiling}{
+    \begin{figure}[t]
+        \begin{center}
+            \includegraphics[width=0.8\columnwidth]{figures/ag_interClusterTiling.pdf}
+            \caption{Transposing a 16-element vector across two lane groups.}
+            \label{fig:interClusterTiling}
+        \end{center}
+    \end{figure}
+}
+
+\begin{comment}
+\newcommand{\tblParams}{
+    \begin{table}[t]
+        \begin{center}
+            \begin{tabular}{ll}
+                \toprule
+                Parameter &Definition \\
+                \midrule
+                $N$ &Degree of ciphertext polynomials \\
+                $Q$ &Modulus of ciphertext polynomial coefficients \\
+                \bottomrule
+            \end{tabular}
+        \end{center}
+        \caption{FHE parameters and their definitions.}
+        \label{tbl:params}
+    \end{table}
+}
+\end{comment}
+
+\newcommand{\tblUtilization}{
+\begin{figure}[t]
+    \includegraphics[width=0.99\columnwidth]{plots/utils.pdf}
+    \caption{Functional unit and memory bandwidth utilization.}
+    \label{tbl:utilization}
+    \vspace{0.05in}
+\end{figure}
+}
+
+\newcommand{\figNewKS}{
+    \begin{figure}[t]
+        \begin{center}
+            \includegraphics[width=\columnwidth]{figures/ag_newKS.pdf}
+            \caption{New keyswitching implementation.}
+            \label{lst:newKeyswitching}
+        \end{center}
+    \end{figure}
+}
+
+\newcommand{\figWorkflow}{
+  \begin{figure}[t]
+    \begin{center}
+      \vspace{-0.1in}
+        \includegraphics[width=0.8\columnwidth]{figures/ag_workflow.pdf}
+        \caption{FHE can offload computation to the cloud securely.}
+        \label{fig:workflow}
+    \end{center}
+  \end{figure}
+}
+\newcommand{\figCRB}{
+  \begin{figure}[t]
+      \begin{center}
+          \includegraphics[width=0.8\columnwidth]{figures/ag_crb.pdf}
+          \caption{Microarchitecture of the change RNS Base (CRB) unit.}
+          \label{fig:crb}
+      \end{center}
+  \end{figure}
+}
+
+\newcommand{\figOverview}{
+  \begin{figure}[t]
+    \begin{center}
+        \includegraphics[width=\columnwidth]{plots/overview.pdf}
+      \vspace{-0.13in}
+        \caption{Overview of the proposed CraterLake architecture.}
+        \label{fig:overview}
+    \end{center}
+  \end{figure}
+}
+
+\begin{comment}
+\newcommand{\figTilingExample}{
+    \begin{figure}[t]
+        \begin{center}
+            \includegraphics[width=\columnwidth]{figures/ag_tilingExample.pdf}
+            \caption{Dividing the \emph{coeffToSlot} dataflow into partitions that fit on chip.}
+            \label{fig:tilingExample}
+        \end{center}
+    \end{figure}
+}
+\end{comment}
+
+\newcommand{\figTiling}{
+  \begin{figure}[t]
+    \begin{center}
+        \includegraphics[width=\columnwidth]{figures/ag_tiling.pdf}
+        \caption{Breakdown of different components of a ciphertext.}
+        \label{fig:tiling}
+    \end{center}
+  \end{figure}
+}
+
+\newcommand{\tblBenchmarks}{
+    %\begin{table}[t] % MINIPAGED, see below
+        \begin{center}
+            \begin{footnotesize}
+                \begin{tabular}{lrrrrr}
+                    \toprule
+                    Execution time (ms) on  & \name  & F1+   & CPU      & vs. F1+ & vs. CPU \\
+                    \midrule
+                    ResNet-20               & 264.25 & 2,693 & 23\,min &         10.2\x &          5,211\x \\
+                    Logistic Regression     & 120.74 &   639 &  356\,s &         5.29\x &          2,949\x \\
+                    LSTM                    & 128.90 & 2,573 &  859\,s &         20.0\x &          6,665\x \\
+                    Packed Bootstrapping    &   2.76 &  58.3 & 17.2\,s &         21.1\x &          6,228\x \\
+                    \midrule
+                    \textbf{deep gmean speedup}  &&&                   & \textbf{12.3\x} & \textbf{5,025\x} \\
+                    \midrule
+                    Unpacked bootstrapping  &  0.10  & 0.21    &    877 &         2.04\x &          8,612\x \\
+                    CIFAR Unencryp. Wghts.  & 58.22  & 94.1    & 187\,s &         1.62\x &          3,205\x \\
+                    MNIST Unencryp. Wghts.  &  0.15  & 0.13    &    561 &         0.88\x &          3,771\x \\
+                    MNIST Encryp. Wghts.    &  0.26  & 0.22    &   1369 &         0.84\x &          5,297\x \\
+                    \midrule
+                    \textbf{shallow gmean speedup} &&&                  &\textbf{1.25\x} & \textbf{4,846\x}  \\
+                    \bottomrule
+               \end{tabular}
+            \end{footnotesize}
+       \end{center}
+       \vspace{-0.08in} % dsm: WTF Latex.... otherwise same-height minipaged tables have different separation with legend.
+       \caption{Performance of \name, F1+, and CPU on full FHE benchmarks.}
+       \label{tbl:benchmarks}
+    %\end{table}
+}
+
+\begin{comment}
+\newcommand{\figFOneplusNetworkBandwidth}{
+    \begin{figure}[t]
+        \begin{center} 
+            \includegraphics[width=0.7\columnwidth]{plots/f1_power.pdf}
+            \caption{Per-benchmark F1+ energy breakdown.}%\tmp{The number should be total Jules}
+            \label{fig:FOneplusNetworkBandwidth}
+        \end{center}
+    \end{figure}
+}
+\end{comment}
+
+\newcommand{\figGmeanVsStorage}{
+    \begin{figure}[t]
+        \begin{center}
+            \includegraphics[width=0.9\columnwidth]{plots/scratchpad_sweep.pdf}
+            \caption{Gmean performance of \name on deep benchmarks as a function of on-chip storage size.}
+            \label{fig:gmeanVsStorage}
+        \end{center}
+    \end{figure}
+}
+
+\newcommand{\tblPerformanceBreakdown}{
+    %\begin{table}[t] % MINIPAGED, see below
+        \begin{footnotesize}
+        \begin{center}
+            \begin{tabular}{lrrr}
+                \toprule
+                Speedup vs.             & no KSHGen & no CRB/chain \\
+                \midrule
+                ResNet-20               & 1.3\x    & 18.9\x \\
+                Logistic Regression     & 1.2\x    &  8.7\x \\
+                LSTM                    & 1.9\x    & 37.0\x \\
+                Packed Bootstrapping    & 1.8\x    & 38.8\x \\
+                \midrule
+                \textbf{deep gmean speedup} & \textbf{1.5\x} & \textbf{22.0\x} \\
+                \midrule
+                Unpacked Bootstrapping  &1.9\x & 3.7\x \\
+                CIFAR Unencrypt. Wghts. &1.0\x & 3.7\x \\
+                MNIST Unencrypt. Wghts. &1.1\x & 1.3\x \\
+                MNIST Encryp. Wghts.    &1.1\x & 1.0\x \\
+                \midrule
+                \textbf{shallow gmean speedup}  &\textbf{1.2\x}    &\textbf{2.0\x} \\
+                \bottomrule
+            \end{tabular}
+            \caption{Speedups of \name over configurations without KSHGen and CRB or chaining.}
+            \label{tbl:performanceBreakdown}
+        \end{center}
+        \end{footnotesize}
+    %\end{table}
+}
+
+\newcommand{\tblBenchmarksAndPerformanceBreakdown}{
+\begin{table*}[t]
+  \begin{minipage}{0.55\linewidth}
+    \tblBenchmarks
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.41\linewidth}
+    \tblPerformanceBreakdown
+  \end{minipage}
+  \vspace{-0.15in}
+\end{table*}
+}
+
+
+
+\newcommand{\figDataMovementAndPower}{
+    \begin{figure}[t]
+        \begin{center}
+            \captionsetup[subfigure]{labelformat=empty}
+            \begin{subfigure}[b]{0.49\columnwidth}
+                \includegraphics[width=\linewidth]{plots/cl_data_movement.pdf}
+                \caption{}
+                \label{fig:dataMovement}
+            \end{subfigure}
+            \hfil %%
+            \begin{subfigure}[b]{0.49\columnwidth}
+                \includegraphics[width=\linewidth]{plots/cl_power.pdf}
+                \caption{}
+                \label{fig:power}
+            \end{subfigure}
+            \begin{center}
+              \vspace{-0.2in}
+                (a) \hspace{0.45\columnwidth} (b)
+            \end{center}
+              \vspace{-0.1in}
+            \caption{Per-benchmark breakdown of (a) data movement and (b) average power for \name.}
+        \end{center}
+    \end{figure}
+}
+
+\newcommand{\tblMicrobenchmarks}{
+    \begin{table}[t]
+        \begin{footnotesize}
+            \begin{center}
+                \begin{tabular}{l|rr|rr|rr}
+                    \toprule
+                    & \multicolumn{2}{c|}{$N$=64K} & \multicolumn{2}{c|}{$N$=32K} & \multicolumn{2}{c}{$N$=16K} \\
+                    Operation        & Ours  & vs. F1+ & Ours  & vs. F1+ & Ours & vs. F1+ \\
+                    \midrule
+                    Ct. mult.        & 8,436 & 6.13\x  & 2,260 & 3.00\x  &  708 & 1.31\x \\
+                    Ct. rotate       & 6,388 & 7.85\x  & 1,748 & 3.66\x  &  580 & 1.43\x \\
+                    Pt. rotate       & 4,096 & 0.25\x  & 1,024 & 0.25\x  &  256 & 0.25\x \\
+                    Ct. add          & 1,024 & 0.25\x  &   256 & 0.25\x  &   64 & 0.25\x \\
+                    Pt.-Ct. mult.    & 1,024 & 0.25\x  &   256 & 0.25\x  &   64 & 0.25\x \\
+                    \bottomrule
+                \end{tabular}
+            \end{center}
+            \caption{Performance of \name vs. F1+ on ciphertext operations. We report results in reciprocal throughput, in nanoseconds per ciphertext operation (lower is better). The benchmarks are in order: $(N, \log Q) = (64K, 1,664), (32K, 832), (16K, 416)$.}
+            \label{tbl:microbenchmarks}
+        \end{footnotesize}
+    \end{table}
+}
+
+\newcommand{\tblDataTypes}{
+    \begin{table}[t]
+        \begin{center}
+            \begin{tabular}{lrrr}
+                \toprule
+                Data type & Size vs. Pt & $L=10$ & $L=32$ \\
+                \midrule
+                Old Keyswitch Hint & $2L$\x & $20\,$MB & $208\,$MB \\
+                New Keyswitch Hint & $4$\x & $4\,$MB & $12\,$MB \\
+                Ciphertext & $2$\x & $2\,$MB & $6\,$MB \\
+                Plaintext & $1$\x & $1\,$MB & $3\,$MB \\
+                \bottomrule
+            \end{tabular}
+        \end{center}
+        \caption{Comparison of sizes of different data types used in FHE.}
+    \end{table}
+}
+
+\newcommand{\tblOpCost}{
+    \begin{table}[t]\label{tbl:opCost}
+        \begin{center}
+            \begin{tabular}{lrrr}
+                \toprule
+                Operation & Integer mults & \% KS & \% total ops \\
+                \midrule
+                Ct-ct multiplication &$3 \times 10^{12}$ & $99.99\%$ & ??? \\
+                Ct rotation &$3 \times 10^{12}$ & $100.00\%$ & ??? \\
+                Pt-ct multiplication & $10^6$ & - & ??? \\
+                Ct-ct addition &0 & - & ??? \\
+                Pt-ct addition &0 & - & ??? \\
+                Pt rotation &0 & - & ??? \\
+                \bottomrule
+            \end{tabular}
+        \end{center}
+        \caption{Computational cost of FHE operations.}
+    \end{table}
+}
+
+\newcommand{\tblGF}{
+\newcolumntype{C}{>{\raggedright\arraybackslash}m{0.9in}}
+  \begin{wraptable}{r}{1.75in} 
+    \vspace{-0.22in}
+       \begin{footnotesize}
+    \begin{center}
+      \begin{footnotesize}
+        \begin{tabular}{Cr}
+          \toprule
+    Component                                           & Area [mm$^2$] \\
+    \midrule
+    CRB FU                                              & 158.8 \\
+    NTT FU                                              &  28.1 \\
+    Automorphism FU                                     &   9.0 \\
+    KSHGen FU                                           &   3.3 \\
+    Multiply FU                                         &   2.2 \\
+    Add FU                                              &   0.8 \\
+    \mbox{\textbf{Total FUs} (CRB, 2$\times$NTT,}  & \textbf{240.5} \\
+    \mbox{\hspace{2pt} Aut, KSHGen, 5$\times$Mul, 5$\times$Add)} & \\
+    \midrule
+    \mbox{Register file (256\,MB)}                      & 192.0 \\
+    \mbox{On-chip interconnect}                         &  10.0 \\
+    \mbox{Mem. PHYs (2$\times$HBM2E)}                   &  29.8 \\
+    \midrule
+    \textbf{Total \name}                                &  \textbf{472.3} \\
+    \bottomrule
+\end{tabular}
+\end{footnotesize}
+\vspace{-0.05in}
+\caption{Area breakdown of \name by component.}
+\label{tbl:GF12}
+\vspace{-0.25in}
+\end{center}
+       \end{footnotesize}
+\end{wraptable}
+}

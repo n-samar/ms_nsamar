@@ -2,67 +2,76 @@
 
 \subsection{Fully Homomorphic Encryption}
 
-A significant portion of computing workloads are now executed in the cloud.
-However, executing a program in the cloud involves users to trust their chosen Cloud Service Provider (CSP)
-with access to the data their computations require. Even if a user's trusted CSP is not maliciously inspecting their data,
-the CSP is suceptible to being hacked by other actors who can now access user data.
-For sensitive information such as health records or financial information, this risk might
-be unacceptable.
 
-Fully Homomorphic Encryption (FHE) provides a promising solution to this problem.
-FHE systems provide a cryptographically secure method, though computationally expensive, to perform computations on
-encrypted data \cite{gentry:stoc09:fhe, brakerski:itcs12:bgv, cheon:asiacrypt2017:ckks}.
-Specifically, FHE allows for a ``server" to evaluate an arbitrary arithmetic
-circuit of additions and mulitplications on encrypted inputs.
-This means that the ``user", who provides the encrypted inputs and a set of public keys, 
-does not need to trust the server with access to their data.
+A large and increasing fraction of the world's compute runs on the cloud, which
+is vulnerable to data breaches. Conventional techniques to mitigate attacks
+offer limited security, as cloud servers must decrypt data in order to process
+it.
 
-Writing an FHE program is quite different from writing a program in a standard
-programming language like C++ or Python. 
-FHE programs must be arithmetic \emph{circuits}, meaning that 
-data dependent branches, and therefore loops, are impossible to express.
-The intuitition behind this is that a program cannot branch on data it cannot
-even decrypt. This means that not all standard ``plaintext" (unencrypted) programs
-can be efficiently translated into FHE programs. Importantly, many numeric
-programs including linear algebra, logistic regression, and neural networks
-\emph{can} be written as arithmetic circuits 
-\cite{halevi:acc14:algo-helib, han:iaai19:he-logreg, dowlin:icml16:cryptonets}.
-These algorithms are also particularly appealing candidates for homomorphic
-encryption because they are often run on sensitive data.
+\emph{Fully homomorphic encryption (FHE)} is a special type of encryption
+scheme that enables \emph{computing on encrypted data directly}, without
+decrypting it. FHE allows a client to offload a computation to an untrusted
+server \emph{without} revealing any data. This enables
+the client to harness the compute power of the cloud while maintaining
+cryptographic privacy. Though FHE has some limitations (e.g., data-dependent
+branching is not possible), it is general enough to support many compelling use
+cases, such as privacy-preserving machine learning, secure genome analysis,
+private set intersection, private information retrieval, and many
+more~\cite{kim2020semi,gilad:icml16:cryptonets,han:aaai19:logistic,han:iacr18:efficient,juvekar2018gazelle,DBLP:conf/ccs/ChenLR17,DBLP:conf/tcc/GentryH19}. 
+%\nnote{add citations and more examples}
 
-Unfortunately, all FHE programs have significant computational overheads 
-over standard plaintext programs.
-Several software libraries \cite{palisade, helib, seal}
-implement state of the art FHE cryptosystems, but they all
-suffer from several order-of-magnitude slowdowns over plaintext computations.
-These massive slowdowns make running homomorphically encrypted programs
-infeasible in practice.
-Hardware acceleration seems like a promising approach to closing the
-performance gap between FHE and plaintext computations.
+% axelf: purging unfortunately/fortunately from the whole paper
+Despite its ideal privacy, FHE is rarely used today because it incurs
+prohibitive overheads: in CPUs, FHE computations are 10,000$\times$ to
+100,000$\times$ slower than equivalent unencrypted computations, even when
+using highly optimized FHE libraries.
+% dsm: I don't think this adds much here, other than distance to get to the
+% actual point
+%Some of these overhead costs are due to the size of FHE ciphertexts while
+%others are due to the additional complexity of representing arbitrary
+%functions in a form suitable for computing using FHE.
+
+Fortunately, state-of-the-art FHE schemes are well-suited to hardware
+acceleration. First, they are regular and structured: FHE programs operate on
+very long vectors, and all operations are known ahead of time. Second, FHE
+requires several non-SIMD operations, such as \emph{number-theoretic
+transforms} (NTTs), that are inefficient on CPUs and GPUs. But these operations
+can be accelerated by specialized functional units, avoiding these
+inefficiencies. As a result, prior work has proposed FPGA and ASIC-based
+accelerators~\cite{riazi:asplos20:heax,cousins:hpec12:sipher-fpga,cousins:tetc17:fpga-he,turan:tc20:heaws,cousins:hpec14:fpga-he,
+roy:hpca19:fpga-he,feldmann:micro21:f1}. While most prior accelerators achieve
+limited speedups, a recent design, F1~\cite{feldmann:micro21:f1}, achieves
+speedups of
+%2,000-15,000$\times$ dsm: Let's avoid the 15000x speedup, we don't have
+%anything that large but we're using a different baseline, diff configs, etc.
+about 5,000$\times$ on FHE programs.
 
 \subsection{Prior Work}
 
-To this end, several FPGA accelerators have been proposed, each showing
-substantial speedups over CPU-based software implementations
-\cite{riazi:asplos20:heax, roy:hpca19:he-fpga}.
-However, these FPGA designs present several drawbacks. 
-FPGAs cannot emulate all of the logic required to execute a full FHE program
-simultaneously, and are therefore limited to accelerating only limited chunks
-of the overall computation at once.
-Additionally, an FPGA design must be tailored to a specfic FHE cryptosystem and
-arithmetic circuit, leaving limited flexibility at runtime. 
-Finally, FPGAs are very power hungry and have very limited clock speeds.
+\paragraph{HE-MPC accelerators are hampered by communication:} To avoid the
+overheads of FHE, recent work has proposed accelerators for private deep
+learning that combine shallow homomorphic encryption (HE) with multi-party
+computation (MPC): Gazelle~\cite{juvekar2018gazelle} and
+Cheetah~\cite{reagen:hpca21:cheetah}. These systems require very frequent
+communication with the client, essentially after every single level of
+multiplication. So while they reduce accelerator overheads, they are limited by
+high client-server communication and client encryption/decryption overheads.
+CHOCO~\cite{vanderhagen:arxiv21:choco} shows that, even after accelerating
+client operations, communication costs dominate.
 
-Furthermore, all existing accelerators fall short of performing
-\emph{Fully} Homomorphic Encryption, and instead only implement
-\emph{Somewhat} Homomorphic Encryption (SHE). The key difference is that
-SHE circuits can only be of limited depth; a specific value cannot be the
-result of more than a fixed number of operations, otherwise it will become
-too noisy and therefore undecryptable. 
-To turn a SHE scheme into a FHE scheme,
-we need a \emph{bootstrapping} operation which ``resets" an encrypted value's
-noise. Bootstrapping operations have been implemented in FHE software
-libraries, but to our knowledge, no one has attempted to accelerate
-bootstrapping in hardware. Supporting bootstrapping would allow an accelerator
-to support more complex linear algebra computations, deeper neural networks,
-and more training iterations for logistic regression.
+By efficiently supporting bootstrapping, CraterLake eliminates the need for any
+additional communication (beyond uploading the encrypted data) for computations
+of unbounded depth. In addition, CraterLake  reduces communication costs over prior
+FHE systems: whereas without bootstrapping the client must send inputs encoded
+in large polynomials, bootstrapping allows the client to send narrow inputs
+(e.g., with 32 instead of 1,500 bits per coefficient), which the server can
+bootstrap before computation. This reduces encryption and network overheads.
+
+\paragraph{GPUs are inefficient on FHE:} Prior work has studied the use of GPUs
+to accelerate
+FHE~\cite{wang:hpec12:fhe-gpu,wang:tc13:fhe-gpu,wang:iscas14:leveled-gpu,al:emerging19:implementation}.
+While the data-parallel nature of GPUs may seem a good fit for FHE, these
+efforts achieve similar performance to multicore CPUs. This is because GPUs
+lack modular arithmetic, cannot implement all-to-all operations like NTTs and
+automorphisms efficiently, and their small on-chip memories add memory
+accesses.

@@ -16,7 +16,4 @@ auto_header.tex
 metadata.txt
 doc_data.txt
 !**/plots/*.pdf
-!**/figures/*.pdf
-# We don't want to commit cropped figures
-**/figures/*-crop.pdf
-**/plots/*-crop.pdf
+!**/figures/figures.pdf

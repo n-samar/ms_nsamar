@@ -1,7 +1,11 @@
-Computing in public datacenters requires users to trust their chosen Cloud Service Provider with access to the data their computations require. 
-Given the sensitive nature of certain types of data, this is often undesirable.
-Fully Homomorphic Encryption (FHE) provides a cryptographically secure, though computationally expensive,
-method of performing computations on encrypted data.
-To make homomorphically encrypted computations perform sufficiently well to be practically usable, 
-we propose a novel programmable VLIW vector architecture.
-We also propose techniques to efficiently map FHE programs onto this architecture.
+Fully Homomorphic Encryption (FHE) enables offloading computation to untrusted
+servers with cryptographic privacy. Despite its attractive security, FHE is not
+yet widely~adopted due to its prohibitive overheads, about 10,000$\times$ over
+unencrypted computation.
+
+We propose to develop CraterLake, the first FHE accelerator that enables FHE programs of
+\emph{unbounded} size. To
+tackle this challenge, CraterLake introduces a new hardware architecture that
+efficiently scales to very large ciphertexts, novel functional units to
+accelerate key kernels, and new algorithms to reduce
+data movement.
