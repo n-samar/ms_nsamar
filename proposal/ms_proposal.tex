@@ -1,0 +1,54 @@
+% -*- Mode:TeX -*-
+
+%% The documentclass options along with the pagestyle can be used to generate
+%% a technical report, a draft copy, or a regular thesis.  You may need to
+%% re-specify the pagestyle after you \include  cover.tex.  For more
+%% information, see the first few lines of mitthesis.cls. 
+
+%\documentclass[12pt,vi,twoside]{mitthesis}
+%%
+%%  If you want your thesis copyright to you instead of MIT, use the
+%%  ``vi'' option, as above.
+%%
+%\documentclass[12pt,twoside,leftblank]{mitthesis}
+%%
+%% If you want blank pages before new chapters to be labelled ``This
+%% Page Intentionally Left Blank'', use the ``leftblank'' option, as
+%% above. 
+
+% \documentclass[12pt,twoside]{mitthesis}
+
+\documentclass[12pt]{article}
+
+%\input{headers.tex}
+
+\usepackage{setspace}
+\usepackage{amsfonts}
+\usepackage{booktabs}
+\singlespacing
+\def\baselinestretch{1.4}
+\setlength{\oddsidemargin}{0.25in}	% 1.25in left margin
+\setlength{\evensidemargin}{0.25in}	% 1.25in left margin (even pages)
+\setlength{\topmargin}{0.0in}		% 1in top margin
+\setlength{\textwidth}{6.0in}		% 6.0in text - 1.25in rt margin
+\setlength{\textheight}{9in}		% Body ht for 1in margins
+\addtolength{\topmargin}{-\headheight}	% No header, so compensate
+\addtolength{\topmargin}{-\headsep}	% for header height and separation
+
+\pagestyle{plain}
+
+\begin{document}
+\include{Cover}
+\include{01_intro}
+\include{02_proposal}
+\include{03_schedule}
+
+\begin{singlespacing}
+%\bibliographystyle{unsrt}
+%\bibliographystyle{ieeetr}
+\bibliographystyle{IEEEtranS} % order references by author name
+\bibliography{refs,confs}
+\end{singlespacing}
+
+\end{document}
+

@@ -1,0 +1,187 @@
+\section{Proposal}
+
+We propose a Very Long Instruction Word (VLIW) vector architecture targeting
+the widely used BGV \cite{brakerski:itcs12:bgv} and CKKS \cite{cheon:asiacrypt2017:ckks}
+FHE systems.
+
+\subsection{Characteristics of Targeted FHE Schemes}
+
+The following applies generally to all the cryptosystems we target.
+
+Let $R = \mathbb{Z}[z]/(x^N+1)$. Our ciphertexts are stored as pairs of
+polynomials in the quotient ring $R_q = R /qR$ where $q$ is the product of
+32-bit primes $q_1, \dots, q_L$. We note that this introduces two parameters
+to our ciphertext space: $N$ and $L$. $N$ is the degree of our polynomial, 
+and therefore the number of coefficients we must store for each ciphertext.
+$L$, by determining the number of 32-bit primes which make up the modulus,
+controls the bit-width of the coefficients.
+
+Each ciphertext encrypts a vector of $S$ many plaintext elements.
+$S$, often referred to in the FHE literature as the number of ``SIMD-slots",
+is picked between $1$ and $N$, and is fixed for all ciphertexts in a particular
+computation. 
+Homomorphically adding two ciphertexts $a, b$ will result in adding the
+values stored in their respective SIMD-slots element-wise.
+Homomorphically multiplying two ciphertexts $a, b$ will proceed analogously.
+The values stored in SIMD-slots can be permuted by applying various
+\emph{automorphisms} to a ciphertext. We can regard addition, multiplication,
+and automorphisms as the building blocks of any homomorphically encrypted
+program.
+
+As we perform homomorphic operations, the resulting ciphertexts will accumulate
+\emph{noise}. Once the noise exceeds a fixed threshold, a ciphertext becomes
+undecipherable. Homomorphic multiplication adds significant noise, while both
+automorphisms and homomorphic addition add minimal noise.
+In order to avoid this happening, we can \emph{bootstrap} it to reset its noise.
+Bootstrapping is a computationally expensive operation, and also an active area
+of mathematical research.
+
+Homomorphic addition is performed by adding the respective polynomials of the
+two operand ciphertexts. Homomorphic multiplication is performed analogously,
+but with polynomial mulitplication instead of addition. Automorphisms are
+performed by applying a specific set of permutations to the ciphertext
+coefficients. Importantly, both multiplication as well as automorphisms
+require a ``key-switching" step after being completed to make the result
+interoperable with other ciphertexts. This key-switching step involves
+matrix-vector multiplication with a set of key-switching hints that are provided
+as part of the public key.
+
+Our proposed accelerator will target values of $N$ from $2^10$ to $2^14$ and
+values of $L$ from 7 to 16. Fundamentally, $N$ impacts the security of our
+encryption scheme, with higher values of $N$ resulting in more secure
+encryption. $L$ decides the number of homomorphic operations we can do between
+bootstrapping. Each $L$ can be thought of as a level, and performing a
+homomorphic multiplication reduces a ciphertext's level by 1. A ciphertext must
+be bootstrapped before its level decreases below $L_{min}$, which is the 
+number of levels required to perform the boostrapping operation itself.
+
+There are two mathematical optimizations, widely utilized in the existing
+literature, which we will also be targeting. The first is using a 
+Residue Number System to avoid wide bit arithmetic. Consider $L = 16$, in
+this scenario, $q$ is a 512-bit prime, meaning that all coefficients must
+also be 512-bits wide. Homomorphic addition, multiplication, and key-switching
+would all require 512-bit wide adders and multipliers, which would be
+area-inefficient given the quadratic overhead of these circuits.
+Instead, using RNS, we can store each coefficient as an array of its residues
+mod $q_1, \dots, q_L$. Each of these residues will be only 32-bits wide,
+allowing us to use 32-bit multipliers and adders, and use the
+Chinese Remainder Theorem (CRT) to reconstitute our original 512-bit wide
+coefficients upon final decryption. The second optimization is applying a
+type of Discrete Fourier Transform, known as a Number Theoretic Transform (NTT),
+to all of our polynomials and operating on them in the NTT-domain. Doing so
+transforms polynomial multiplications from the basic $O(n^2)$ method to a simple
+$O(n)$ coefficient-wise multiplication. However, it does require the
+introduction of custom functional units to perform NTTs at high
+throughput.
+
+\subsection{Architecture}
+
+Our proposed architecture is based on two key observations about FHE programs.
+The first is that FHE programs are completely static: as they lack any
+branching behavior, the entire program dataflow is fixed. This means
+that we can take advantage of VLIW scheduling techniques to statically
+schedule programs at compile-time and avoid any sort of expensive dynamic
+speculation systems. 
+We are also able to use explicit data orchestration techniques, bringing
+data to and from an on-chip scratchpad as needed.
+The second observation is that FHE programs can be
+implemented with relatively few different functional units: adders,
+multipliers, NTT units, and automorphism (``shuffler") units.
+
+Combining these two observations, we propose a vector VLIW processor with
+explicit data orchestration. Our architecture will have the four types
+of functional units required, with the exact number of each to be determined
+over the course of our work. We will consider area vs. throughput tradeoffs
+to decide how many of each functional unit we should incorporate.
+
+The specific design and synthesis of each type of functional unit is being
+studied by another member of our research group, and the results of this
+will determine the architectural tradeoffs involved. 
+We will also explore different types of memory (HBM vs. DDR) and their impact
+on the overall performance our accelerator can achieve. 
+Our initial estimates suggest that 128-wide vector units may work well for our
+design, however, the vector width is subject to change as needed. The same goes
+for our initial scratchpad size of 48MB.
+
+\subsection{Workloads}
+
+We will focus on accelerating existing programs optimized and designed for
+FHE systems. Specifically, we will implementing a logistic regression
+algorithm like the one described in \cite{han:iaai19:he-logreg} and neural
+networks with plaintext weights like the ones described in 
+\cite{dowlin:icml16:cryptonets}. We will also evaluate more basic FHE programs
+such as matrix-vector multiply and bootstrapping.
+
+Our accelerator design focuses on providing a flexible, programmable platform
+for FHE acceleration, so we will not focus on a single specific cryptosystem
+or set of initial parameters ($N, L$). Instead, we will perform a more complete
+design space exploration, aiming to show that our proposed design is
+general enough to accelerate different programs across
+cryptosystems with different starting parameters.
+For comparrison to existing FPGA-accelerators, we will also perform simpler
+benchmarks featuring just additions and multiplications.
+
+\subsection{Scheduling}
+
+As mentioned, the extremely static nature of FHE programs allows for all
+instruction and data scheduling to occur at compile-time. This requires
+an effective scheduling algorithm to efficiently utilize the accelerator
+resources. An effective scheduling algorithm is also essential to performing
+a well-informed design-space exploration of our accelerator architecture.
+Determining the resource requirements needed to run different programs requires
+a detailed knowledge of how those particular programs would map to accelerator
+designs with differing numbers of functional units, scratchpad sizes, and
+memory subsystems.
+
+To this end, a large focus of my research will be designing and implementing
+an effective FHE scheduling algorithm. Our input programs will be described
+as dataflow graphs, detailing the particular additions, mulitplications,
+and automorphisms required to execute a given computation. We propose a
+``scheduler frontend" which will take this dataflow graph expressed at a
+ciphertext-level and lower it to a dataflow graph at a ``residue-polynomial"
+level (polynomials of coefficients mod the same $q_i$).
+
+This residue-polynomial level dataflow graph will then be passed through
+a ``scheduler backend" which will also take a specific accelerator design
+as an input, and add loads, stores, evictions, and instruction timings to the
+inputted dataflow graph. When working correctly, the scheduler should produce
+a near-optimal cycle-accurate schedule for specific dataflow graph on a
+specific accelerator design.
+
+Optimal scheduling is an NP-hard problem, so our scheduler will be focused
+on robust heuristics as well as iterative improvement of a specific schedule.
+It is interesting to note that given the completely static nature of this
+computation, it is possible to evaluate Belady's Min algorithm for optimal
+cache replacement. This algorithm is not possible in many more dynamic systems,
+as it requires perfect foresight. We will investigate different instruction 
+issuing heuristics to determine
+efficient tradeoffs between increasing parallelism and maximizing the 
+reuse of on-chip operands. Finally, memory bandwidth is sure to be a scarce
+resource, regardless of whether we use HBM or a DDR-based system. Our proposed
+scheduling algorithm will need to ensure that memory bandwidth is effectively
+utilized to avoid our accelerator becoming hopelessly memory-bound.
+
+Traditionally, VLIW systems have struggled with the tradeoff between maximizing
+pipeline parallelism and code-footprint blowup. We believe that our system will
+not inherently suffer from this problem, as the size of our operands is
+significantly larger than single-word or double-word operands in existing VLIW
+systems, and will therefore amortize an increased instruction footprint.
+As part of our research, we will verify that this is indeed the case,
+and if we find this assumption to be faulty, we will consider design
+strategies to add loop control-flow to our programs and therefore
+shrink code-size.
+
+\subsection{Proposed Evaluation}
+
+We will evaluate the performance of our designs in a simulated environment.
+Our accelerator design tradeoffs will be informed by area estimates from
+individually synthesized functional units. Using these area estimates,
+we will use our proposed scheduling algorithm to sweep achievable
+accelerator designs and produce cycle-accurate simulated performance results.
+We will also verify that all schedules are correct and achievable.
+
+Each of the workloads described earlier 
+will be evaluated across a sweep of different
+encryption parameters and input data sizes to ensure that our results are
+representative of real FHE use-cases.
+

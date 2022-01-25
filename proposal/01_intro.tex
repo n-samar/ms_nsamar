@@ -1,0 +1,68 @@
+\section{Introduction}
+
+\subsection{Fully Homomorphic Encryption}
+
+A significant portion of computing workloads are now executed in the cloud.
+However, executing a program in the cloud involves users to trust their chosen Cloud Service Provider (CSP)
+with access to the data their computations require. Even if a user's trusted CSP is not maliciously inspecting their data,
+the CSP is suceptible to being hacked by other actors who can now access user data.
+For sensitive information such as health records or financial information, this risk might
+be unacceptable.
+
+Fully Homomorphic Encryption (FHE) provides a promising solution to this problem.
+FHE systems provide a cryptographically secure method, though computationally expensive, to perform computations on
+encrypted data \cite{gentry:stoc09:fhe, brakerski:itcs12:bgv, cheon:asiacrypt2017:ckks}.
+Specifically, FHE allows for a ``server" to evaluate an arbitrary arithmetic
+circuit of additions and mulitplications on encrypted inputs.
+This means that the ``user", who provides the encrypted inputs and a set of public keys, 
+does not need to trust the server with access to their data.
+
+Writing an FHE program is quite different from writing a program in a standard
+programming language like C++ or Python. 
+FHE programs must be arithmetic \emph{circuits}, meaning that 
+data dependent branches, and therefore loops, are impossible to express.
+The intuitition behind this is that a program cannot branch on data it cannot
+even decrypt. This means that not all standard ``plaintext" (unencrypted) programs
+can be efficiently translated into FHE programs. Importantly, many numeric
+programs including linear algebra, logistic regression, and neural networks
+\emph{can} be written as arithmetic circuits 
+\cite{halevi:acc14:algo-helib, han:iaai19:he-logreg, dowlin:icml16:cryptonets}.
+These algorithms are also particularly appealing candidates for homomorphic
+encryption because they are often run on sensitive data.
+
+Unfortunately, all FHE programs have significant computational overheads 
+over standard plaintext programs.
+Several software libraries \cite{palisade, helib, seal}
+implement state of the art FHE cryptosystems, but they all
+suffer from several order-of-magnitude slowdowns over plaintext computations.
+These massive slowdowns make running homomorphically encrypted programs
+infeasible in practice.
+Hardware acceleration seems like a promising approach to closing the
+performance gap between FHE and plaintext computations.
+
+\subsection{Prior Work}
+
+To this end, several FPGA accelerators have been proposed, each showing
+substantial speedups over CPU-based software implementations
+\cite{riazi:asplos20:heax, roy:hpca19:he-fpga}.
+However, these FPGA designs present several drawbacks. 
+FPGAs cannot emulate all of the logic required to execute a full FHE program
+simultaneously, and are therefore limited to accelerating only limited chunks
+of the overall computation at once.
+Additionally, an FPGA design must be tailored to a specfic FHE cryptosystem and
+arithmetic circuit, leaving limited flexibility at runtime. 
+Finally, FPGAs are very power hungry and have very limited clock speeds.
+
+Furthermore, all existing accelerators fall short of performing
+\emph{Fully} Homomorphic Encryption, and instead only implement
+\emph{Somewhat} Homomorphic Encryption (SHE). The key difference is that
+SHE circuits can only be of limited depth; a specific value cannot be the
+result of more than a fixed number of operations, otherwise it will become
+too noisy and therefore undecryptable. 
+To turn a SHE scheme into a FHE scheme,
+we need a \emph{bootstrapping} operation which ``resets" an encrypted value's
+noise. Bootstrapping operations have been implemented in FHE software
+libraries, but to our knowledge, no one has attempted to accelerate
+bootstrapping in hardware. Supporting bootstrapping would allow an accelerator
+to support more complex linear algebra computations, deeper neural networks,
+and more training iterations for logistic regression.

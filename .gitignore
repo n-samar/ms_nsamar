@@ -1,0 +1,22 @@
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+
+*.lof
+*.lot
+*.toc
+
+*.pdf
+
+*.pyc
+
+auto_header.tex
+metadata.txt
+doc_data.txt
+!**/plots/*.pdf
+!**/figures/*.pdf
+# We don't want to commit cropped figures
+**/figures/*-crop.pdf
+**/plots/*-crop.pdf
