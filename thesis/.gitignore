@@ -1,0 +1,17 @@
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.pdf
+*.pyc
+auto_header.tex
+metadata.txt
+doc_data.txt
+# Don't ignore pdfs in plots and figures
+# !plots/*.pdf
+# !figures/*.pdf
+# ... unless they are cropped copies.
+# figures/*-crop.pdf
+# plots/*-crop.pdf
+# plots/cropped-break-legend.pdf

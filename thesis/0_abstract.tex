@@ -1,0 +1,31 @@
+
+\emph{``This innovation that this industry talks about so much is bullshit. Anybody
+can innovate. Don't do this `think different'; don't do this big `innovation'
+thing. Screw that. It's meaningless. 99\% of it is: get the work done.''}
+
+--- Linus Torvalds
+\vspace{1cm}
+
+Fully Homomorphic Encryption (FHE) allows computing on encrypted data, enabling secure offloading of computation to untrusted servers.
+Though it provides ideal security, FHE is expensive when executed in software, 4 to 5 orders of magnitude slower than computing on unencrypted data.
+These overheads are a major barrier to FHE's widespread adoption.
+
+We present \name, the first FHE accelerator that is programmable, i.e., capable of executing full FHE programs.
+\name builds on an in-depth architectural analysis of the characteristics of FHE computations
+that reveals acceleration opportunities. \name is a wide-vector processor with novel functional units deeply specialized to FHE primitives, 
+such as modular arithmetic, number-theoretic transforms, and structured permutations.
+
+% axelf: tentative?
+Due to the static nature of FHE computations, \name uses an exposed ISA, requiring novel compilation techniques to statically schedule all compute and data movement. We design a compiler that efficiently maps FHE programs onto \name hardware and maximizes reuse of on-chip data, helping to reduce data movement bottlenecks. 
+The compiler leverages \name's explicitly managed scratchpad to decouple computation from data movement, a necessary ingredient in achieving high performance given the large size of FHE operands.
+
+% This organization provides so much compute throughput that data movement becomes the key bottleneck.
+% Thus, \name is primarily designed to minimize 
+% data movement.
+% Hardware provides an explicitly-managed memory hierarchy and mechanisms to decouple data movement from execution.
+% A novel compiler leverages these mechanisms to maximize reuse and schedule off-chip and on-chip data movement.
+ 
+We evaluate \name using cycle-accurate simulation and RTL synthesis.
+\name is the first system to accelerate complete FHE programs,
+and outperforms state-of-the-art software implementations by gmean 6,500$\times$ and by up to 17,000$\times$.
+These speedups counter most of FHE's overheads and enable new applications, like real-time private deep learning in the cloud.

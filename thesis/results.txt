@@ -1,0 +1,1431 @@
+WARNING:root:[Memory(cachedir='./joblib')]: Flushing completely the cache
+Graphs will be saved in ./scc_graphs (created)
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getCycles-alias...
+getCycles-alias([ ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-05')])
+Matching directories:
+  victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Skipped 1 unfinished experiments
+Loaded 311 experiments
+...............................__________________________________________________getCycles-alias - 3.7s, 0.1min
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getCycles-alias...
+getCycles-alias([ ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-04'),
+  ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-06')])
+Matching directories:
+  victory/scc/2019/05/23-main/2019_05_20-04-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-OoO-issueWidth_4-bfrs_4-subnts_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/23-main/2019_05_20-06-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-OoO-issueWidth_4-bfrs_4-subnts_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-04-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-OoO-issueWidth_4-bfrs_4-subnts_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-06-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-OoO-issueWidth_4-bfrs_4-subnts_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 438 experiments
+...........................................__________________________________________________getCycles-alias - 9.9s, 0.2min
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getCycles-alias...
+getCycles-alias([ ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-07'),
+  ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-09'),
+  ( 'victory',
+    'scc',
+    '2019',
+    '05',
+    '25-fix-hmmer-competition',
+    '2019_05_20-02')])
+Matching directories:
+  victory/scc/2019/05/23-main/2019_05_20-07-r4512-micro19_scc-competition-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/23-main/2019_05_20-09-r4512-micro19_high_scc-competition-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/25-fix-hmmer-competition/2019_05_20-02-r4512-micro19_scc-competition-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-07-r4512-micro19_scc-competition-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-09-r4512-micro19_high_scc-competition-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/25-fix-hmmer-competition/2019_05_20-02-r4512-micro19_scc-competition-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 268 experiments
+.........................../data/sanchez/tools/pymodules/lib/python2.7/site-packages/la/farray/misc.py:16: RuntimeWarning: invalid value encountered in less_equal
+  if (x <= 0).any() and check_for_greater_than_zero:
+__________________________________________________getCycles-alias - 6.7s, 0.1min
+Scc Self-1C-Relative Speedups
+             1                                                
+             |     2                                          
+             |     |     4                                    
+             |     |     |     8                              
+             |     |     |     |    12                        
+             |     |     |     |     |    16                  
+             |     |     |     |     |     |    24            
+             |     |     |     |     |     |     |    36      
+ libqntm  1.00  1.97  3.88  6.99  9.99 12.95 18.48 27.11
+     lbm  1.00  2.04  4.10  7.29 10.36 13.52 21.55 36.19
+    milc  1.00  1.67  2.98  4.86  6.41  7.72  9.74 12.07
+   astar  1.00  1.96  3.75  6.00  7.57  9.55 11.47 12.43
+   hmmer  1.00  1.72  2.75  4.20  4.17  4.13  3.97  3.79
+  sphinx  1.00  1.66  2.41  2.66  2.78  2.84  2.81  2.84
+     mcf  1.00  1.57  2.23  2.19  2.24  2.37  2.58  2.63
+    MEAN  1.00  1.80  3.16  4.88  6.22  7.58 10.09 13.87
+   GMEAN  1.00  1.79  3.08  4.48  5.38  6.22  7.45  8.82
+Scc Same-System-Serial-Relative Speedups
+             1                                                
+             |     2                                          
+             |     |     4                                    
+             |     |     |     8                              
+             |     |     |     |    12                        
+             |     |     |     |     |    16                  
+             |     |     |     |     |     |    24            
+             |     |     |     |     |     |     |    36      
+ libqntm  1.02  1.01  1.01  1.01  1.01  1.01  1.01  1.01
+     lbm  0.79  1.57  3.14  5.89  8.51 11.16 15.65 21.90
+    milc  0.96  1.59  2.85  4.85  6.48  7.92 10.14 12.65
+   astar  0.46  0.80  1.50  2.54  3.25  4.17  5.09  5.53
+   hmmer  0.59  1.00  1.57  2.21  2.10  2.05  1.96  1.87
+  sphinx  0.79  1.29  1.82  2.07  2.17  2.18  2.00  1.66
+     mcf  0.91  1.42  2.02  2.04  2.03  2.04  2.04  1.98
+    MEAN  0.79  1.24  1.99  2.94  3.65  4.36  5.41  6.66
+   GMEAN  0.76  1.21  1.87  2.54  2.89  3.19  3.51  3.70
+Scc Serial-1C-Relative Speedups
+             1                                                
+             |     2                                          
+             |     |     4                                    
+             |     |     |     8                              
+             |     |     |     |    12                        
+             |     |     |     |     |    16                  
+             |     |     |     |     |     |    24            
+             |     |     |     |     |     |     |    36      
+ libqntm  1.02  2.00  3.95  7.10 10.15 13.17 18.79 27.57
+     lbm  0.79  1.62  3.25  5.78  8.22 10.73 17.10 28.72
+    milc  0.96  1.59  2.85  4.65  6.13  7.38  9.31 11.53
+   astar  0.46  0.90  1.72  2.75  3.47  4.37  5.26  5.69
+   hmmer  0.59  1.01  1.62  2.47  2.45  2.43  2.33  2.23
+  sphinx  0.79  1.32  1.91  2.11  2.21  2.25  2.23  2.25
+     mcf  0.91  1.43  2.02  1.99  2.03  2.15  2.34  2.39
+    MEAN  0.79  1.41  2.47  3.84  4.95  6.07  8.19 11.48
+   GMEAN  0.76  1.36  2.35  3.42  4.10  4.74  5.68  6.73
+Scc Self-1C-Relative Speedups
+              1                                                                                           
+              |      2                                                                                    
+              |      |      4                                                                             
+              |      |      |      8                                                                      
+              |      |      |      |     12                                                               
+              |      |      |      |      |     16                                                        
+              |      |      |      |      |      |     24                                                 
+              |      |      |      |      |      |      |     36                                          
+              |      |      |      |      |      |      |      |     64                                   
+              |      |      |      |      |      |      |      |      |    100                            
+              |      |      |      |      |      |      |      |      |      |    144                     
+              |      |      |      |      |      |      |      |      |      |      |    196              
+              |      |      |      |      |      |      |      |      |      |      |      |    256       
+ libqntm   1.00   1.97   3.88   6.99   9.99  12.95  18.48  27.11  45.87  68.64 139.26 251.30 326.22
+     lbm   1.00   2.04   4.10   7.29  10.36  13.52  21.55  36.19  60.71  87.07 114.87 140.75 160.08
+    milc   1.00   1.67   2.98   4.86   6.41   7.72   9.74  12.07  15.18  17.15  18.26  18.79  19.37
+    MEAN   1.00   1.89   3.65   6.38   8.92  11.40  16.59  25.12  40.59  57.62  90.79 136.95 168.56
+   GMEAN   1.00   1.89   3.62   6.28   8.72  11.06  15.71  22.79  34.84  46.80  66.35  87.27 100.38
+Scc Same-System-Serial-Relative Speedups
+              1                                                                                           
+              |      2                                                                                    
+              |      |      4                                                                             
+              |      |      |      8                                                                      
+              |      |      |      |     12                                                               
+              |      |      |      |      |     16                                                        
+              |      |      |      |      |      |     24                                                 
+              |      |      |      |      |      |      |     36                                          
+              |      |      |      |      |      |      |      |     64                                   
+              |      |      |      |      |      |      |      |      |    100                            
+              |      |      |      |      |      |      |      |      |      |    144                     
+              |      |      |      |      |      |      |      |      |      |      |    196              
+              |      |      |      |      |      |      |      |      |      |      |      |    256       
+ libqntm   1.02   1.01   1.01   1.01   1.01   1.01   1.01   1.01    nan    nan    nan    nan    nan
+     lbm   0.79   1.57   3.14   5.89   8.51  11.16  15.65  21.90  36.61  53.71  72.39  90.50 104.91
+    milc   0.96   1.59   2.85   4.85   6.48   7.92  10.14  12.65  16.21  18.60  19.98  20.23  19.46
+    MEAN   0.92   1.39   2.33   3.92   5.33   6.70   8.93  11.85  26.41  36.15  46.18  55.36  62.19
+   GMEAN   0.92   1.36   2.09   3.07   3.82   4.47   5.43   6.54  24.36  31.60  38.03  42.79  45.19
+Scc Serial-1C-Relative Speedups
+              1                                                                                           
+              |      2                                                                                    
+              |      |      4                                                                             
+              |      |      |      8                                                                      
+              |      |      |      |     12                                                               
+              |      |      |      |      |     16                                                        
+              |      |      |      |      |      |     24                                                 
+              |      |      |      |      |      |      |     36                                          
+              |      |      |      |      |      |      |      |     64                                   
+              |      |      |      |      |      |      |      |      |    100                            
+              |      |      |      |      |      |      |      |      |      |    144                     
+              |      |      |      |      |      |      |      |      |      |      |    196              
+              |      |      |      |      |      |      |      |      |      |      |      |    256       
+ libqntm   1.02   2.00   3.95   7.10  10.15  13.17  18.79  27.57  46.64  69.79 141.59 255.52 331.70
+     lbm   0.79   1.62   3.25   5.78   8.22  10.73  17.10  28.72  48.18  69.10  91.16 111.70 127.04
+    milc   0.96   1.59   2.85   4.65   6.13   7.38   9.31  11.53  14.51  16.39  17.45  17.96  18.51
+    MEAN   0.92   1.74   3.35   5.84   8.17  10.43  15.07  22.61  36.44  51.76  83.40 128.39 159.08
+   GMEAN   0.92   1.73   3.32   5.76   8.00  10.14  14.41  20.90  31.95  42.91  60.84  80.03  92.05
+autoMargins (xmin, ymin, xmax, ymax): [0.24640046296296295, 0.21337301587301588, 0.68789930555555567, 0.74190476190476207]
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-05')], 
+<function networkDataTransfer at 0x7fe54806e488>)
+Matching directories:
+  victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Skipped 1 unfinished experiments
+Loaded 311 experiments
+...............................________________________________________________getStatFunc-alias - 6.2s, 0.1min
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '05', '21-no-progressive', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '21-no-progressive', '2019_05_20-05')], 
+<function networkDataTransfer at 0x7fe54806e488>)
+Matching directories:
+  victory/scc/2019/05/21-no-progressive/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/21-no-progressive/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/21-no-progressive/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/21-no-progressive/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 309 experiments
+...............................________________________________________________getStatFunc-alias - 7.1s, 0.1min
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '05', '22-no-tree', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '22-no-tree', '2019_05_20-05')], 
+<function networkDataTransfer at 0x7fe54806e488>)
+Matching directories:
+  victory/scc/2019/05/22-no-tree/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/22-no-tree/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/22-no-tree/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/22-no-tree/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 380 experiments
+......................................________________________________________________getStatFunc-alias - 7.1s, 0.1min
+Drawing sguiggly 1.20873043503 1.0 right
+Drawing sguiggly 2.8662062811 2.0 left
+Drawing sguiggly 1.46502490504 7.8 right
+Drawing sguiggly 2.02913633623 8.8 left
+Drawing sguiggly 1.74176844911 39.4 center
+autoMargins (xmin, ymin, xmax, ymax): [0.07091485507246377, 0.29351193383122709, 0.91908514492753624, 0.48204362172432846]
+Networkdt-Relative Breakdown Scheme (S) 36-Core
+              LLC-Mem                                                                                                                                               
+                    | L2s-LLC-GETS                                                                                                                                  
+                    |            | L2s-LLC-GETX                                                                                                                     
+                    |            |            | L2s-LLC-PUTS                                                                                                        
+                    |            |            |            | L2s-LLC-PUTX                                                                                           
+                    |            |            |            |            |  LLC-L2s-INV                                                                              
+                    |            |            |            |            |            | LLC-L2s-INVX                                                                 
+                    |            |            |            |            |            |            | LLC-L2s-RESP                                                    
+                    |            |            |            |            |            |            |            |       Aborts                                       
+                    |            |            |            |            |            |            |            |            |        Tasks                          
+                    |            |            |            |            |            |            |            |            |            |          GVT             
+ libqntm         0.42         0.09         0.00         0.03         0.09         0.01         0.01         0.25         0.02         0.05         0.03
+    milc         0.25         0.07         0.03         0.02         0.05         0.04         0.03         0.33         0.07         0.07         0.04
+   hmmer         0.00         0.07         0.05         0.01         0.01         0.08         0.06         0.42         0.24         0.04         0.02
+     mcf         0.02         0.07         0.03         0.00         0.01         0.12         0.10         0.45         0.16         0.01         0.03
+  sphinx         0.03         0.02         0.04         0.01         0.01         0.12         0.01         0.31         0.31         0.11         0.02
+     lbm         0.22         0.13         0.02         0.07         0.06         0.00         0.04         0.42         0.00         0.01         0.02
+   astar         0.01         0.01         0.00         0.00         0.00         0.02         0.01         0.07         0.18         0.66         0.02
+    MEAN         0.14         0.07         0.03         0.02         0.03         0.06         0.04         0.32         0.14         0.14         0.03
+   GMEAN         0.05         0.06         0.02         0.01         0.02         0.03         0.02         0.28         0.07         0.05         0.03
+Networkdt-Relative Breakdown Scheme (-U) 36-Core
+              LLC-Mem                                                                                                                                               
+                    | L2s-LLC-GETS                                                                                                                                  
+                    |            | L2s-LLC-GETX                                                                                                                     
+                    |            |            | L2s-LLC-PUTS                                                                                                        
+                    |            |            |            | L2s-LLC-PUTX                                                                                           
+                    |            |            |            |            |  LLC-L2s-INV                                                                              
+                    |            |            |            |            |            | LLC-L2s-INVX                                                                 
+                    |            |            |            |            |            |            | LLC-L2s-RESP                                                    
+                    |            |            |            |            |            |            |            |       Aborts                                       
+                    |            |            |            |            |            |            |            |            |        Tasks                          
+                    |            |            |            |            |            |            |            |            |            |          GVT             
+ libqntm         0.42         0.11         0.02         0.03         0.09         0.02         0.02         0.32         0.09         0.06         0.04
+    milc         0.25         0.08         0.06         0.02         0.09         0.06         0.04         0.46         0.24         0.12         0.05
+   hmmer         0.00         0.07         0.06         0.01         0.01         0.08         0.07         0.43         0.23         0.02         0.02
+     mcf         0.02         0.05         0.03         0.00         0.01         0.10         0.07         0.34         0.13         0.01         0.03
+  sphinx         0.04         0.02         0.05         0.01         0.03         0.09         0.02         0.30         0.27         0.08         0.03
+     lbm         0.22         0.13         0.02         0.07         0.06         0.00         0.04         0.42         0.00         0.01         0.02
+   astar         0.01         0.02         0.01         0.00         0.00         0.02         0.01         0.09         0.02         0.40         0.04
+    MEAN         0.14         0.07         0.03         0.02         0.04         0.05         0.04         0.34         0.14         0.10         0.03
+   GMEAN         0.05         0.06         0.03         0.01         0.02         0.03         0.03         0.30         0.08         0.05         0.03
+Networkdt-Relative Breakdown Scheme (-B) 36-Core
+              LLC-Mem                                                                                                                                               
+                    | L2s-LLC-GETS                                                                                                                                  
+                    |            | L2s-LLC-GETX                                                                                                                     
+                    |            |            | L2s-LLC-PUTS                                                                                                        
+                    |            |            |            | L2s-LLC-PUTX                                                                                           
+                    |            |            |            |            |  LLC-L2s-INV                                                                              
+                    |            |            |            |            |            | LLC-L2s-INVX                                                                 
+                    |            |            |            |            |            |            | LLC-L2s-RESP                                                    
+                    |            |            |            |            |            |            |            |       Aborts                                       
+                    |            |            |            |            |            |            |            |            |        Tasks                          
+                    |            |            |            |            |            |            |            |            |            |          GVT             
+ libqntm         0.43         0.19         0.06         0.03         0.09         0.13         0.14         0.79         0.50         0.41         0.10
+    milc         0.30         0.10         0.09         0.03         0.14         0.11         0.06         0.67         0.35         0.13         0.06
+   hmmer         0.01         0.07         0.06         0.01         0.01         0.09         0.07         0.45         0.26         0.03         0.02
+     mcf         0.02         0.05         0.03         0.00         0.01         0.10         0.07         0.34         0.13         0.01         0.03
+  sphinx         0.04         0.03         0.04         0.01         0.03         0.09         0.02         0.28         0.24         0.06         0.03
+     lbm         0.22         0.20         0.04         0.09         0.07         0.06         0.08         0.74         0.15         0.04         0.04
+   astar         0.01         0.02         0.01         0.00         0.00         0.02         0.01         0.09         0.02         0.40         0.04
+    MEAN         0.15         0.09         0.05         0.02         0.05         0.08         0.06         0.48         0.23         0.15         0.04
+   GMEAN         0.05         0.07         0.04         0.01         0.03         0.07         0.05         0.40         0.17         0.07         0.04
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-05')], 
+<function networkBandwidth at 0x7fe54806e500>)
+Matching directories:
+  victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Skipped 1 unfinished experiments
+Loaded 311 experiments
+...............................________________________________________________getStatFunc-alias - 3.4s, 0.1min
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '05', '21-no-progressive', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '21-no-progressive', '2019_05_20-05')], 
+<function networkBandwidth at 0x7fe54806e500>)
+Matching directories:
+  victory/scc/2019/05/21-no-progressive/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/21-no-progressive/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/21-no-progressive/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/21-no-progressive/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 309 experiments
+...............................________________________________________________getStatFunc-alias - 3.4s, 0.1min
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '05', '22-no-tree', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '22-no-tree', '2019_05_20-05')], 
+<function networkBandwidth at 0x7fe54806e500>)
+Matching directories:
+  victory/scc/2019/05/22-no-tree/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/22-no-tree/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/22-no-tree/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/22-no-tree/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 380 experiments
+......................................________________________________________________getStatFunc-alias - 4.0s, 0.1min
+autoMargins (xmin, ymin, xmax, ymax): [0.088732638888888896, 0.31920544109409033, 0.90126736111111105, 0.45635011446146523]
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-05')], 
+<function memoryBandwidth at 0x7fe54806e758>)
+Matching directories:
+  victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Skipped 1 unfinished experiments
+Loaded 311 experiments
+...............................________________________________________________getStatFunc-alias - 3.6s, 0.1min
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '05', '21-no-progressive', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '21-no-progressive', '2019_05_20-05')], 
+<function memoryBandwidth at 0x7fe54806e758>)
+Matching directories:
+  victory/scc/2019/05/21-no-progressive/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/21-no-progressive/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/21-no-progressive/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/21-no-progressive/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 309 experiments
+...............................________________________________________________getStatFunc-alias - 3.3s, 0.1min
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '05', '22-no-tree', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '22-no-tree', '2019_05_20-05')], 
+<function memoryBandwidth at 0x7fe54806e758>)
+Matching directories:
+  victory/scc/2019/05/22-no-tree/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/22-no-tree/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/22-no-tree/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/22-no-tree/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 380 experiments
+......................................________________________________________________getStatFunc-alias - 3.9s, 0.1min
+autoMargins (xmin, ymin, xmax, ymax): [0.089487469806763295, 0.31935581701886467, 0.90051253019323663, 0.53519279409224652]
+Matching directories:
+  victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-05')], 
+<function cycles at 0x7fe54806e140>)
+Matching directories:
+  victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Skipped 1 unfinished experiments
+Loaded 311 experiments
+...............................________________________________________________getStatFunc-alias - 4.9s, 0.1min
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-05')], 
+<function getCommits at 0x7fe5456d9398>)
+Matching directories:
+  victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Skipped 1 unfinished experiments
+Loaded 311 experiments
+...............................________________________________________________getStatFunc-alias - 3.6s, 0.1min
+1-core average task length
+            task                
+               |   total        
+ libqntm  609.92  609.92
+    milc  372.48  372.48
+   hmmer  266.21  266.21
+     mcf  634.65  634.65
+    h264   80.76   80.76
+  sphinx  146.39  146.43
+     lbm 2649.14 2649.14
+   astar   31.44   31.44
+    MEAN  598.87  598.88
+   GMEAN  280.02  280.03
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getCycles-alias...
+getCycles-alias([ ('victory', 'scc', '2019', '03-micro19', '42-mis-inputs', '2019_04_02-01'),
+  ('victory', 'scc', '2019', '03-micro19', '43-mis-test', '2019_04_02-01'),
+  ('victory', 'scc', '2019', '03-micro19', '48-mis-final', '2019_04_03-01'),
+  ('victory', 'scc', '2019', '03-micro19', '51-mis-coarsen', '2019_04_03-02')])
+Matching directories:
+  victory/scc/2019/03-micro19/42-mis-inputs/2019_04_02-01-r4468-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/03-micro19/43-mis-test/2019_04_02-01-r4468-micro19_scc-mis-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/03-micro19/48-mis-final/2019_04_03-01-r4468-micro19_scc-mis-1_2_4_16_36_64_100cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/03-micro19/51-mis-coarsen/2019_04_03-02-r4468-micro19_scc-mis-1_2_4_16_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/42-mis-inputs/2019_04_02-01-r4468-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/43-mis-test/2019_04_02-01-r4468-micro19_scc-mis-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/48-mis-final/2019_04_03-01-r4468-micro19_scc-mis-1_2_4_16_36_64_100cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/51-mis-coarsen/2019_04_03-02-r4468-micro19_scc-mis-1_2_4_16_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 556 experiments
+........................................................__________________________________________________getCycles-alias - 8.8s, 0.1min
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getCycles-alias...
+getCycles-alias([('victory', 'scc', '2019', '03-micro19', '51-mis-coarsen', '2019_04_03-01')])
+Matching directories:
+  victory/scc/2019/03-micro19/51-mis-coarsen/2019_04_03-01-r4468-micro19_scc-mis-manual-1_2_4_16_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/51-mis-coarsen/2019_04_03-01-r4468-micro19_scc-mis-manual-1_2_4_16_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 480 experiments
+................................................__________________________________________________getCycles-alias - 7.3s, 0.1min
+Scc Self-1C-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  1.00  2.19  5.36 16.52 28.38 37.93 46.12
+  MEAN  1.00  2.19  5.36 16.52 28.38 37.93 46.12
+ GMEAN  1.00  2.19  5.36 16.52 28.38 37.93 46.12
+Nested-Chain Self-1C-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  0.84  1.83  4.25  9.34 12.14 13.65 14.50
+  MEAN  0.84  1.83  4.25  9.34 12.14 13.65 14.50
+ GMEAN  0.84  1.83  4.25  9.34 12.14 13.65 14.50
+Outer Self-1C-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  1.12  2.48  5.98 13.73 17.48 16.12 12.84
+  MEAN  1.12  2.48  5.98 13.73 17.48 16.12 12.84
+ GMEAN  1.12  2.48  5.98 13.73 17.48 16.12 12.84
+Outer-Chain Self-1C-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  1.03  2.23  5.12  9.09 10.96 11.55 11.38
+  MEAN  1.03  2.23  5.12  9.09 10.96 11.55 11.38
+ GMEAN  1.03  2.23  5.12  9.09 10.96 11.55 11.38
+Tls Self-1C-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  1.12  2.50  5.99  8.24  7.82  7.43  7.16
+  MEAN  1.12  2.50  5.99  8.24  7.82  7.43  7.16
+ GMEAN  1.12  2.50  5.99  8.24  7.82  7.43  7.16
+Scc Same-System-Serial-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  0.68  1.25  2.22  6.87 12.45 17.33 21.73
+  MEAN  0.68  1.25  2.22  6.87 12.45 17.33 21.73
+ GMEAN  0.68  1.25  2.22  6.87 12.45 17.33 21.73
+Nested-Chain Same-System-Serial-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  0.57  1.04  1.76  3.88  5.33  6.23  6.83
+  MEAN  0.57  1.04  1.76  3.88  5.33  6.23  6.83
+ GMEAN  0.57  1.04  1.76  3.88  5.33  6.23  6.83
+Outer Same-System-Serial-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  0.76  1.41  2.47  5.71  7.67  7.37  6.05
+  MEAN  0.76  1.41  2.47  5.71  7.67  7.37  6.05
+ GMEAN  0.76  1.41  2.47  5.71  7.67  7.37  6.05
+Outer-Chain Same-System-Serial-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  0.70  1.27  2.12  3.78  4.81  5.27  5.36
+  MEAN  0.70  1.27  2.12  3.78  4.81  5.27  5.36
+ GMEAN  0.70  1.27  2.12  3.78  4.81  5.27  5.36
+Tls Same-System-Serial-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  0.76  1.43  2.48  3.43  3.43  3.40  3.37
+  MEAN  0.76  1.43  2.48  3.43  3.43  3.40  3.37
+ GMEAN  0.76  1.43  2.48  3.43  3.43  3.40  3.37
+Scc Serial-1C-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  0.68  1.49  3.64 11.20 19.25 25.73 31.29
+  MEAN  0.68  1.49  3.64 11.20 19.25 25.73 31.29
+ GMEAN  0.68  1.49  3.64 11.20 19.25 25.73 31.29
+Nested-Chain Serial-1C-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  0.57  1.24  2.88  6.33  8.24  9.26  9.84
+  MEAN  0.57  1.24  2.88  6.33  8.24  9.26  9.84
+ GMEAN  0.57  1.24  2.88  6.33  8.24  9.26  9.84
+Outer Serial-1C-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  0.76  1.68  4.06  9.31 11.86 10.94  8.71
+  MEAN  0.76  1.68  4.06  9.31 11.86 10.94  8.71
+ GMEAN  0.76  1.68  4.06  9.31 11.86 10.94  8.71
+Outer-Chain Serial-1C-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  0.70  1.51  3.48  6.17  7.44  7.83  7.72
+  MEAN  0.70  1.51  3.48  6.17  7.44  7.83  7.72
+ GMEAN  0.70  1.51  3.48  6.17  7.44  7.83  7.72
+Tls Serial-1C-Relative Speedups
+           1                                          
+           |     2                                    
+           |     |     4                              
+           |     |     |    16                        
+           |     |     |     |    36                  
+           |     |     |     |     |    64            
+           |     |     |     |     |     |   100      
+   mis  0.76  1.70  4.06  5.59  5.30  5.04  4.86
+  MEAN  0.76  1.70  4.06  5.59  5.30  5.04  4.86
+ GMEAN  0.76  1.70  4.06  5.59  5.30  5.04  4.86
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([('victory', 'scc', '2019', '03-micro19', '51-mis-coarsen', '2019_04_03-01')], <function cycles at 0x7fe54806e140>)
+Matching directories:
+  victory/scc/2019/03-micro19/51-mis-coarsen/2019_04_03-01-r4468-micro19_scc-mis-manual-1_2_4_16_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/51-mis-coarsen/2019_04_03-01-r4468-micro19_scc-mis-manual-1_2_4_16_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 480 experiments
+................................................________________________________________________getStatFunc-alias - 5.9s, 0.1min
+Drawing sguiggly 15.6324611313 4.8 center
+autoMargins (xmin, ymin, xmax, ymax): [0.061139794685990345, 0.21001656942564301, 0.90852128623188411, 0.71380287501880146]
+Drawing sguiggly 15.6324611313 4.8 center
+autoMargins (xmin, ymin, xmax, ymax): [0.061139794685990345, 0.21001656942564301, 0.92886020531400959, 0.71380287501880146]
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '03-micro19', '42-mis-inputs', '2019_04_02-01'),
+  ('victory', 'scc', '2019', '03-micro19', '43-mis-test', '2019_04_02-01'),
+  ('victory', 'scc', '2019', '03-micro19', '48-mis-final', '2019_04_03-01'),
+  ('victory', 'scc', '2019', '03-micro19', '51-mis-coarsen', '2019_04_03-02')], 
+<function cycles at 0x7fe54806e140>)
+Matching directories:
+  victory/scc/2019/03-micro19/42-mis-inputs/2019_04_02-01-r4468-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/03-micro19/43-mis-test/2019_04_02-01-r4468-micro19_scc-mis-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/03-micro19/48-mis-final/2019_04_03-01-r4468-micro19_scc-mis-1_2_4_16_36_64_100cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/03-micro19/51-mis-coarsen/2019_04_03-02-r4468-micro19_scc-mis-1_2_4_16_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/42-mis-inputs/2019_04_02-01-r4468-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/43-mis-test/2019_04_02-01-r4468-micro19_scc-mis-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/48-mis-final/2019_04_03-01-r4468-micro19_scc-mis-1_2_4_16_36_64_100cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/51-mis-coarsen/2019_04_03-02-r4468-micro19_scc-mis-1_2_4_16_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 556 experiments
+........................................................________________________________________________getStatFunc-alias - 6.9s, 0.1min
+autoMargins (xmin, ymin, xmax, ymax): [0.061139794685990345, 0.13258330119647632, 0.90852128623188411, 0.7912361432479682]
+autoMargins (xmin, ymin, xmax, ymax): [0.061139794685990345, 0.13258330119647632, 0.92886020531400959, 0.7912361432479682]
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([('victory', 'scc', '2019', '03-micro19', '51-mis-coarsen', '2019_04_03-01')], <function getCommits at 0x7fe5456d9398>)
+Matching directories:
+  victory/scc/2019/03-micro19/51-mis-coarsen/2019_04_03-01-r4468-micro19_scc-mis-manual-1_2_4_16_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/51-mis-coarsen/2019_04_03-01-r4468-micro19_scc-mis-manual-1_2_4_16_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 480 experiments
+................................................________________________________________________getStatFunc-alias - 4.8s, 0.1min
+1-core average task length
+                        task              
+                           |  total       
+              mis_tls 206.48 206.48
+        mis_decoupled 111.75 111.75
+ mis_decoupled_nested  88.73  88.73
+                 MEAN 135.65 135.65
+                GMEAN 126.98 126.98
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '03-micro19', '42-mis-inputs', '2019_04_02-01'),
+  ('victory', 'scc', '2019', '03-micro19', '43-mis-test', '2019_04_02-01'),
+  ('victory', 'scc', '2019', '03-micro19', '48-mis-final', '2019_04_03-01'),
+  ('victory', 'scc', '2019', '03-micro19', '51-mis-coarsen', '2019_04_03-02')], 
+<function getCommits at 0x7fe5456d9398>)
+Matching directories:
+  victory/scc/2019/03-micro19/42-mis-inputs/2019_04_02-01-r4468-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/03-micro19/43-mis-test/2019_04_02-01-r4468-micro19_scc-mis-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/03-micro19/48-mis-final/2019_04_03-01-r4468-micro19_scc-mis-1_2_4_16_36_64_100cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/03-micro19/51-mis-coarsen/2019_04_03-02-r4468-micro19_scc-mis-1_2_4_16_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/42-mis-inputs/2019_04_02-01-r4468-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/43-mis-test/2019_04_02-01-r4468-micro19_scc-mis-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/48-mis-final/2019_04_03-01-r4468-micro19_scc-mis-1_2_4_16_36_64_100cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/03-micro19/51-mis-coarsen/2019_04_03-02-r4468-micro19_scc-mis-1_2_4_16_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 556 experiments
+......................................................./data/sanchez/tools/pymodules/lib/python2.7/site-packages/la/farray/misc.py:24: RuntimeWarning: invalid value encountered in log
+  x = np.log(x).sum(axis)
+________________________________________________getStatFunc-alias - 5.7s, 0.1min
+1-core average task length
+             task              
+                |  total       
+   mis_scc 139.38 139.38
+ mis_outer 165.23 165.23
+      MEAN 152.31 152.31
+     GMEAN 151.76 151.76
+Matching directories:
+  victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Drawing sguiggly 25.3760435744 34.4 center
+autoMargins (xmin, ymin, xmax, ymax): [0.061139794685990345, 0.1178263567520319, 0.90852128623188411, 0.80599308769241262]
+Drawing sguiggly 25.3760435744 34.4 center
+autoMargins (xmin, ymin, xmax, ymax): [0.061139794685990345, 0.1178263567520319, 0.92885466080855639, 0.80599308769241262]
+autoMargins (xmin, ymin, xmax, ymax): [0.061139794685990345, 0.1178263567520319, 0.90852128623188411, 0.80599308769241262]
+autoMargins (xmin, ymin, xmax, ymax): [0.061139794685990345, 0.1178263567520319, 0.92886020531400959, 0.80599308769241262]
+autoMargins (xmin, ymin, xmax, ymax): [0.061139794685990345, 0.1178263567520319, 0.90852128623188411, 0.80599308769241262]
+autoMargins (xmin, ymin, xmax, ymax): [0.061139794685990345, 0.1178263567520319, 0.92886020531400959, 0.80599308769241262]
+autoMargins (xmin, ymin, xmax, ymax): [0.11594223484848486, 0.16888888888888887, 0.83955484117490675, 0.82111111111111112]
+autoMargins (xmin, ymin, xmax, ymax): [0.11594223484848486, 0.16888888888888887, 0.87405776515151512, 0.82111111111111112]
+1-core Serial-relative SCC speedups
+         Original                                    
+                |   1c SCC                           
+                |        |   4c SCC                  
+                |        |        |  36c SCC         
+ libqntm     1.00     1.02     3.95    27.57
+     lbm     1.00     0.79     3.25    28.72
+    milc     1.00     0.96     2.85    11.53
+   astar     1.00     0.46     1.72     5.69
+   hmmer     1.00     0.59     1.62     2.23
+  sphinx     1.00     0.79     1.91     2.25
+     mcf     1.00     0.91     2.02     2.39
+   gmean     1.00     0.76     2.35     6.73
+    MEAN     1.00     0.78     2.46    10.89
+   GMEAN     1.00     0.76     2.35     6.73
+1-core Serial-relative SCC speedups (+) or slowdowns (-)
+          1c SCC                        
+               |  4c SCC                
+               |       | 36c SCC        
+ libqntm    1.02    3.95   27.57
+     lbm   -1.26    3.25   28.72
+    milc   -1.05    2.85   11.53
+   astar   -2.18    1.72    5.69
+   hmmer   -1.70    1.62    2.23
+  sphinx   -1.26    1.91    2.25
+     mcf   -1.10    2.02    2.39
+   gmean   -1.31    2.35    6.73
+    MEAN   -1.11    2.46   10.89
+   GMEAN     nan    2.35    6.73
+Drawing sguiggly 27.5699637853 3.0 center
+Drawing sguiggly 28.7197664903 7.4 center
+Drawing sguiggly 11.5348566343 11.8 center
+autoMargins (xmin, ymin, xmax, ymax): [0.085323547979797992, 0.14010109898978049, 0.90467645202020197, 0.6419696080809264]
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getCycles-alias...
+getCycles-alias([ ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-08'),
+  ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-10'),
+  ( 'victory',
+    'scc',
+    '2019',
+    '05',
+    '25-fix-hmmer-competition',
+    '2019_05_20-03')])
+Matching directories:
+  victory/scc/2019/05/23-main/2019_05_20-08-r4512-micro19_scc-competition-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-OoO-issueWidth_4-bfrs_4-subnts_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/23-main/2019_05_20-10-r4512-micro19_high_scc-competition-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-OoO-issueWidth_4-bfrs_4-subnts_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/25-fix-hmmer-competition/2019_05_20-03-r4512-micro19_scc-competition-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-OoO-issueWidth_4-bfrs_4-subnts_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-08-r4512-micro19_scc-competition-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-OoO-issueWidth_4-bfrs_4-subnts_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-10-r4512-micro19_high_scc-competition-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-OoO-issueWidth_4-bfrs_4-subnts_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/25-fix-hmmer-competition/2019_05_20-03-r4512-micro19_scc-competition-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-OoO-issueWidth_4-bfrs_4-subnts_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 374 experiments
+......................................__________________________________________________getCycles-alias - 8.7s, 0.1min
+1-Sb-core serial-relative speedups on OoO cores
+         Orig. in-order                                                                           
+                      |          Orig.                                                            
+                      |              |         1c SCC                                             
+                      |              |              |         4c SCC                              
+                      |              |              |              |        36c SCC               
+ libqntm           1.00           3.58           2.89          11.18          76.74
+     lbm           1.00           3.11           2.39           9.54          72.61
+    milc           1.00           2.34           2.07           6.68          31.80
+   astar           1.00           2.44           0.73           2.70           6.86
+   hmmer           1.00           1.59           1.11           2.90           5.46
+  sphinx           1.00           2.43           1.72           4.24           4.78
+     mcf           1.00           1.82           1.51           3.39           3.68
+   gmean           1.00           2.39           1.63           5.02          14.20
+    MEAN           1.00           2.46           1.76           5.71          27.02
+   GMEAN           1.00           2.39           1.63           5.02          14.20
+1-Sb-core serial-relative OoO core speedups (+) or slowdowns (-)
+           Orig.                                
+               |  1c SCC                        
+               |       |  4c SCC                
+               |       |       | 36c SCC        
+ libqntm    3.58    2.89   11.18   76.74
+     lbm    3.11    2.39    9.54   72.61
+    milc    2.34    2.07    6.68   31.80
+   astar    2.44   -1.38    2.70    6.86
+   hmmer    1.59    1.11    2.90    5.46
+  sphinx    2.43    1.72    4.24    4.78
+     mcf    1.82    1.51    3.39    3.68
+   gmean    2.39    1.63    5.02   14.20
+    MEAN    2.46    1.49    5.71   27.02
+   GMEAN    2.39     nan    5.02   14.20
+Drawing sguiggly 76.7367967062 4.0 center
+Drawing sguiggly 72.6067984841 9.4 center
+Drawing sguiggly 31.800586433 14.8 center
+autoMargins (xmin, ymin, xmax, ymax): [0.10410511363636364, 0.17343436565655085, 0.88589488636363634, 0.65661613939395402]
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getCycles-alias...
+getCycles-alias([('victory', 'scc', '2019', '05', '24-no-task-hacking', '2019_05_20-03')])
+Matching directories:
+  victory/scc/2019/05/24-no-task-hacking/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/24-no-task-hacking/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 256 experiments
+.........................__________________________________________________getCycles-alias - 6.5s, 0.1min
+1-core Serial-relative no-task-hack SCC speedups
+         Original                                    
+                |   1c SCC                           
+                |        |   4c SCC                  
+                |        |        |  36c SCC         
+ libqntm     1.00     1.02     3.95    27.56
+     lbm     1.00     0.79     3.25    28.72
+    milc     1.00     0.96     2.85    11.54
+   astar     1.00     0.88     1.41     0.57
+   hmmer     1.00     0.42     0.53     0.45
+  sphinx     1.00     0.78     1.33      nan
+     mcf     1.00     0.91     2.02     2.34
+   gmean     1.00     0.79     1.85     4.19
+    MEAN     1.00     0.82     2.15    10.77
+   GMEAN     1.00     0.79     1.85     4.19
+1-core Serial-relative no-task-hack SCC speedups (+) or slowdowns (-)
+          1c SCC                        
+               |  4c SCC                
+               |       | 36c SCC        
+ libqntm    1.02    3.95   27.56
+     lbm   -1.26    3.25   28.72
+    milc   -1.05    2.85   11.54
+   astar   -1.14    1.41   -1.77
+   hmmer   -2.40   -1.89   -2.22
+  sphinx   -1.28    1.33     nan
+     mcf   -1.10    2.02    2.34
+   gmean   -1.26    1.85    4.19
+    MEAN   -1.06    1.85   10.05
+   GMEAN     nan     nan     nan
+Drawing sguiggly 27.5629066436 3.0 center
+Drawing sguiggly 28.7240084556 7.4 center
+Drawing sguiggly 11.5398354546 11.8 center
+autoMargins (xmin, ymin, xmax, ymax): [0.085323547979797992, 0.13533920737977589, 0.90467645202020197, 0.64673149969093102]
+Matching directories:
+  victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-07'),
+  ('victory', 'scc', '2019', '05', '23-main', '2019_05_20-09'),
+  ( 'victory',
+    'scc',
+    '2019',
+    '05',
+    '25-fix-hmmer-competition',
+    '2019_05_20-02')], 
+<function cycles at 0x7fe54806e140>)
+Matching directories:
+  victory/scc/2019/05/23-main/2019_05_20-07-r4512-micro19_scc-competition-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/23-main/2019_05_20-09-r4512-micro19_high_scc-competition-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/25-fix-hmmer-competition/2019_05_20-02-r4512-micro19_scc-competition-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-07-r4512-micro19_scc-competition-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/23-main/2019_05_20-09-r4512-micro19_high_scc-competition-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/25-fix-hmmer-competition/2019_05_20-02-r4512-micro19_scc-competition-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 268 experiments
+.........................../data/sanchez/tools/pymodules/lib/python2.7/site-packages/la/farray/misc.py:24: RuntimeWarning: divide by zero encountered in log
+  x = np.log(x).sum(axis)
+________________________________________________getStatFunc-alias - 7.5s, 0.1min
+Execution-Time-Serial-Relative Breakdown Scheme (O) Sbcore-Core
+            Non-task                                                                        
+                   | Task-commit                                                            
+                   |           |  Task-abort                                                
+                   |           |           |  Full-queue                                    
+                   |           |           |           |     No-task                        
+                   |           |           |           |           |       Other            
+ libqntm        1.00        0.00        0.00        0.00        0.00        0.00
+     lbm        1.00        0.00        0.00        0.00        0.00        0.00
+    milc        1.00        0.00        0.00        0.00        0.00        0.00
+   astar        1.00        0.00        0.00        0.00        0.00        0.00
+   hmmer        1.00        0.00        0.00        0.00        0.00        0.00
+  sphinx        1.00        0.00        0.00        0.00        0.00        0.00
+     mcf        1.00        0.00        0.00        0.00        0.00        0.00
+    MEAN        1.00        0.00        0.00        0.00        0.00        0.00
+   GMEAN        1.00        0.00        0.00        0.00        0.00        0.00
+Execution-Time-Serial-Relative Breakdown Scheme (1) Sbcore-Core
+            Non-task                                                                        
+                   | Task-commit                                                            
+                   |           |  Task-abort                                                
+                   |           |           |  Full-queue                                    
+                   |           |           |           |     No-task                        
+                   |           |           |           |           |       Other            
+ libqntm        0.00        0.98        0.00        0.00        0.00        0.00
+     lbm        0.00        1.26        0.00        0.00        0.00        0.00
+    milc        0.00        1.05        0.00        0.00        0.00        0.00
+   astar        0.00        2.18        0.00        0.00        0.00        0.00
+   hmmer        0.00        1.70        0.00        0.00        0.00        0.00
+  sphinx        0.00        1.26        0.00        0.00        0.00        0.00
+     mcf        0.00        1.10        0.00        0.00        0.00        0.00
+    MEAN        0.00        1.36        0.00        0.00        0.00        0.00
+   GMEAN        0.00        1.31        0.00        0.00        0.00        0.00
+Execution-Time-Serial-Relative Breakdown Scheme (4) Sbcore-Core
+            Non-task                                                                        
+                   | Task-commit                                                            
+                   |           |  Task-abort                                                
+                   |           |           |  Full-queue                                    
+                   |           |           |           |     No-task                        
+                   |           |           |           |           |       Other            
+ libqntm        0.00        0.25        0.01        0.00        0.00        0.00
+     lbm        0.00        0.31        0.00        0.00        0.00        0.00
+    milc        0.00        0.22        0.10        0.03        0.00        0.00
+   astar        0.00        0.56        0.01        0.00        0.01        0.00
+   hmmer        0.00        0.43        0.05        0.15        0.00        0.00
+  sphinx        0.00        0.30        0.15        0.08        0.00        0.00
+     mcf        0.00        0.29        0.15        0.05        0.00        0.00
+    MEAN        0.00        0.34        0.07        0.04        0.00        0.00
+   GMEAN        0.00        0.32        0.00        0.00        0.00        0.00
+Execution-Time-Serial-Relative Breakdown Scheme (36) Sbcore-Core
+            Non-task                                                                        
+                   | Task-commit                                                            
+                   |           |  Task-abort                                                
+                   |           |           |  Full-queue                                    
+                   |           |           |           |     No-task                        
+                   |           |           |           |           |       Other            
+ libqntm        0.00        0.03        0.00        0.00        0.00        0.00
+     lbm        0.00        0.03        0.00        0.00        0.00        0.00
+    milc        0.00        0.03        0.02        0.04        0.00        0.00
+   astar        0.00        0.06        0.06        0.03        0.02        0.00
+   hmmer        0.00        0.06        0.36        0.02        0.00        0.00
+  sphinx        0.00        0.04        0.28        0.12        0.01        0.00
+     mcf        0.00        0.04        0.36        0.02        0.00        0.00
+    MEAN        0.00        0.04        0.15        0.03        0.00        0.00
+   GMEAN        0.00        0.04        0.04        0.01        0.00        0.00
+Drawing sguiggly 2.18280460244 13.4 center
+Drawing sguiggly 1.7002159429 17.6 center
+autoMargins (xmin, ymin, xmax, ymax): [0.11594223484848486, 0.16888888888888887, 0.87089953229477879, 0.55888888888888899]
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getCycles-alias...
+getCycles-alias([ ('victory', 'scc', '2019', '05', '21-no-progressive', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '21-no-progressive', '2019_05_20-05')])
+Matching directories:
+  victory/scc/2019/05/21-no-progressive/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/21-no-progressive/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/21-no-progressive/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/21-no-progressive/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 309 experiments
+...............................__________________________________________________getCycles-alias - 6.4s, 0.1min
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getCycles-alias...
+getCycles-alias([ ('victory', 'scc', '2019', '05', '22-no-tree', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '22-no-tree', '2019_05_20-05')])
+Matching directories:
+  victory/scc/2019/05/22-no-tree/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/22-no-tree/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/22-no-tree/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/22-no-tree/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 380 experiments
+....................................../usr/lib/pymodules/python2.7/matplotlib/pyplot.py:412: RuntimeWarning: More than 20 figures have been opened. Figures created through the pyplot interface (`matplotlib.pyplot.figure`) are retained until explicitly closed and may consume too much memory. (To control this warning, see the rcParam `figure.max_num_figures`).
+  max_open_warning, RuntimeWarning)
+__________________________________________________getCycles-alias - 7.0s, 0.1min
++ Unbounded Trees (Scc) Scc-1C-Relative Speedups
+              1                                                                                           
+              |      2                                                                                    
+              |      |      4                                                                             
+              |      |      |      8                                                                      
+              |      |      |      |     12                                                               
+              |      |      |      |      |     16                                                        
+              |      |      |      |      |      |     24                                                 
+              |      |      |      |      |      |      |     36                                          
+              |      |      |      |      |      |      |      |     64                                   
+              |      |      |      |      |      |      |      |      |    100                            
+              |      |      |      |      |      |      |      |      |      |    144                     
+              |      |      |      |      |      |      |      |      |      |      |    196              
+              |      |      |      |      |      |      |      |      |      |      |      |    256       
+ libqntm   1.00   1.97   3.88   6.99   9.99  12.95  18.48  27.11  45.87  68.64 139.26 251.30 326.22
+    milc   1.00   1.67   2.98   4.86   6.41   7.72   9.74  12.07  15.18  17.15  18.26  18.79  19.37
+   hmmer   1.00   1.72   2.75   4.20   4.17   4.13   3.97   3.79    nan    nan    nan    nan    nan
+     mcf   1.00   1.57   2.23   2.19   2.24   2.37   2.58   2.63    nan    nan    nan    nan    nan
+    h264   1.00   1.22   1.32   1.26   1.21   1.17   0.95    nan    nan    nan    nan    nan    nan
+  sphinx   1.00   1.66   2.41   2.66   2.78   2.84   2.81   2.84    nan    nan    nan    nan    nan
+     lbm   1.00   2.04   4.10   7.29  10.36  13.52  21.55  36.19  60.71  87.07 114.87 140.75 160.08
+   astar   1.00   1.96   3.75   6.00   7.57   9.55  11.47  12.43    nan    nan    nan    nan    nan
+    MEAN   1.00   1.73   2.93   4.43   5.59   6.78   8.94  13.87  40.59  57.62  90.79 136.95 168.56
+   GMEAN   1.00   1.71   2.77   3.83   4.46   5.04   5.76   8.82  34.84  46.80  66.35  87.27 100.38
++ Bounded Trees Scc-1C-Relative Speedups
+              1                                                                                           
+              |      2                                                                                    
+              |      |      4                                                                             
+              |      |      |      8                                                                      
+              |      |      |      |     12                                                               
+              |      |      |      |      |     16                                                        
+              |      |      |      |      |      |     24                                                 
+              |      |      |      |      |      |      |     36                                          
+              |      |      |      |      |      |      |      |     64                                   
+              |      |      |      |      |      |      |      |      |    100                            
+              |      |      |      |      |      |      |      |      |      |    144                     
+              |      |      |      |      |      |      |      |      |      |      |    196              
+              |      |      |      |      |      |      |      |      |      |      |      |    256       
+ libqntm   1.00   1.97   3.89   6.86   9.69  12.38  17.26  24.39  38.06  51.53  81.52 106.00 116.58
+    milc   1.00   1.67   2.90   4.19   5.38   6.35   7.87   9.56  11.72  12.69  13.00  12.35  11.62
+   hmmer   1.02   1.72   2.70   4.18   4.15   4.11   4.02   3.88    nan    nan    nan    nan    nan
+     mcf   1.00   1.60   2.26   2.24   2.27   2.40   2.60   2.68    nan    nan    nan    nan    nan
+    h264   1.02   1.22   1.31   1.26   1.20   1.17   0.96   0.83    nan    nan    nan    nan    nan
+  sphinx   1.00   1.63   2.26   2.41   2.48   2.51   2.47   2.40    nan    nan    nan    nan    nan
+     lbm   1.00   2.04   4.10   7.29  10.36  13.52  21.55  36.19  60.64  87.07 114.80 140.72 160.15
+   astar   1.02   1.96   3.55   5.46   6.52   7.94   8.03   7.49    nan    nan    nan    nan    nan
+    MEAN   1.01   1.73   2.87   4.23   5.26   6.30   8.10  10.93  36.81  50.43  69.77  86.35  96.11
+   GMEAN   1.01   1.71   2.72   3.66   4.21   4.72   5.26   5.81  30.02  38.47  49.54  56.90  60.08
+Chains Scc-1C-Relative Speedups
+             1                                                                              
+             |     2                                                                        
+             |     |     4                                                                  
+             |     |     |     8                                                            
+             |     |     |     |    12                                                      
+             |     |     |     |     |    16                                                
+             |     |     |     |     |     |    24                                          
+             |     |     |     |     |     |     |    36                                    
+             |     |     |     |     |     |     |     |    64                              
+             |     |     |     |     |     |     |     |     |   100                        
+             |     |     |     |     |     |     |     |     |     |   144                  
+             |     |     |     |     |     |     |     |     |     |     |   196            
+             |     |     |     |     |     |     |     |     |     |     |     |   256      
+ libqntm  1.01  1.99  3.95  4.63  5.58  6.40  7.60  8.90 10.45 20.43   nan   nan   nan
+    milc  1.00  1.67  2.90  4.09  5.21  6.10  7.42  8.80 10.20  9.05  5.99  7.35  6.29
+   hmmer  0.99  1.68  2.63  3.70  4.10  4.12  4.02  3.85   nan   nan   nan   nan   nan
+     mcf  1.00  1.60  2.26  2.24  2.28  2.40  2.61  2.70   nan   nan   nan   nan   nan
+    h264  1.02  1.22  1.31  1.26  1.20  1.17  0.96  0.83   nan   nan   nan   nan   nan
+  sphinx  1.00  1.62  2.27  2.37  2.45  2.48  2.46  2.36   nan   nan   nan   nan   nan
+     lbm  1.00  2.04  4.09  5.85  7.56  9.16 13.24 20.19 26.87 31.08 29.86 24.18 27.03
+   astar  1.02  1.96  3.55  5.46  6.54  7.94  8.03  7.49   nan   nan   nan   nan   nan
+    MEAN  1.00  1.72  2.87  3.70  4.36  4.97  5.79  6.89 15.84 20.19 17.92 15.77 16.66
+   GMEAN  1.00  1.70  2.72  3.33  3.75  4.11  4.43  4.71 14.20 17.91 13.37 13.34 13.04
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getCycles-alias...
+getCycles-alias([('victory', 'scc', '2019', '05', '20-no-hints', '2019_05_20-03')])
+Matching directories:
+  victory/scc/2019/05/20-no-hints/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/20-no-hints/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 192 experiments
+...................__________________________________________________getCycles-alias - 5.0s, 0.1min
+Total cycles (billions)
+             1      
+ libqntm 13.87
+    milc  7.27
+   hmmer  5.16
+     mcf  6.10
+    h264  7.82
+  sphinx  8.21
+     lbm 12.08
+   astar 11.80
+    MEAN  9.04
+   GMEAN  8.57
+Scc Scc-1C-Relative Speedups
+              1                                                                                           
+              |      2                                                                                    
+              |      |      4                                                                             
+              |      |      |      8                                                                      
+              |      |      |      |     12                                                               
+              |      |      |      |      |     16                                                        
+              |      |      |      |      |      |     24                                                 
+              |      |      |      |      |      |      |     36                                          
+              |      |      |      |      |      |      |      |     64                                   
+              |      |      |      |      |      |      |      |      |    100                            
+              |      |      |      |      |      |      |      |      |      |    144                     
+              |      |      |      |      |      |      |      |      |      |      |    196              
+              |      |      |      |      |      |      |      |      |      |      |      |    256       
+ libqntm   1.00   1.97   3.88   6.99   9.99  12.95  18.48  27.11  45.87  68.64 139.26 251.30 326.22
+    milc   1.00   1.67   2.98   4.86   6.41   7.72   9.74  12.07  15.18  17.15  18.26  18.79  19.37
+   hmmer   1.00   1.72   2.75   4.20   4.17   4.13   3.97   3.79    nan    nan    nan    nan    nan
+     mcf   1.00   1.57   2.23   2.19   2.24   2.37   2.58   2.63    nan    nan    nan    nan    nan
+    h264   1.00   1.22   1.32   1.26   1.21   1.17   0.95    nan    nan    nan    nan    nan    nan
+  sphinx   1.00   1.66   2.41   2.66   2.78   2.84   2.81   2.84    nan    nan    nan    nan    nan
+     lbm   1.00   2.04   4.10   7.29  10.36  13.52  21.55  36.19  60.71  87.07 114.87 140.75 160.08
+   astar   1.00   1.96   3.75   6.00   7.57   9.55  11.47  12.43    nan    nan    nan    nan    nan
+    MEAN   1.00   1.73   2.93   4.43   5.59   6.78   8.94  13.87  40.59  57.62  90.79 136.95 168.56
+   GMEAN   1.00   1.71   2.77   3.83   4.46   5.04   5.76   8.82  34.84  46.80  66.35  87.27 100.38
+Nohints Scc-1C-Relative Speedups
+             1                                                
+             |     2                                          
+             |     |     4                                    
+             |     |     |     8                              
+             |     |     |     |    12                        
+             |     |     |     |     |    16                  
+             |     |     |     |     |     |    24            
+             |     |     |     |     |     |     |    36      
+ libqntm  1.00  1.97  3.88  6.98  9.99 12.95 18.49 27.11
+    milc  1.00  1.67  2.98  4.86  6.41  7.72  9.75 12.08
+   hmmer  1.00  1.72  2.75  4.20  4.17  4.13  3.96  3.78
+     mcf  1.00  1.57  2.23  2.19  2.23  2.37  2.59  2.57
+    h264  1.00  1.22  1.32  1.26  1.21  1.17  0.95   nan
+  sphinx  1.00  1.66  2.40  2.65  2.77  2.83  2.79   nan
+     lbm  1.00  2.04  4.10  7.29 10.36 13.52 21.54 36.20
+   astar  1.11  2.04  3.57  4.52  4.94  5.23  3.60  2.10
+    MEAN  1.01  1.74  2.90  4.24  5.26  6.24  7.96 13.97
+   GMEAN  1.01  1.71  2.75  3.69  4.23  4.67  4.98  7.90
+Matching directories:
+  victory/scc/2019/05/23-main/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/23-main/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '05', '22-no-tree', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '22-no-tree', '2019_05_20-05')], 
+<function cycles at 0x7fe54806e140>)
+Matching directories:
+  victory/scc/2019/05/22-no-tree/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/22-no-tree/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/22-no-tree/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/22-no-tree/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 380 experiments
+......................................________________________________________________getStatFunc-alias - 4.4s, 0.1min
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([ ('victory', 'scc', '2019', '05', '21-no-progressive', '2019_05_20-03'),
+  ('victory', 'scc', '2019', '05', '21-no-progressive', '2019_05_20-05')], 
+<function cycles at 0x7fe54806e140>)
+Matching directories:
+  victory/scc/2019/05/21-no-progressive/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  victory/scc/2019/05/21-no-progressive/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/21-no-progressive/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+  /data/sanchez/results/pls/victory/scc/2019/05/21-no-progressive/2019_05_20-05-r4512-micro19_high_scc-scc-sampledref-1_2_4_8_12_16_24_36_64_100_144_196_256cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 309 experiments
+...............................________________________________________________getStatFunc-alias - 4.0s, 0.1min
+Execution-Time-Le-Chain-Relative Breakdown Scheme (C) 36C-Core
+             Commit                                                       
+                  |      Abort                                            
+                  |          | Full-queue                                 
+                  |          |          |    No-task                      
+                  |          |          |          |      Other           
+ libqntm       0.34       0.33       0.24       0.08       0.00
+     lbm       0.55       0.16       0.09       0.21       0.00
+    milc       0.25       0.29       0.26       0.20       0.00
+   astar       0.22       0.06       0.04       0.68       0.00
+    MEAN       0.34       0.21       0.16       0.29       0.00
+   GMEAN       0.32       0.17       0.12       0.22       0.00
+Execution-Time-Le-Chain-Relative Breakdown Scheme (+B) 36C-Core
+             Commit                                                       
+                  |      Abort                                            
+                  |          | Full-queue                                 
+                  |          |          |    No-task                      
+                  |          |          |          |      Other           
+ libqntm       0.30       0.05       0.02       0.00       0.00
+     lbm       0.52       0.03       0.00       0.00       0.00
+    milc       0.24       0.23       0.40       0.05       0.00
+   astar       0.22       0.06       0.04       0.68       0.00
+    MEAN       0.32       0.09       0.12       0.18       0.00
+   GMEAN       0.30       0.07       0.03       0.02       0.00
+Execution-Time-Le-Chain-Relative Breakdown Scheme (+U) 36C-Core
+             Commit                                                       
+                  |      Abort                                            
+                  |          | Full-queue                                 
+                  |          |          |    No-task                      
+                  |          |          |          |      Other           
+ libqntm       0.29       0.03       0.00       0.00       0.00
+     lbm       0.52       0.03       0.00       0.00       0.00
+    milc       0.24       0.14       0.31       0.03       0.00
+   astar       0.22       0.19       0.11       0.08       0.00
+    MEAN       0.32       0.10       0.11       0.03       0.00
+   GMEAN       0.30       0.07       0.03       0.01       0.00
+autoMargins (xmin, ymin, xmax, ymax): [0.11594223484848486, 0.17957264957264957, 0.87405776515151512, 0.62833333333333341]
+Execution-Time-Le-Scc-Relative Breakdown Scheme (S) 36C-Core
+             Commit                                                       
+                  |      Abort                                            
+                  |          | Full-queue                                 
+                  |          |          |    No-task                      
+                  |          |          |          |      Other           
+ libqntm       0.90       0.08       0.01       0.00       0.00
+     lbm       0.94       0.05       0.01       0.00       0.00
+    milc       0.33       0.20       0.43       0.04       0.00
+   astar       0.36       0.32       0.18       0.14       0.00
+    MEAN       0.63       0.16       0.16       0.05       0.00
+   GMEAN       0.57       0.13       0.05       0.02       0.00
+Execution-Time-Le-Scc-Relative Breakdown Scheme (-U) 36C-Core
+             Commit                                                       
+                  |      Abort                                            
+                  |          | Full-queue                                 
+                  |          |          |    No-task                      
+                  |          |          |          |      Other           
+ libqntm       0.90       0.16       0.05       0.01       0.00
+     lbm       0.94       0.05       0.01       0.00       0.00
+    milc       0.33       0.31       0.55       0.07       0.00
+   astar       0.37       0.10       0.07       1.12       0.00
+    MEAN       0.64       0.15       0.17       0.30       0.00
+   GMEAN       0.57       0.12       0.06       0.03       0.00
+Execution-Time-Le-Scc-Relative Breakdown Scheme (-B) 36C-Core
+             Commit                                                       
+                  |      Abort                                            
+                  |          | Full-queue                                 
+                  |          |          |    No-task                      
+                  |          |          |          |      Other           
+ libqntm       1.03       1.02       0.74       0.26       0.00
+     lbm       0.98       0.29       0.15       0.37       0.00
+    milc       0.34       0.39       0.36       0.28       0.00
+   astar       0.37       0.10       0.07       1.12       0.00
+    MEAN       0.68       0.45       0.33       0.51       0.00
+   GMEAN       0.60       0.33       0.23       0.42       0.00
+Drawing sguiggly 3.04674063244 1.6 center
+autoMargins (xmin, ymin, xmax, ymax): [0.1157449494949495, 0.17957264957264957, 0.87425505050505048, 0.62833333333333341]
+Drawing sguiggly 3.04674063244 1.6 center
+autoMargins (xmin, ymin, xmax, ymax): [0.060573671497584539, 0.15152777777777782, 0.92685628019323663, 0.6830208333333333]
+Drawing sguiggly 3.04674063244 1.6 center
+autoMargins (xmin, ymin, xmax, ymax): [0.1923188784395681, 0.19203703703703706, 0.79768112156043192, 0.70694449707574658]
+Execution-Time-Le-100C-Chain-Relative Breakdown Scheme (C) 100C-Core
+             Commit                                                       
+                  |      Abort                                            
+                  |          | Full-queue                                 
+                  |          |          |    No-task                      
+                  |          |          |          |      Other           
+ libqntm       0.30       0.59       0.09       0.02       0.00
+     lbm       0.38       0.34       0.05       0.22       0.00
+    milc       0.12       0.31       0.26       0.32       0.00
+    MEAN       0.27       0.41       0.13       0.19       0.00
+   GMEAN       0.24       0.40       0.11       0.11       0.00
+Execution-Time-Le-100C-Chain-Relative Breakdown Scheme (+B) 100C-Core
+             Commit                                                       
+                  |      Abort                                            
+                  |          | Full-queue                                 
+                  |          |          |    No-task                      
+                  |          |          |          |      Other           
+ libqntm       0.26       0.08       0.04       0.01       0.00
+     lbm       0.33       0.02       0.00       0.00       0.00
+    milc       0.09       0.12       0.38       0.12       0.00
+    MEAN       0.23       0.08       0.14       0.04       0.00
+   GMEAN       0.20       0.06       0.04       0.01       0.00
+Execution-Time-Le-100C-Chain-Relative Breakdown Scheme (+U) 100C-Core
+             Commit                                                       
+                  |      Abort                                            
+                  |          | Full-queue                                 
+                  |          |          |    No-task                      
+                  |          |          |          |      Other           
+ libqntm       0.26       0.03       0.00       0.00       0.00
+     lbm       0.33       0.02       0.00       0.00       0.00
+    milc       0.10       0.06       0.28       0.09       0.00
+    MEAN       0.23       0.04       0.10       0.03       0.00
+   GMEAN       0.20       0.04       0.02       0.01       0.00
+autoMargins (xmin, ymin, xmax, ymax): [0.1157449494949495, 0.17957264957264957, 0.87425505050505048, 0.62833333333333341]
+Execution-Time-Le-100C-Scc-Relative Breakdown Scheme (S) 100C-Core
+             Commit                                                       
+                  |      Abort                                            
+                  |          | Full-queue                                 
+                  |          |          |    No-task                      
+                  |          |          |          |      Other           
+ libqntm       0.86       0.11       0.01       0.01       0.00
+     lbm       0.92       0.07       0.01       0.01       0.00
+    milc       0.18       0.12       0.53       0.17       0.00
+    MEAN       0.65       0.10       0.19       0.06       0.00
+   GMEAN       0.53       0.09       0.04       0.02       0.00
+Execution-Time-Le-100C-Scc-Relative Breakdown Scheme (-U) 100C-Core
+             Commit                                                       
+                  |      Abort                                            
+                  |          | Full-queue                                 
+                  |          |          |    No-task                      
+                  |          |          |          |      Other           
+ libqntm       0.87       0.29       0.15       0.04       0.00
+     lbm       0.92       0.07       0.01       0.01       0.00
+    milc       0.18       0.24       0.72       0.22       0.00
+    MEAN       0.65       0.20       0.29       0.09       0.00
+   GMEAN       0.52       0.16       0.10       0.04       0.00
+Execution-Time-Le-100C-Scc-Relative Breakdown Scheme (-B) 100C-Core
+             Commit                                                       
+                  |      Abort                                            
+                  |          | Full-queue                                 
+                  |          |          |    No-task                      
+                  |          |          |          |      Other           
+ libqntm       1.00       2.00       0.31       0.06       0.00
+     lbm       1.08       0.95       0.15       0.63       0.00
+    milc       0.22       0.58       0.49       0.60       0.00
+    MEAN       0.77       1.18       0.31       0.43       0.00
+   GMEAN       0.62       1.03       0.28       0.29       0.00
+autoMargins (xmin, ymin, xmax, ymax): [0.1157449494949495, 0.17957264957264957, 0.87425505050505048, 0.62833333333333341]
+autoMargins (xmin, ymin, xmax, ymax): [0.060573671497584539, 0.15152777777777779, 0.92685628019323663, 0.6830208333333333]
+autoMargins (xmin, ymin, xmax, ymax): [0.22394500561167227, 0.19203703703703706, 0.76605499438832769, 0.78812492283972069]
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([('victory', 'scc', '2019', '05', '20-no-hints', '2019_05_20-03')], <function cycles at 0x7fe54806e140>)
+Matching directories:
+  victory/scc/2019/05/20-no-hints/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/20-no-hints/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 192 experiments
+...................________________________________________________getStatFunc-alias - 2.6s, 0.0min
+Execution-Time-Hints-Scc-Relative Breakdown Scheme (S) 36C-Core
+             Commit                                                       
+                  |      Abort                                            
+                  |          | Full-queue                                 
+                  |          |          |    No-task                      
+                  |          |          |          |      Other           
+ libqntm       0.90       0.08       0.01       0.00       0.00
+     lbm       0.94       0.05       0.01       0.00       0.00
+    milc       0.33       0.20       0.43       0.04       0.00
+   astar       0.36       0.32       0.18       0.14       0.00
+    MEAN       0.63       0.16       0.16       0.05       0.00
+   GMEAN       0.57       0.13       0.05       0.02       0.00
+Execution-Time-Hints-Scc-Relative Breakdown Scheme (-H) 36C-Core
+             Commit                                                       
+                  |      Abort                                            
+                  |          | Full-queue                                 
+                  |          |          |    No-task                      
+                  |          |          |          |      Other           
+ libqntm       0.90       0.08       0.01       0.00       0.00
+     lbm       0.94       0.05       0.01       0.00       0.00
+    milc       0.33       0.20       0.43       0.03       0.00
+   astar       1.07       4.63       0.05       0.16       0.00
+    MEAN       0.81       1.24       0.13       0.05       0.00
+   GMEAN       0.74       0.25       0.04       0.02       0.00
+Drawing sguiggly 5.91400357348 8.6 center
+autoMargins (xmin, ymin, xmax, ymax): [0.1157449494949495, 0.17957264957264957, 0.87425505050505048, 0.62833333333333341]
+Drawing sguiggly 5.91400357348 32.0 center
+autoMargins (xmin, ymin, xmax, ymax): [0.060573671497584539, 0.15152777777777782, 0.92390891177218404, 0.6830208333333333]
+Drawing sguiggly 5.91400357348 8.6 center
+autoMargins (xmin, ymin, xmax, ymax): [0.14753607503607505, 0.19203703703703706, 0.82432838388955409, 0.70694450326762803]
+________________________________________________________________________________
+[Memory] Calling __main__--data-sanchez-users-victory-clones-swarm-zsim-scripts-graph-scripts-paper_scc.getStatFunc-alias...
+getStatFunc-alias([('victory', 'scc', '2019', '05', '24-no-task-hacking', '2019_05_20-03')], <function cycles at 0x7fe54806e140>)
+Matching directories:
+  victory/scc/2019/05/24-no-task-hacking/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Will process result directories:
+  /data/sanchez/results/pls/victory/scc/2019/05/24-no-task-hacking/2019_05_20-03-r4512-micro19_scc-scc-sampledref-1_2_4_8_12_16_24_36cores-16cqCap-200gvtP-sbCore-bfrs_4-serializeHints_True-tbPolicy_Dequeue-clearTb_True-extraChildren_32-tm_Hint
+Loading configurations...
+Loaded 256 experiments
+..........................________________________________________________getStatFunc-alias - 3.3s, 0.1min
+data for task hacks:
+[('S', label_0
+    libqntm
+    milc
+    hmmer
+    mcf
+    h264
+    sphinx
+    lbm
+    astar
+label_1
+    4c
+label_2
+    Commit
+    Abort
+    Full-queue
+    No-task
+    Other
+x
+array([[[  1.39128372e+10,   3.67041883e+08,   1.78000000e+01,
+           0.00000000e+00,   0.00000000e+00]],
+
+       [[  6.21773992e+09,   2.84161489e+09,   7.04399346e+08,
+           0.00000000e+00,   0.00000000e+00]],
+
+       [[  5.16706648e+09,   5.52502771e+08,   1.78203992e+09,
+           0.00000000e+00,   0.00000000e+00]],
+
+       [[  6.53104884e+09,   3.41028172e+09,   1.01682623e+09,
+           0.00000000e+00,   0.00000000e+00]],
+
+       [[  8.45432736e+09,   7.31939816e+09,   7.91746989e+09,
+           0.00000000e+00,   0.00000000e+00]],
+
+       [[  7.74197434e+09,   3.81244778e+09,   2.09924458e+09,
+           0.00000000e+00,   2.43350167e+06]],
+
+       [[  1.17862183e+10,   1.87000000e+02,   0.00000000e+00,
+           0.00000000e+00,   0.00000000e+00]],
+
+       [[  1.21743837e+10,   1.87762096e+08,   2.11071168e+07,
+           1.96601885e+08,   0.00000000e+00]]])), ('-A', label_0
+    libqntm
+    milc
+    hmmer
+    mcf
+    h264
+    sphinx
+    lbm
+    astar
+label_1
+    4c
+label_2
+    Commit
+    Abort
+    Full-queue
+    No-task
+    Other
+x
+array([[[  1.39131377e+10,   3.67040089e+08,   1.50000000e+01,
+           0.00000000e+00,   0.00000000e+00]],
+
+       [[  6.21764759e+09,   2.84152531e+09,   7.04399503e+08,
+           0.00000000e+00,   0.00000000e+00]],
+
+       [[  6.82754995e+09,   1.58125346e+10,   2.25745304e+08,
+           0.00000000e+00,   0.00000000e+00]],
+
+       [[  6.53132308e+09,   3.41100699e+09,   1.01716671e+09,
+           0.00000000e+00,   0.00000000e+00]],
+
+       [[  8.05252688e+09,   7.31969438e+09,   7.91231076e+09,
+           0.00000000e+00,   0.00000000e+00]],
+
+       [[  6.57816918e+09,   1.08197342e+10,   2.18579112e+09,
+           0.00000000e+00,   2.49103750e+06]],
+
+       [[  1.17862002e+10,   1.87000000e+02,   0.00000000e+00,
+           0.00000000e+00,   0.00000000e+00]],
+
+       [[  6.00405042e+09,   9.17856112e+09,   0.00000000e+00,
+           1.94558246e+08,   0.00000000e+00]]]))]
+Execution-Time-Task-Hacks-Scc-Relative Breakdown Scheme (S) 4C-Core
+            Commit                                                       
+                 |      Abort                                            
+                 |          | Full-queue                                 
+                 |          |          |    No-task                      
+                 |          |          |          |      Other           
+  astar       0.97       0.01       0.00       0.02       0.00
+  hmmer       0.69       0.07       0.24       0.00       0.00
+ sphinx       0.57       0.28       0.15       0.00       0.00
+   MEAN       0.74       0.12       0.13       0.01       0.00
+  GMEAN       0.72       0.07       0.04       0.00       0.00
+Execution-Time-Task-Hacks-Scc-Relative Breakdown Scheme (-A) 4C-Core
+            Commit                                                       
+                 |      Abort                                            
+                 |          | Full-queue                                 
+                 |          |          |    No-task                      
+                 |          |          |          |      Other           
+  astar       0.48       0.73       0.00       0.02       0.00
+  hmmer       0.91       2.11       0.03       0.00       0.00
+ sphinx       0.48       0.79       0.16       0.00       0.00
+   MEAN       0.62       1.21       0.06       0.01       0.00
+  GMEAN       0.59       1.07       0.00       0.00       0.00
+Drawing sguiggly 3.04812332631 3.4 center
+autoMargins (xmin, ymin, xmax, ymax): [0.1157449494949495, 0.17957264957264957, 0.87425505050505048, 0.62833333333333341]
+Drawing sguiggly 3.04812332631 11.2 center
+autoMargins (xmin, ymin, xmax, ymax): [0.060573671497584539, 0.15152777777777782, 0.92390891177218404, 0.6830208333333333]
+Drawing sguiggly 3.04812332631 3.4 center
+autoMargins (xmin, ymin, xmax, ymax): [0.28114089614089616, 0.19203703703703706, 0.69113805856452926, 0.70694450326762803]

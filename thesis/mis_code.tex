@@ -1,0 +1,49 @@
+% [mcj] Unfortunately this cannot be defined in a \newcommand due to the
+% lstlisting https://tex.stackexchange.com/q/29971
+
+\begin{figure*}[t]
+\begin{minipage}{0.30\linewidth}
+\begin{lstlisting}[
+    style=customcpp,
+    caption=Sequential implementation of maximal independent set.,
+    label=lst:misseq]
+void sequentialMIS(Graph* g) {
+ for (Vertex* v : g->vertices)
+  if (v->state == UNVISITED) {
+   v->state = IN;
+   for (Vertex* n : v->neighbors)
+    n->state = OUT;
+  }
+}
+\end{lstlisting}
+\end{minipage}
+\hfill
+\begin{minipage}{0.30\linewidth}
+\begin{lstlisting}[
+    style=customcpp,
+    caption=Swarm implementation of MIS.,
+    label=lst:misswarm]
+void exclude(Timestamp, Vertex* v) {
+ v->state = OUT;
+}
+
+void include(Timestamp ts, Vertex* v) {
+ if (v->state == UNVISITED) {
+  v->state = IN;
+  for (Vertex* n : v->neighbors)
+   swarm::enqueue(exclude, ts, n);
+ }
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{0.30\linewidth}
+\begin{lstlisting}[style=customcpp]
+void swarmMIS(Graph* g) {
+ int ts = 0;
+ for (Vertex* v : g->vertices)
+  swarm::enqueue(include, ts++, v);
+ swarm::run();
+}
+\end{lstlisting}
+\end{minipage}
+\end{figure*}

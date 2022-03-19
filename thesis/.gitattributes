@@ -1,0 +1,3 @@
+# To diff .pdf files diff using pdfinfo, run the command:
+# git config --global diff.pdf.textconv pdfinfo
+*.pdf binary diff=pdf

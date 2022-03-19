@@ -1,0 +1,145 @@
+\chapter{Functional Units}
+\label{sec:FUs}
+
+In this section, we describe \name's novel functional units.
+These include the first vectorized automorphism unit (\autoref{sec:automorphism}),
+the first fully-pipelined flexible NTT unit (\autoref{sec:fourStepNTT}),
+and a new simplified modular multiplier adapted to FHE (\autoref{sec:modMult}).
+
+\section{Automorphism unit}\label{sec:automorphism}
+
+\figAutomorphism
+Each residue polynomial in \name is stored as $G$ independent $E$-element hardware vectors ($N=G\cdot E$).
+An automorphism $\sigma_k$ maps the element at index $i$ to index $ki \textrm{ mod } N$;
+there are $N$ automorphisms total, two for each odd $k < N$ (\autoref{sec:fhe_operation}).
+The key challenge in designing an automorphism unit is that these permutations are hard to vectorize:
+we would like this unit to consume and produce $E=$128 elements/cycle, but the vectors
+are much longer, with $N$ up to 16\,K, and elements are permuted across different hardware vectors.
+Moreover, we must support variable $N$ \emph{and} all automorphisms.
+
+Standard solutions fail: a 16\,K$\times$16\,K crossbar is much too large;
+a scalar approach, like reading elements in sequence from an SRAM, is too slow (taking $N$ cycles);
+and using banks of SRAM to increase throughput runs into frequent bank conflicts:
+each automorphism ``spreads''~elements with a different stride, so regardless of geometry,
+some automorphisms will map many consecutive elements to the~same~bank.
+
+We contribute a new insight that makes vectorizing automorphisms simple:
+if we interpret a residue polynomial as a $G \times E$ matrix,
+an automorphism can always be decomposed into two independent \emph{column} and \emph{row permutations}.
+If we transpose this matrix, both column and row permutations can 
+\figautfu
+be applied \emph{in blocks of $E$ elements}. \autoref{fig:automorphism} shows an example 
+of how automorphism $\sigma_3$ is applied to a residue polynomial
+with $N=16$ and $E=4$ elements/cycle.
+Note how the permute column and row operations are local to each $4$-element hardware vector.
+Other $\sigma_k$ induce different permutations, but with the same row/column structure.
+
+
+
+Our automorphism unit, shown in \autoref{fig:aut_fu},
+uses this insight to be both vectorized (consuming $E=128$ elements/cycle) and fully pipelined.
+Given a residue polynomial of $N=G\cdot E$ elements, the automorphism unit first applies the column permutation
+to each $E$-element input.
+Then, it feeds this to a \emph{transpose unit} that reads in the whole residue polynomial interpreting it as a $G\times E$ matrix,
+and produces its transpose $E\times G$.
+The transpose unit outputs $E$ elements per cycle (outputting multiple rows per cycle when $G < E$).
+Row permutations are applied to each $E$-element chunk, and the reverse transpose is applied.
+
+
+Further, we decompose both the row and column permutations into a pipeline of sub-permutations that are \textit{fixed in hardware},
+with each sub-permutation either applied or bypassed based on simple control logic; this avoids using crossbars for the $E$-element permute row and column operations.
+
+\figQuadrantSwap
+
+\paragraph{Transpose unit:}
+Our \textit{quadrant-swap transpose} unit transposes an $E \times E$ (e.g., $128\times 128$) matrix by recursively decomposing it into quadrants and exploiting
+the identity
+
+\vspace{-12pt}
+\begin{equation*}
+  \left[ \begin{array}{c|c}
+      \texttt{A} & \texttt{B}\\
+      \hline
+      \texttt{C} & \texttt{D}
+  \end{array}\right]^{\textrm{T}} =   \left[ \begin{array}{c|c}
+      \texttt{A}^{\textrm{T}} & \texttt{C}^{\textrm{T}} \\
+      \hline
+      \texttt{B}^{\textrm{T}} & \texttt{D}^{\textrm{T}}
+  \end{array}\right].
+\end{equation*}
+
+The basic building block is a $K \times K$ \textit{quadrant-swap} unit, which swaps quadrants \texttt{B} and \texttt{C}, as shown in \autoref{fig:quadrantSwap}(left). Operationally, the quadrant swap procedure consists of three steps, each taking $K/2$ cycles:
+\begin{compactenum}
+  \item Cycle \texttt{i} in the first step reads \texttt{A[i]} and \texttt{C[i]} and stores them in \texttt{top[i]} and \texttt{bottom[i]}, respectively.
+\item Cycle \texttt{i} in the second step reads \texttt{B[i]} and \texttt{D[i]}. The unit activates the first swap MUX and the bypass line, thus storing \texttt{D[i]} in \texttt{top[i]} and outputing \texttt{A[i]} (by reading from \texttt{top[i]}) and \texttt{B[i]} via the bypass line.
+\item Cycle \texttt{i} in the third step outputs \texttt{D[i]} and \texttt{C[i]} by reading from \texttt{top[i]} and \texttt{bottom[i]}, respectively. The second swap MUX is activated so that \texttt{C[i]} is on top.
+\end{compactenum}
+Note that step $3$ for one input can be done in parallel with step $1$ for the next, so the unit is \emph{fully pipelined}.
+
+The transpose is implemented by a full $E \times E$ quadrant-swap followed by $\log_2E$ layers of smaller transpose units
+to recursively transpose \texttt{A}, \texttt{B}, \texttt{C}, and \texttt{D}. \autoref{fig:quadrantSwap} (right) shows an implementation for $E=8$. Finally, by selectively bypassing some of the initial quadrant swaps,
+this transpose unit also works for all values of $N$ ($N=G\times E$ with power-of-2 $G < E$).
+
+Prior work has implemented transpose units for signal-processing applications,
+either using registers~\cite{wang2018pipelined,zhang2020novel} or with custom SRAM designs~\cite{shang2014single}.
+Our design has three advantages over prior work: it uses standard SRAM memory,
+so it's dense without requiring complex custom SRAMs;
+it is fully pipelined; and it works for a wide range of dimensions.
+
+\section{Four-step NTT unit}\label{sec:fourStepNTT}
+
+\figFourStepNTT
+
+%The Cooley-Tukey algorithm \cite{cooley:moc65:algorithm} can be parallelized in hardware into a so-called \textit{NTT butterfly} pipeline.
+%However, this pipeline requires the datapath to be as wide as the number of elements we want
+%to apply the NTT to. This means we would need a $16K$-element datapath to support $N=16K$, which is too wide.
+%Ideally, instead of unrolling the datapath prior to an NTT, we would fix it to $128$-element hardware vectors,
+%with each ciphertext stored in $8$-$128$ hardware vectors (depending on the value of $N$).
+
+There are many ways to implement NTTs in hardware:
+an NTT is like an FFT~\cite{cooley:moc65:algorithm}
+but with a butterfly that uses modular multipliers.
+We implement $N$-element NTTs (from 1K to 16K) as a composition
+of smaller $E$=128-element NTTs,
+since implementing a full 16K-element NTT datapath is prohibitive.
+The challenge is that standard approaches result in memory access patterns
+that are hard to vectorize.
+
+To that end, we use the \textit{four-step variant} of the FFT algorithm~\cite{bailey:supercomputing89:FFTs},
+which adds an extra multiplication to produce a vector-friendly decomposition.
+\autoref{fig:fourStepNTT} illustrates a simple four-step NTT pipeline for $E=4$;
+we use the same structure with $E=128$.
+The unit is fully pipelined and consumes $E$ elements per cycle.
+To compute an $N=E\times E$ NTT, the unit first computes an $E$-point NTT on each $E$-element group,
+multiplies each group with twiddles,
+transposes the $E$ groups, and computes another $E$-element NTT on each transpose.
+The same NTT unit implements the inverse NTT
+by storing multiplicative factors (\textit{twiddles}) required for both forward and inverse NTTs in a small \textit{twiddle SRAM}.
+
+Crucially, we are able to support all values of $N$ using a single four-step NTT pipeline by conditionally bypassing layers in the second NTT butterfly.
+We use the same transpose unit implementation as with automorphisms.
+
+The NTT unit is large: each of the 128-element NTTs requires $E(\log (E)-1)/2$=384 multipliers,
+and the full unit uses 896 multipliers.
+But its high throughput improves performance over many low-throughput NTTs (\autoref{sec:evaluation}). %by gmean 2.5$\times$ on relevant benchmarks (\autoref{tbl:sensitivity}); this is because using many small NTT units in parallel causes the memory footprint to quickly exceed scratchpad capacity.
+This is the first implementation of a fully-pipelined four-step NTT unit, 
+improving NTT performance by 1,600$\times$ over the state of the art (\autoref{tbl:microbenchmark}).
+
+
+\section{Optimized modular multiplier}\label{sec:modMult}
+\tblModMult
+
+Modular multiplication computes $a\cdot b \textrm{ mod } q$.
+This is the most expensive and frequent operation.
+Therefore, improvements to the modular multiplier have an almost
+linear impact on the computational capabilities of an FHE accelerator.
+
+Prior work~\cite{mert:euromicro19:design}
+recognized that a Montgomery multiplier~\cite{montgomery:mom85:modular} within NTTs can be improved by leveraging
+the fact that the possible values of modulus $q$ are restricted by the number of elements the NTT is applied to.
+We notice that if we only select moduli $q_i$, such that $q_i = -1 \textrm{ mod } 2^{16}$,
+we can remove a mutliplier stage from~\cite{mert:euromicro19:design};
+this reduces area by 19\% and power by 30\% (\autoref{tbl:modMult}).
+The additional restriction on $q$ is acceptable because FHE
+requires at most 10s of moduli~\cite{gentry:crypto2012:homomorphic},
+and our approach allows for 6,186~prime~moduli.

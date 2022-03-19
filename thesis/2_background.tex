@@ -1,0 +1,500 @@
+\chapter{Background}\label{sec:background}
+
+% dsm: Definitely not here; we may want to split it...
+%\tblNomenclature
+
+%\section{Overview of FHE Schemes}
+
+%\todo{What should we call residue vectors?}
+
+% dsm: Should be in intro. Don't use "Alice". "Client" instead.
+%The computational model enabled by FHE is illustrated in Figure \ref{fig:overview}. Alice wishes to outsource her computation to an
+%untrusted third party (UTP), but is unwilling to share her data with the UTP. Assuming the UTP supports computation on
+%encrypted data, Alice can encrypt her data with her own secret key (of an appropriate FHE scheme) and send the \textit{FH-encrypted} data to the UTP. The
+%UTP executes the requested computation on Alice's encrypted data and sends the encrypted result back to Alice. Alice
+%decrypts the result, safe in the knowledge that the UTP was not able to see the data it computed on.
+%\todo{Should we mention here that FHE does not ensure correctness of the computation? Reviewers not familiar with crypto/security may wonder why an untrusted server is assumed to perform the computation correctly. We can say verifiable computation suing encrypted data is out of scope of this paper.}
+% dsm: No, we're not in the business of giving reviewers ammo.
+
+%\section{FHE Parameters}
+
+% TODO(dsm)" Focus on BGV early on.
+
+Fully Homomorphic Encryption allows for performing arbitrary
+arithmetic on encrypted plaintext values, via appropriate operations
+on their ciphertexts. Decrypting the resulting ciphertext yields the
+same result as if the operations were performed on the plaintext
+values ``in the clear.''
+
+Over the last decade, prior work has proposed multiple \emph{FHE schemes},
+each working in somewhat different ways and providing various trade-offs.
+These schemes include BGV~\cite{brakerski:toct14:leveled},
+B/FV~\cite{brakerski:crypto12:fully,fan:iacr12:somewhat},
+GSW~\cite{gentry:crypto13:homomorphic}, and CKKS~\cite{cheon:ictaci17:homomorphic}.
+Though these schemes differ in how they encrypt plaintexts, they all
+use the same data type for ciphertexts:
+polynomials where each coefficient is an integer modulo $Q$.
+This commonality makes it possible to build a single accelerator that supports multiple FHE schemes;
+\name supports BGV, GSW, and CKKS.
+
+We describe FHE in a layered fashion:
+\autoref{sec:fhe_mapping} introduces FHE's programming model and operations, i.e., FHE's \emph{interface};
+\autoref{sec:fhe_operation} describes how FHE operations are \emph{implemented};
+\autoref{sec:fhe_optimizations} presents implementation \emph{optimizations};
+and \autoref{sec:fhe_analysis} performs an \emph{architectural analysis}
+of~a~representative FHE kernel to reveal acceleration opportunities.
+
+For concreteness, we \emph{introduce FHE using the BGV scheme}, and briefly discuss other FHE schemes in \autoref{sec:fhe_others}.
+
+
+\section{FHE programming model and operations}
+\label{sec:fhe_mapping}
+
+FHE programs are \emph{dataflow graphs}: directed acyclic graphs where nodes are operations and edges represent data values
+(inputs, outputs, or intermediate values consumed by one or more operations).
+All operations and dependences are known in advance, and data-dependent branching is impossible.
+
+In FHE, unencrypted (plaintext) data values are always \emph{vectors};
+in BGV~\cite{brakerski:toct14:leveled}, each vector consists of $N$
+integers modulo an integer $t$.  BGV provides three operations on
+these vectors: element-wise \emph{addition} (mod $t$), element-wise
+\emph{multiplication} (mod $t$), and a small set of particular
+vector \emph{permutations}.
+% , like rotations or Frobenius~maps~\cite{halevi:crypto14:algorithms}.
+% nikola: we do not support any Frobenius maps
+
+We stress that this is BGV's \emph{interface}, not its implementation:
+it describes \emph{unencrypted} data, and the homomorphic operations
+that BGV implements on that data in its encrypted form.  In
+\autoref{sec:fhe_operation} we describe how BGV represents encrypted
+data and how each operation is implemented.
+
+At a high level, FHE provides a vector programming model with restricted operations. In particular, individual vector elements cannot be directly accessed.  This causes some overheads in certain
+algorithms; for example, summing up the elements of a vector is non-trivial,
+and requires a sequence of permutations and additions.
+
+Despite these limitations, prior work has devised reasonably efficient implementations of key algorithms,
+including linear algebra~\cite{halevi:crypto14:algorithms},
+neural network inference~\cite{brutzkus:icml19:low, gilad:icml16:cryptonets}, 
+logistic regression~\cite{han:iacr18:efficient}, and genome processing~\cite{blatt:nas20:secure}.
+%, and bootstrapping~\cite{ducas:iacr14:fhe}.
+These implementations are often coded by hand, but recent work has proposed FHE compilers to automate
+this translation for particular domains, like deep learning~\cite{dathathri:pldi19:chet,dathathri:pldi20:eva}.
+
+Finally, note that not all data must be encrypted:
+BGV provides versions of addition and multiplication where one of the operands is unencrypted.
+Multiplying by unencrypted data is cheaper, so algorithms can trade privacy for performance.
+For example, a deep learning inference can use encrypted weights and inputs to keep the model private,
+or use unencrypted weights, which does not protect the model but keeps inputs and inferences private~\cite{brutzkus:icml19:low}.
+
+\section{BGV implementation overview}
+\label{sec:fhe_operation}
+
+We now describe how BGV represents and processes encrypted data (ciphertexts).
+The implementation of each computation on ciphertext data is called a \emph{homomorphic operation}.
+For example, the \emph{homomorphic multiplication} of two ciphertexts yields another ciphertext that,
+when decrypted, is the element-wise multiplication of the encrypted plaintexts.
+
+%Note that homomorphic operations are \emph{not} simply the same operation on ciphertexts.
+%for example, homomorphic multiplication is a more complex sequence of operations.
+
+\paragraph{Data types:}
+BGV encodes each plaintext vector as a polynomial with~$N$ coefficients
+mod~$t$.
+%(these coefficients are computed from the $N$-element vector they encode).
+We denote the plaintext space as~$R_t$, so
+\vspace{-2pt}
+\[\mathfrak{a} = a_0 + a_1x + ... + a_{N-1}x^{N-1} \in R_t\]
+%\vspace{-6pt}
+is a plaintext. Each plaintext is encrypted into a ciphertext consisting of two 
+polynomials of~$N$ integer coefficients modulo some value $Q$, with $Q \gg t$.
+Each ciphertext polynomial is a member of~$R_Q$.
+
+\paragraph{Encryption and decryption:}
+Though encryption and decryption are performed by the client (so \name need not accelerate~them),
+they are useful to understand.
+In BGV, the \textit{secret key} is a polynomial $\mathfrak{s} \in R_Q$.
+% dsm: Irrelevant
+%with small (\tmp{$\mod t$}) coefficients.
+To encrypt a plaintext $\mathfrak{m} \in R_t$, one samples a uniformly
+random $\mathfrak{a} \in R_Q$, an \emph{error} (or \emph{noise}) $\mathfrak{e} \in R_Q$ with small entries,
+and computes the ciphertext $ct$ as
+\vspace{-2pt}
+\begin{equation*}
+  ct = (\mathfrak{a}, \mathfrak{b} = \mathfrak{a}\mathfrak{s} + t \mathfrak{e} + \mathfrak{m}).
+\end{equation*}
+
+Ciphertext $ct = (\mathfrak{a}, \mathfrak{b})$ is decrypted by
+recovering
+$\mathfrak{e}' = t\mathfrak{e} + \mathfrak{m} = \mathfrak{b} -
+\mathfrak{a} \mathfrak{s} \bmod{Q}$, and then recovering
+$\mathfrak{m} = \mathfrak{e}' \bmod t$.  Decryption is correct as long
+as~$\mathfrak{e}'$ does not ``wrap around'' modulo~$Q$, i.e., its
+coefficients have magnitude less than~$Q/2$.
+
+The security of any encryption scheme relies on the ciphertexts not
+revealing anything about the value of the plaintext (or the secret
+key). Without adding the noise term $\mathfrak{e}$, the original message $\mathfrak{m}$ would be recoverable from $ct$ via simple Gaussian elimination.
+Including the noise term entirely hides the plaintext (under cryptographic assumptions)~\cite{lyubashevsky:tact10:ideal}.
+
+As we will see, applying homomorphic operations on ciphertexts increases their noise,
+so we can only perform a limited number of
+operations before the resulting noise becomes too
+large %(i.e., $t\mathfrak{e}$'s coefficients wrap around)
+and makes decryption fail.  We later describe \emph{noise management
+  strategies} to keep this noise bounded and thereby allow unlimited
+operations.
+
+\paragraph{Homomorphic addition} of ciphertexts
+$ct_0 = (\mathfrak{a}_{0}, \mathfrak{b}_{0})$ and
+$ct_1 = (\mathfrak{a}_{1}, \mathfrak{b}_{1})$ is done simply by adding
+their corresponding polynomials:
+$ct_{\text{add}} = ct_0 + ct_1 = (\mathfrak{a}_0 + \mathfrak{a}_1,
+\mathfrak{b}_0 + \mathfrak{b}_1)$.
+
+\paragraph{Homomorphic multiplication} requires two steps.
+First, the four input polynomials are multiplied and assembled:
+\vspace{-2pt}
+\begin{equation*}
+  ct_{\times} = (\mathfrak{l}_2, \mathfrak{l}_1, \mathfrak{l}_0) = (\mathfrak{a}_0\mathfrak{a}_1,
+  \mathfrak{a}_0\mathfrak{b}_1 + \mathfrak{a}_1 \mathfrak{b}_0,
+  \mathfrak{b}_0\mathfrak{b}_1) .
+\end{equation*}
+% TODO(asf): I think it's a more convincing point to discuss 3-tuple vs. 2-tuple and the doubling of computation size unless you key-switch
+This $ct_{\times}$ can be seen as a special intermediate ciphertext
+encrypted under a different secret key. The second step performs a
+\emph{key-switching operation} to produce a ciphertext encrypted under
+the original secret key~$\mathfrak{s}$. More specifically,
+$\mathfrak{l}_2$ undergoes this key-switching process
+%expanded to many polynomials and then multiplied by special \textit{key-switching hint} (KSH) matrices 
+to produce two polynomials
+$(\mathfrak{u}_1, \mathfrak{u}_0) =
+\textrm{KeySwitch}(\mathfrak{l}_2)$.  The final output ciphertext is
+$ct_{\text{mul}} = (\mathfrak{l}_1 + \mathfrak{u}_1, \mathfrak{l}_0 +
+\mathfrak{u}_0)$.
+
+As we will see later (\autoref{sec:fhe_analysis}), key-switching is an
+expensive operation that dominates the cost of a multiplication.
+%both due to complex transforms and because it needs large key-switch hint matrices that dominate data movement.
+%(\autoref{sec:fhe_analysis}).
+%There are several ways to implement key-switching, but all involve very
+%large (multi-megabyte) key-switch hint matrices that can dominate data movement.
+
+\paragraph{Homomorphic permutations} permute the~$N$ plaintext values
+(coefficients) that are encrypted in a ciphertext.
+% dsm: 2.1 just said this.
+%These permutations enable homomorphic computation between operands encrypted \textit{within the same ciphertext} (e.g., the dot-product in the example in \autoref{sec:programming}).
+Homomorphic permutations are implemented using \emph{automorphisms},
+which are special permutations of the coefficients of the ciphertext
+polynomials.  There are~$N$ automorphisms, denoted
+$\sigma_k(\mathfrak{a})$ and $\sigma_{-k}(\mathfrak{a})$ for all
+positive odd $k<N$. Specifically, \vspace{-2pt}
+\begin{equation*}
+  \sigma_k(\mathfrak{a}): a_i \rightarrow (-1)^{s} a_{ik \textrm{ mod } N} \text{ for } i=0,...,N-1,
+\end{equation*}
+where $s=0$ if $ik \textrm{ mod } 2N < N$, and $s=1$ otherwise.
+For example, $\sigma_{5}(\mathfrak{a})$ permutes $\mathfrak{a}$'s coefficients so that 
+$a_0$ stays at position 0, $a_1$ goes from position 1 to position 5, and so on (these wrap around, e.g., with $N=1024$,
+$a_{205}$ goes to position~1, since $205\cdot5 \textrm{ mod } 1024 = 1$).
+
+To perform a homomorphic permutation, we first compute an automorphism on the ciphertext polynomials:
+$ct_{\sigma} = (\sigma_k(\mathfrak{a}), \sigma_k(\mathfrak{b}))$.
+%\axelf{This somehow sounds like we're the ones encrypting it under a different secret key...}
+Just as in homomorphic multiplication, $ct_{\sigma}$ is encrypted
+under a different secret key, requiring an expensive key-switch to
+produce the final output
+$ct_{\text{perm}} = (\mathfrak{u}_1, \sigma_{k}(\mathfrak{b}) +
+\mathfrak{u}_0)$, where
+$(\mathfrak{u}_1, \mathfrak{u}_0) = \text{KeySwitch}(\sigma_k
+(\mathfrak{a}))$.
+
+We stress that the permutation applied to the ciphertext \emph{does
+  not} induce the same permutation on the underlying plaintext
+vector. For example, using a single automorphism and careful indexing,
+it is possible to homomorphically \emph{rotate} the vector of the $N$
+encrypted plaintext values.
+
+% CJP: the above is not 100% accurate; we can rotate two
+% N/2-dimensional subvectors, and it relies on seeing the plaintext
+% as a vector of *slot* values, not polynomial coefficients.
+
+% nikola: Daniel, after talking to Chris, it seems like automorphisms _do_ implement rotations after clever reindexing. You are correct that the the zeroth ciphertext coefficient does not change position, however, the underlying plaintext slots actually do change positions. Specifically, Chris said:
+% Plaintext slots are not the coefficients of the plaintext polynomial (which change in the same way as the ciphertext polynomials). Plaintext slots are like evaluations of the plaintext polynomial at special values. The constant coefficient (at position 0) is unchanged, but the overall evaluations (the slot values) change because the other coeffs change.
+
+% dsm: Axel, no. We just said that automorphisms always leave an element fixed. This isn't a matter of careful indexing. No indexing can turn an automorphism into a rotation.
+
+% For example, a homomorphic rotation can be implemented using automorphisms.
+% which is different (and more complex) than a rotation.
+
+\paragraph{Noise growth and management:}
+Recall that ciphertexts have noise, which limits the number of
+operations that they can undergo before decryption gives an incorrect
+result.  Different operations induce different noise growth: addition
+and permutations cause little growth, but multiplication incurs much
+more significant growth.  So, to a first order, noise size is
+determined by \emph{multiplicative depth},
+% dsm: "in path through" may common elsewhere, not in architecture...
+%i.e., the most number of multiplications in path through
+i.e., the longest chain of homomorphic multiplications
+in the computation.
+
+Noise forces the use of a large ciphertext modulus $Q$.
+For example, an FHE program with multiplicative depth of 16
+%axelf: removed neural network mention, I'm not convinced it's a good example
+needs $Q$ to be about 512 bits.  The noise budget, and
+thus the tolerable multiplicative depth, grow about linearly with~$\log Q$.
+
+FHE uses two noise management techniques in tandem:
+\emph{bootstrapping} and \emph{modulus switching}.
+
+Bootstrapping~\cite{gentry09} enables FHE computations of
+\emph{unbounded} depth.  Essentially, it removes noise from a
+ciphertext without access to the secret key (by evaluating the
+decryption function homomorphically).  Thus, FHE programs with a large
+multiplicative depth can be divided into regions of limited depth,
+separated by bootstrapping operations.
+
+Even with bootstrapping, FHE schemes need a large noise budget
+(i.e., a large~$Q$) because \emph{(1)}~bootstrapping is expensive,
+and a higher noise budget enables less-frequent bootstrapping, and
+\emph{(2)}~bootstrapping itself consumes a certain noise budget
+(this is similar to why pipelining any circuit hits a performance ceiling: registers themselves add area and latency).
+
+Modulus switching rescales ciphertexts from modulus~$Q$ to a
+modulus~$Q'$, which reduces the noise proportionately.
+Modulus switching is usually applied before each homomorphic
+multiplication, to reduce its noise blowup.
+
+% dsm: I don't think this is precise, and it's not needed.
+%, and makes noise grow linearly rather than exponentially.
+For example, to execute an FHE program of multiplicative depth 16, we
+would start with a 512-bit modulus~$Q$.  Right before each multiplication, we
+would switch to a modulus that is smaller by 32 bits. So, for example, operations at depth 8 use a 256-bit
+modulus.  Thus, beyond reducing noise, modulus switching reduces
+ciphertext sizes, and thus computation cost.
+
+\paragraph{Security and parameters:}
+The dimension~$N$ and modulus~$Q$ cannot be chosen independently;
+$N/\log Q$ must be above a certain level for sufficient security.
+In practice, many useful computations require non-trivial depth, meaning that they must be implemented with a wide modulus (large $Q$).
+To provide acceptable security for these computations, we must in turn use a large $N$, resulting in very large ciphertexts. For example, with 512-bit $Q$, $N$ must be at least $16K$, resulting in very large ciphertexts (2 MB).
+%Thus, ciphertext size increases quadratically with circuit depth
+%(as doubling the allowed depth doubles both $N$ and the number of bit of $Q$),
+%rendering data movement a challenge.
+
+\section{Algorithmic insights and optimizations}
+\label{sec:fhe_optimizations}
+
+\name leverages two optimizations developed in prior work:
+
+\paragraph{Fast polynomial multiplication via NTTs:}
+Multiplying two polynomials requires convolving their coefficients, an
+expensive (naively $O(N^2)$) operation.
+Just like convolutions can be made faster with the Fast Fourier Transform,
+%(as convolution in the time domain is equivalent to point-wise multiplication in the frequency domain),
+polynomial multiplication can be made faster with the Number-Theoretic Transform (NTT)~\cite{moenck1976practical},  % victor asked for a  ``reassuring read-more-about-NTT citation''
+a variant of the discrete Fourier transform for modular arithmetic.
+The NTT takes an $N$\hyp{}coefficient polynomial as input and returns an $N$\hyp{}element vector representing the input in the
+\textit{NTT domain}. This representation is useful because polynomial addition and multiplication are both simple component-wise operations.\,Specifically,
+\begin{equation*}
+NTT(\mathfrak{a}+\mathfrak{b}) = NTT(\mathfrak{a}) + NTT(\mathfrak{b}) 
+\end{equation*}
+and 
+\begin{equation*}
+NTT(\mathfrak{a}\mathfrak{b}) = NTT(\mathfrak{a}) \odot NTT(\mathfrak{b})
+\end{equation*}
+where $\odot$ denotes component-wise multiplication.
+
+NTTs require only $O(N \log N)$ modular operations, saving substantial computation over the naive approach.
+% \vspace{-12pt} % dsm: Why is latex being so finicky...
+% \begin{equation*}
+%   \vspace{-2pt}
+%   \textrm{NTT}(\mathfrak{a}\mathfrak{b}) = \textrm{NTT}(\mathfrak{a}) \odot \textrm{NTT}(\mathfrak{b}),
+% \end{equation*}
+% where $\odot$ stands for component-wise multiplication.
+%, i.e.,
+%$(a_0, ..., a_{N-1}) \odot (b_0, ..., b_{N-1}) = (a_0b_0, ..., a_{N-1}b_{N-1})$.
+% Since the NTT is a linear transformation, other linear operations (like additions) can be performed in the NTT domain. 
+% dsm: used to say additions and automorphisms. Sure, but automorphisms are rare enough that it doesn't matter, and it's not at all obvious that automorphisms are linear... I'd rather avoid the cognitive load
+Thus, FHE implementations often leave ciphertexts in the NTT domain
+across homomorphic operations, instead of performing forward and inverse NTTs for every multiply.
+% nikola: redundant
+% This reduces the number of NTTs.
+
+\paragraph{Avoiding wide arithmetic via Residue Number System (RNS) representation:}
+FHE requires wide ciphertext coefficients (e.g., 512 bits), but wide arithmetic is expensive:
+the cost of a modular multiplier (which takes most of the compute)
+grows quadratically with bit width in our range of interest. Sub-quadratic designs such as Karatsuba multipliers~\cite{karatsuba:1962:multiplication} exist but impose higher constant-factor overheads that make them more expensive for our targetted bit widths.
+Moreover, we need to efficiently support a broad range of widths (e.g., 64 to 512 bits in 32-bit increments),
+both because programs need different widths, and because modulus switching progressively reduces coefficient widths.
+
+RNS representation \cite{garner1959residue}  % victor asked for a ``reassuring read-more-about-RNS citation''
+enables representing a single polynomial with wide coefficients as multiple polynomials with narrower coefficients,
+called \emph{residue polynomials}.
+To achieve this, the modulus~$Q$  is set to be the product of $L$
+smaller distinct primes, $Q = q_1q_2\cdots\ q_L$.
+Then, a polynomial in $R_Q$ can be represented as $L$ polynomials in
+$R_{q_1}, \ldots, R_{q_L}$,
+where the coefficients in the $i$-th polynomial are simply the wide coefficients modulo $q_i$.
+%
+For example, with $W = 32$-bit words, a ciphertext polynomial with $512$-bit modulus~$Q$ is represented as
+$L = \log Q/W = 16$ polynomials with $32$-bit coefficients.
+
+All FHE operations can be carried out under RNS representation, and have either better or equivalent bit-complexity than
+  operating on one wide-coefficient polynomial.
+  %For example, using an RNS representation of a polynomial of length $N$, addition
+%requires $2NL$ $32$-bit additions module the $q_i$s, and a homomorphic multiplication requires $L^2$ NTTs, $2L^2$ 32-bit
+%coefficient multiplications, and $2L^2$ 32-bit additions.
+
+\section{Architectural analysis of FHE}
+\label{sec:fhe_analysis}
+
+We now analyze a key FHE kernel in depth to understand how we can (and cannot) accelerate it.
+Specifically, we consider the key-switching operation,
+which is expensive and takes the bulk of work in homomorphic multiplications and permutations.
+
+\autoref{listing:keyswitch} shows an implementation of key-switching.
+Key-switching takes three inputs: a polynomial \texttt{x}, and two \emph{key-switch hint matrices} \texttt{ksh0} and \texttt{ksh1}. 
+\texttt{x} is stored in RNS form as $L$ residue polynomials (\texttt{RVec}). Each residue polynomial \texttt{x[i]}
+is a vector of $N$ 32-bit integers modulo $q_i$.
+Inputs and outputs are in the NTT domain, and only the \texttt{y[i]} (line 3) are in coefficient form.
+
+
+\begin{figure}[h]
+\begin{center}
+  \begin{lstlisting}[caption={Key-switch implementation. \texttt{RVec} is an $N$-element vector of 32-bit values, storing a single RNS polynomial in either the coefficient or the NTT domain. %Inputs and outputs are in the NTT domain. 
+    %RVec[L] is a vector of L RNS polynomials representing a full ciphertext polynomial; RVec[L][L] is an L$\times$L matrix. + and * operations on RVec are element-wise and modular.
+    }, mathescape=true, style=custompython, label=listing:keyswitch]
+  def keySwitch(x: RVec[L], 
+        ksh0: RVec[L][L], ksh1: RVec[L][L]):
+    y = [INTT(x[i],$q_i$) for i in range(L)]
+    u0: RVec[L] = [0, ...]
+    u1: RVec[L] = [0, ...]
+    for i in range(L):
+      for j in range(L):
+        xqj = (i == j) ? x[i] : NTT(y[i], $q_j$)
+        u0[j] += xqj * ksh0[i,j] mod $q_j$
+        u1[j] += xqj * ksh1[i,j] mod $q_j$
+    return (u0, u1)
+  \end{lstlisting}
+\end{center}
+\end{figure}
+
+%Each automorphism, in addition to ciphertext multiplication, requires a different pair of key-switch hint matrices.
+
+\paragraph{Computation vs.\ data movement:}
+A single key-switch requires $L^2$ forward or inverse NTTs (which have the same cost),
+$2L^2$ multiplications, and $2L^2$ additions of $N$-element vectors.
+In RNS form, the rest of a homomorphic multiplication (excluding key-switching)
+is $4L$ multiplications and $3L$ additions (\autoref{sec:fhe_operation}), so key-switching is dominant.
+
+However, the main cost at high values of $L$ and $N$ is data movement. 
+For example, at $L = 16$, $N = 16K$, each RNS polynomial (\texttt{RVec}) is 64\,KB; 
+each ciphertext polynomial is 1\,MB; each ciphertext is 2\,MB; and
+the key-switch hints dominate, taking up 32\,MB.
+With \name's compute throughput,
+fetching the inputs of each key-switching from off-chip memory would demand
+% dsm: With 10 clusters, having 1 NTT / 2 mul / 2 add FUs,
+% of throughput N/V = 128 cycles per vector op,
+% we can do one of these per 128/10 * L^2 ns = 3276 ns
+% Fetching 33 MB in 3.2 us requires 10.07 TB/s
+about 10\,TB/s of memory bandwidth, far beyond what is available in current technology.
+Thus, it is crucial to reuse these values as much as possible.
+
+
+Fortunately, key-switch hints can be reused:
+all homomorphic multiplications use the same key-switch hint matrices,
+and each automorphism has its own pair of matrices.
+But values are so large that few of them fit on-chip.
+
+Finally, note that decomposing or tiling these computations is difficult and may lead to performance penalties. Tiling across \texttt{RVec} elements works poorly because in NTTs every input element affects every output element. Tiling key-switch hint matrices on either dimension is more feasible, but produces many long-lived intermediate values. This approach may produce performance gains if a particular key-switch hint matrix is reused many times, but must be balanced against the increased footprint of intermediates.
+
+% dsm: RPoly is confusing, because most of these are NOT the coefficients of a polynomial.
+
+
+\paragraph{Performance requirements:}
+We conclude that, to accommodate these large operands, an FHE accelerator requires a memory system that
+\emph{(1)} decouples data movement from computation, as demand misses
+during frequent key-switches would tank performance; and
+\emph{(2)} implements a large amount of on-chip storage (over 32\,MB in our example)
+to allow reuse across entire homomorphic operations
+(e.g., reusing the same key-switch hints across many homomorphic multiplications).
+
+Moreover, the FHE accelerator must be designed to use the memory system well.
+First, scheduling data movement and computation is crucial: data must be fetched far ahead of its use to provide decoupling,
+and operations must be ordered carefully to maximize reuse.
+Second, since values are large, excessive parallelism can increase footprint and hinder reuse.
+Thus, the system should use relatively few high-throughput functional units rather than many low-throughput ones.
+
+\paragraph{Functionality requirements:}
+Programmable FHE accelerators must support a wide range of parameters, both $N$ (polynomial/vector sizes)
+and $L$ (number of RNS polynomials, i.e., width of $Q$). While $N$ is generally fixed for a single program,
+$L$ changes as modulus switching sheds off polynomials.
+
+Moreover, FHE accelerators must avoid overspecializing in order to support algorithmic diversity.
+For instance, we have described \emph{an} implementation of key-switching, but there are others~\cite{kim:jmir18:helr,gentry:crypto2012:homomorphic}
+with different tradeoffs. %, and no implementation dominates.
+For example, an alternative implementation requires much more compute
+but has key-switch hints that grow with $L$ instead of $L^2$,
+so it becomes attractive for very large $L$ ($\sim$20).
+
+\name accelerates \emph{primitive operations on large vectors}:
+modular arithmetic, NTTs, and automorphisms.
+It exploits wide vector processing to achieve very high throughput, even though this makes NTTs and automorphisms costlier.
+\name avoids building functional units for coarser primitives, like key-switching, which would hinder algorithmic diversity.
+
+\paragraph{Limitations of prior accelerators:}
+Prior work has proposed several FHE accelerators for FPGAs~\cite{cousins:hpec14:fpga-he,cousins:tetc17:fpga-he,doroz:tc15:accelerating-fhe,roy:hpca19:fpga-he,mert:tvlsi20:bfv-accel,migliore:tecs17:he-karatsuba,riazi:asplos20:heax,turan:tc20:heaws,mert:tvlsi20:bfv-accel}.
+These systems have three important limitations.
+First, they work by accelerating some primitives but defer others to a general-purpose host processor,
+and rely on the host processor to sequence operations.
+This causes excessive data movement that limits speedups.
+Second, these accelerators build functional units for \emph{fixed parameters} $N$ and $L$ (or $\log Q$ for those not using RNS).
+Third, many of these systems build overspecialized primitives that limit algorithmic diversity.
+
+Most of these systems achieve limited speedups, about 10$\times$ over software baselines.
+HEAX~\cite{riazi:asplos20:heax} achieves larger speedups (200$\times$ vs.\ a single core).
+But it does so by overspecializing: it uses relatively low-throughput functional units for primitive operations, 
+so to achieve high performance, it builds a fixed-function pipeline for key-switching.
+
+
+%\emph{(3)} carefully scheduling operations (e.g., grouping several multiplies that reuse the same key-switch hints)
+%and data movement (e.g., key-switch hints must be fetched far ahead of their use)
+
+%Wide-vector functional units are an ideal fit for application with big
+%operands and no tiling opportunities, like FHE.
+
+%The on-chip scratchpad needs to be highly banked to feed wide-vector
+%operations to many functional units. In turn, the functional units
+%need to be low-latency; increasing throughput by adding more
+%functional units is not an appealing option, as more functional units require
+%more operands and KSHs, further straining our already limited on-chip storage.
+
+%\todo{Disqualify prior work based on conclusions from this section} 
+
+
+\section{FHE schemes other than BGV}
+\label{sec:fhe_others}
+
+We have so far focused on BGV, but other FHE schemes provide different
+tradeoffs.  For instance, whereas BGV requires integer
+plaintexts, CKKS~\cite{cheon:ictaci17:homomorphic} supports ``approximate'' computation on fixed-point values.
+B/FV~\cite{brakerski:crypto12:fully,fan:iacr12:somewhat} encodes
+plaintexts in a way that makes modulus switching before 
+homomorphic multiplication unnecessary, thus easing programming (but forgoing the
+associated efficiency gains). And
+GSW~\cite{gentry:crypto13:homomorphic} features reduced, asymmetric
+noise growth under homomorphic multiplication, but encrypts a
+small amount of information per ciphertext (not a full
+$N$-element vector).
+
+Because \name accelerates primitives rather than whole\hyp{}ciphertext
+operations, it supports BGV, CKKS, and GSW with the same hardware,
+since they use the same primitives.  Accelerating B/FV would require
+some other primitives, so, though adding support for them would not be
+too difficult, our current implementation does not target it.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "micro21_fhe"
+%%% End:

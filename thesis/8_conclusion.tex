@@ -1,0 +1,32 @@
+\chapter{Conclusion}
+
+FHE has the potential to enable computation offloading with guaranteed security.
+But FHE's high computation overheads currently limit its applicability to narrow
+cases (simple computations where privacy is paramount).
+\name tackles this challenge, accelerating full FHE computations by over 3-4 orders of magnitude.
+This enables new use cases for FHE, like secure real-time deep learning inference.
+
+\name is the first FHE accelerator that is programmable,
+i.e., capable of executing full FHE programs.
+In contrast to prior accelerators, which build fixed pipelines tailored to specific FHE schemes and parameters,
+\name introduces a more effective design approach:
+it accelerates the \emph{primitive} computations shared by higher-level operations
+using novel high\hyp{}throughput functional units,
+and hardware and compiler are co-designed to minimize data movement,
+the key bottleneck. %constraint in scaling FHE programs.
+This flexibility makes \name broadly useful:
+the same hardware can accelerate all operations within a program,
+arbitrary FHE programs, and even multiple FHE schemes.
+In short, our key contribution is to show that, for FHE,
+we can achieve ASIC-level performance without sacrificing programmability.
+
+\section{Future Work}
+
+This work opens up a number of directions for future work:
+
+\begin{itemize}
+	\item \emph{Improving on-chip scheduling:} Our simple min-cycle on-chip scheduler resolves all hazards by stalling and introducing dead cycles. This leads to lower than desired functional unit utilization. It may be possible to obtain better utilization (and by extension higher speedups) by using a more powerful on-chip scheduling algorithm with more deliberate data and computation placements.
+	\item \emph{Main-memory model:} The current version of the \name compiler assumes worst-case access times. Having a more accurate memory model could allow the compiler to be more aggressive in scheduling computation to obtain larger speedups, but may also require some hardware stalling mechanism when loads take longer than expected.
+	\item \emph{Global scheduling for low-$L$ computations:} Our current work assumes that key-switch hint reuse is critical to all FHE computations. However, for computations at low values of $L$, key-switch hints are not as dominant. Better scheduling algorithms are possible for computations where key-switch hint reuse is not as dominant.
+	\item \emph{Hybrid HE-MPC:} \name is designed around fully offloading entire FHE computations. However, as described in \autoref{sec:mpc}, HE-MPC accelerators are also an active area of research. Future work could investigate if some variant of \name can work well within this model.
+\end{itemize}

@@ -1,0 +1,241 @@
+\chapter{Scheduling Data and Computation}\label{sec:scheduler}
+
+We now describe \name's software stack,
+focusing on the new static scheduling algorithms
+needed to use hardware well.
+
+\figCompilerOverview
+
+\autoref{fig:compilerOverview} shows an overview of the \name compiler.
+The compiler takes as input an FHE program written in a high-level domain specific language (\autoref{sec:programming}).
+The compiler is structured in three stages.
+First, the \emph{homomorphic operation compiler} 
+orders high-level operations to maximize reuse and
+translates the program into a \emph{computation dataflow graph},
+where operations are computation instructions but there are no loads or stores.
+Second, the \emph{off-chip data movement scheduler} %decides the rough order of computations and
+schedules transfers between main memory and the scratchpad to achieve decoupling and maximize reuse.
+This phase uses a simplified view of hardware, considering it as
+a scratchpad directly attached to functional units. %with  bandwidth constraints.
+The result is a dataflow graph that includes loads and stores from off-chip memory.
+Third, the \emph{cycle-level scheduler} refines this dataflow graph.
+It uses a cycle-accurate hardware model to divide instructions across compute clusters
+and schedule on-chip data transfers.
+This phase determine the exact cycles of all operations, and produces the instruction streams for all components.
+
+This multi-pass scheduling primarily minimizes off-chip data movement, the critical bottleneck.
+Only in the last phase do we consider on-chip placement and data movement.
+
+\section{Comparison with prior work}
+
+We initially tried static scheduling algorithms from prior work~\cite{blelloch:acm1999:provably,marchal:jpdc2019:limiting,goodman:ics1988:code,ozer:micro1998:unified,barany:odes2011:register},
+which primarily target VLIW architectures.
+However, we found these approaches ill-suited to \name for multiple reasons.
+First, VLIW designs have less-flexible decoupling mechanisms
+and minimizing data movement is secondary to maximizing compute operations per cycle.
+Second, prior algorithms often focus on loops,
+where the key concern is to find a compact repeating schedule,
+e.g., through software pipelining~\cite{lam1989software}.
+By contrast, \name has no flow control and we can 
+schedule each operation independently.
+Third, though prior work has proposed register-pressure-aware
+instruction scheduling algorithms,
+they targeted small register files and basic blocks,
+whereas we must manage a large scratchpad over a much longer time horizon.
+Thus, many of the algorithms we tried worked poorly~\cite{ozer:micro1998:unified, goodman:ics1988:code, marchal:jpdc2019:limiting} for our use case.
+
+For example, when considering an algorithm such as Code Scheduling to Minimize Register Usage (CSR)~\cite{goodman:ics1988:code}, we find that the schedules it produces suffer from a large blowup of live intermediate values. This large footprint causes scratchpad thrashing and results in poor performance. Furthermore, CSR is also quite computationally expensive, requiring long scheduling times for our larger benchmarks. We evaluate our approach against CSR in \autoref{sec:sensitivity}.
+
+We also attempted to frame our schedules as a register allocation problem. Effectively, the key challenge in all of our schedules is \emph{data movement}, not computation, so finding a register allocation which minimizes spills could provide a good basis for an efficient schedule. However, our scratchpad stores at least 1024 residue vectors (1024 at maximum $N = 16K$, more for smaller values of $N$), and many of our benchmarks involve hundreds of thousands of instructions, meaning that register allocation algorithms simply could not scale to our required sizes~\cite{barany:odes2011:register, xu:sigplan2007:tetris, touati:ijpp2005:register, berson:pact1993:ursa}.
+
+\section{Translating the program to a dataflow graph}
+\label{sec:programming}
+
+%\paragraph{Domain-Specific Language (DSL) for FHE programs:}
+We implement a high-level domain-specific language (DSL) for writing \name programs.
+%similar to the interface of FHE libraries~\cite{halevi:crypto14:algorithms,polyakov:17:palisade,sealcrypto}.
+%except that we will compile these programs down to hardware.
+%
+To illustrate this DSL and provide a running example,
+\autoref{listing:mv} shows the code for matrix-vector multiplication.
+This follows HELib's algorithm~\cite{halevi:crypto14:algorithms}, which \autoref{fig:MultDataflow} shows.
+This toy $4 \times 16K$ matrix-vector multiply uses input ciphertexts with $N=16K$.
+Because accessing individual vector elements is not possible, the code uses homomorphic rotations %(specific homomorphic permutations)
+to produce each output element.
+
+
+% FIXME(dsm): This drawing is outdated.  
+\figMultDataflow
+
+\begin{figure}
+\begin{center}
+  \begin{lstlisting}[caption={$(4 \times 16K)$ matrix-vector multiply in \name's DSL.}, mathescape=true, style=custompython, label=listing:mv]
+p = Program(N = 16384)
+M_rows = [ p.Input(L = 16) for i in range(4) ]
+output = [ None for i in range(4) ]
+V = p.Input(L = 16)
+
+def innerSum(X):
+  for i in range(log2(p.N)):
+    X = Add(X, Rotate(X, 1 << i))
+  return X
+
+for i in range(4):
+  prod = Mul(M_rows[i], V)
+  output[i] = innerSum(prod)
+  \end{lstlisting}
+\end{center}
+\end{figure}
+
+As \autoref{listing:mv} shows, programs in this DSL are at the level
+of the simple FHE interface presented in \autoref{sec:fhe_mapping}.
+There is only one aspect of the FHE implementation in the DSL:
+programs encode the desired noise budget ($L=16$ in our example),
+as the compiler does not automate noise management.
+
+\section{Compiling homomorphic operations}
+
+The first compiler phase works at the level of the homomorphic operations
+provided by the DSL. It clusters operations to improve reuse, and translates
+them down to instructions.
+
+\paragraph{Ordering} homomorphic operations seeks to maximize
+the reuse of key-switch hints, which is crucial to reduce data movement (\autoref{sec:fhe_analysis}).
+For instance, the program in  \autoref{listing:mv}
+uses 15 different sets of key-switch hint matrices: one for the multiplies (line 12), 
+and a different one for \emph{each} of the rotations (line 8).
+If this program was run sequentially as written, it would cycle through all 15 key-switching hints
+(which total 480\, megabytes, exceeding on-chip storage) four times, achieving no reuse.
+Clearly, it is better to reorder the computation to perform all four multiplies, and then all four \texttt{Rotate(X, 1)}, and so on.
+This reuses each key-switch hint four times.
+
+To achieve this, this pass first clusters \emph{independent} homomorphic operations that reuse the same hint,
+then orders all clusters through simple list-scheduling.
+Operations that do depend on each other are not clustered together because they must be serialized.
+This approach generates schedules with good key-switch hint reuse, where such reuse is available in the underlying computation.
+%for all benchmarks we test.
+
+\paragraph{Translation:} Each homomorphic operation is then compiled into instructions,
+using the implementation of each operation in the target FHE scheme (BGV, CKKS, or GSW).
+Each homomorphic operation may translate to thousands of instructions.
+These instructions are also ordered to minimize the amount of live intermediates.
+The end result is an instruction-level dataflow graph where every instruction
+is tagged with a priority that reflects its global order.
+
+To illustrate how different translations can impact performance, we consider two different key-switching instruction orders in \autoref{listing:translations}. 
+The ordering used in \texttt{keySwitch1} requires not only that \texttt{y} be precomputed, but also that \texttt{y} be stored in memory for the entire duration of the function, requiring L residue vectors of scratchpad space. The ordering used in \texttt{keySwitch2} computes a single value of \texttt{y} (called \texttt{yi}) on each iteration of the outer loop. 
+This only requires a single residue vector of scratchpad space, making this implementation more scratchpad-space efficient. However, as \name is a highly parallel system, we must also consider the implications of parallelizing these functions. 
+If we parallelize the outer loop in \texttt{keySwitch1} and send each iteration to a different compute cluster, then only elements of \texttt{y} need to be broadcast between different clusters. 
+On the other hand, if we parallelize the outer loop of \texttt{keySwitch2}, then all accumulations into \texttt{u0} and \texttt{u1} need to be sent across the network, as each cluster must access each element in \texttt{u0} and \texttt{u1}. 
+The \name compiler uses an implementation very similar to \texttt{keySwitch1}, as we find that in practice, the additional footprint introduced is not a problem, and the reduction of on-chip data movement is more beneficial. 
+Other dataflows are possible and are being considered for future versions of the \name compiler.
+We also select an instruction order for modulo reduction, which in addition to key-switching, is the only other non-trivial primitive operation that admits multiple instruction orderings.
+
+\begin{figure}
+\begin{center}
+  \begin{lstlisting}[caption={Key-switch implementation. \texttt{RVec} is an $N$-element vector of 32-bit values, storing a single RNS polynomial in either the coefficient or the NTT domain. %Inputs and outputs are in the NTT domain. 
+    %RVec[L] is a vector of L RNS polynomials representing a full ciphertext polynomial; RVec[L][L] is an L$\times$L matrix. + and * operations on RVec are element-wise and modular.
+    }, mathescape=true, style=custompython, label=listing:translations]
+  def keySwitch1(x: RVec[L], 
+        ksh0: RVec[L][L], ksh1: RVec[L][L]):
+    y = [INTT(x[i],$q_i$) for i in range(L)]
+    u0: RVec[L] = [0, ...]
+    u1: RVec[L] = [0, ...]
+    for j in range(L): # outer loop
+      for i in range(L):
+        xqj = (i == j) ? x[i] : NTT(y[i], $q_j$)
+        u0[j] += xqj * ksh0[i,j] mod $q_j$
+        u1[j] += xqj * ksh1[i,j] mod $q_j$
+    return (u0, u1)
+
+  def keySwitch2(x: RVec[L], 
+        ksh0: RVec[L][L], ksh1: RVec[L][L]):
+    u0: RVec[L] = [0, ...]
+    u1: RVec[L] = [0, ...]
+    for i in range(L): # outer loop
+      yi = INTT(x[i], $q_i$)
+      for j in range(L):
+        xqj = (i == j) ? x[i] : NTT(yi, $q_j$)
+        u0[j] += xqj * ksh0[i,j] mod $q_j$
+        u1[j] += xqj * ksh1[i,j] mod $q_j$
+    return (u0, u1)
+  \end{lstlisting}
+\end{center}
+\end{figure}
+
+\paragraph{Algorithmic Choice:} The compiler also exploits \emph{algorithmic choice} in generating the dataflow graph.
+Specifically, there are multiple implementations of key-switching (\autoref{sec:fhe_analysis}),
+%the standard method (\autoref{sec:fhe_analysis}) uses key-switch hints of size $2L^2$ polynomials,
+%and the alternative method uses key-switch hints of size $2(L + 73)$,
+%but requires substantially more computation~\cite{gentry:crypto2012:homomorphic}.
+%Thus, the right choice of scheme 
+and the right choice depends on $L$, the amount of key-switch reuse,
+and load on FUs. In addition to the key-switching algorithm described in detail in \autoref{sec:fhe_analysis}, we support
+an alternative method which uses key-switch hints of size $2(L + 73)$, but requires substantially mode computation~\cite{gentry:crypto2012:homomorphic}.
+The compiler leverages knowledge of operation order to estimate these and choose the right variant.
+
+One place where this choice is particularly effective is in bootstrapping benchmarks, where we have a single long chain of automorphisms at high values of $L$.
+Each automorphism requires a different key-switch hint and we have a single chain. Therefore, there is no reuse of key-switch hints. Additionally, because we are performing computations at high $L$, our key-switch hints are very large (sometimes $>64$ megabytes). By switching to the alternative key-switching method, we can minimize our off-chip communication
+and obtain speedups as well as significant energy usage reductions.
+
+\section{Scheduling data transfers} \label{sec:datatransfers}
+
+The second compiler phase consumes an instruction-level dataflow graph and produces 
+an approximate schedule that includes data transfers decoupled from computation,
+minimizes off-chip data transfers, and achieves good parallelism.
+This requires solving an interdependent problem: when to bring a value into the scratchpad and which one to replace
+depends on the computation schedule; and to prevent stalls, the computation schedule depends on which values are in the scratchpad.
+To solve this problem, this scheduler uses a simplified model of the machine:
+it does not consider on-chip data movement, and simply treats all functional units 
+as being directly connected to the scratchpad with no read latency or throughput constraints.
+It also does not consider the availability of bandwidth for store instructions.
+
+The scheduler is greedy, scheduling one instruction at a time.
+It considers instructions ready if their inputs are available in the scratchpad,
+and follows instruction priority among ready ones.
+To schedule loads, we assign each load a priority
+
+\vspace{-12pt}
+\begin{equation*}
+p(\text{load}) = \max \{ p(u) | u \in users(\text{load})\},
+\end{equation*}
+then greedily issue loads as bandwidth becomes available.
+When issuing an instruction, we must ensure that there is space to store its result.
+We can often replace a dead value. % that is no longer needed.
+When no such value exists, we evict the value with the furthest expected time to reuse.
+We estimate time to reuse as the maximum priority among unissued users of the value. 
+This approximates Belady's optimal replacement policy~\cite{belady1966study}. 
+Evictions of dirty data add stores to the dataflow graph.
+When evicting a value, we add spill (either dirty or clean) and fill instructions to our dataflow graph.
+
+\section{Cycle-level scheduling}
+
+Finally, the cycle-level scheduler takes in the data movement schedule produced by the previous phase,
+and schedules all operations for all components considering all resource constraints and data dependences.
+This phase distributes computation across clusters and manages their register files and all on-chip transfers.
+Importantly, this scheduler is fully constrained by its input schedule's off-chip data movement. 
+It does not add loads or stores in this stage, but it does move loads to
+their earliest possible issue cycle to avoid stalls on missing operands.
+All resource hazards are resolved by stalling.
+In practice, we find that this separation of scheduling into data movement and instruction scheduling produces good schedules in reasonable compilation times.
+
+This stage works by iterating through all instructions in the order produced by the previous compiler phase (\autoref{sec:datatransfers}) and determining the minimum cycle at which all on-chip resources are required. We consider the availability of off-chip bandwidth, scratchpad space, register file space, functional units, read ports, and write ports. Scheduling a single instruction may require reserving numerous resources. For instance, bringing operands to a particular cluster requires reserving a read port at the data source and a write port at the data destination in addition to a landing register. Furthermore, we may need to evict a live value from the landing register, requiring even more on-chip resources.
+
+Our highly banked scratchpad (\autoref{sec:memsystem}) and many-ported register files (\autoref{sec:regfiles}) make the task of on-chip scheduling substantially simpler. Each resource constraint has the possibility of stalling an instruction, a fact that is mitigated by our large number of ports.
+
+During this final compiler pass, we also finally account for store bandwidth, scheduling stores (which result from spills) as needed. In practice, we find that this does not hurt our performance much, as stores are infrequent across most of our benchmarks due to our global schedule and replacement policy design. After the final schedule is generated, we validate it by simulating it forward to ensure that no clobbers or resource usage violations occur.
+
+It is important to note that because our schedules are fully static, our scheduler also doubles as a performance measurement tool. As illustrated in \autoref{fig:compilerOverview}, the compiler takes in an architecture description file detailing a particular configuration of \name. This flexibility allows us to conduct design space explorations very quickly (\autoref{sec:scalability}).
+
+\section{Limitations}
+
+Our compiler is designed to maximize reuse of on-chip data and minimize off-chip traffic for key-switch hint dominated workloads. While it performs this task successfully, it suffers some inefficiencies; we leave addressing these inefficiencies to future work.
+
+First, min-cycle scheduling greedily makes decisions about where to place data and schedule computations one instruction at a time.
+This often leads to globally suboptimal schedules with unnecessary on-chip data movement. 
+For instance, we find that NTTs are often computed in one cluster and the results are sent to a different cluster to be multiplied by key-switch hints. 
+In most cases, this is energy-inefficient and can also lead to the addition of further stall cycles in the min-cycle scheduler.
+
+Additionally, taking a single-instruction greedy view of scheduling disallows us from using vector chaining. This leads to additional and unnecessary register-file reads and writes which consume additional energy and introduce stall cycles.
+
+Finally, another compiler limitation is that our key-switch hint based global scheduler assumes that key-switch hints will dominate off-chip data movement. This assumption holds true in computations at higher values of $L$ (recall, KSH size of $O(L^2)$ for operations at a given value of $L$) but with low values of $L$, key-switch hints are not as dominant. Thus, though prioritizing key-switch hints is the right overall heuristic, it causes some additional data movement in some benchmarks (\autoref{sec:datamovement}).

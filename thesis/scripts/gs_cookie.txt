@@ -1,0 +1,5 @@
+# Netscape HTTP Cookie File
+# dsm: Apparently setting citation format in Google Scholar doesn't work anymore.
+# This cookie tells scholar to return a link to Bibtex citations (CF=4)
+
+.scholar.google.com	TRUE	/	FALSE	2147483647	GSP	CF=4
