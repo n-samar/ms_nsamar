@@ -1,549 +1,398 @@
-\usepackage{comment}
+\newcommand{\x}{$\times$}
 
-\newcommand{\tblParamTradeoffs}{
-  \begin{table}[h]
-    \begin{center}
-      \caption{Trade-offs between FHE parameters.}
-      \begin{footnotesize}
-        \begin{tabular}{ c | c c }
-          \toprule
-          & Small $N$ & Big $N$ \\
-          \midrule
-          Big $Q$ & Not secure & Sweet spot \\
-          Small $Q$ &  \multicolumn{2}{c}{Cannot bootstrap} \\
-          \bottomrule
-        \end{tabular}
-      \end{footnotesize}
-    \end{center}
-    \label{tbl:paramTradeoffs}
-  \end{table}
-}
-
-\newcommand{\figParamTradeoffs}{
-  \begin{figure}[h]
+\newcommand{\figBootstrapping}{
+    \begin{figure}[t]
         \begin{center}
-     \includegraphics[width=0.75\columnwidth]{plots/security.pdf}
-    \caption{Trade-offs between FHE parameters. Parameter values above the
-      red line are deemed insecure (i.e., correspond to a security parameter below $80$ bits). The
-      parameter values below the black line do not allow for bootstrapping.}
-    \label{fig:paramTradeoffs}
-    \vspace{-0.03in}
-    \end{center}
-  \end{figure}
-}
-
-\newcommand{\figArch}{
-  \begin{figure}[h]
-        \begin{center}
-     \includegraphics[width=\columnwidth]{figures/ag_arch.pdf}
-     \vspace{-0.12in} % this negative vspace... adds space  (which is what I want)
-     \caption{Overview of the \name architecture.}
-     \vspace{0.025in} % leave bottoms flush
-    \label{fig:arch}
-  \end{center}
-  \end{figure}
-}
-
-\newcommand{\figMultDataflow}{
-  \begin{figure}[h]
-        \begin{center}
-     \includegraphics[width=0.99\columnwidth]{figures/ag_mult_dataflow.pdf}
-    \caption{Example matrix-vector multiply using FHE.}
-    \label{fig:MultDataflow}
-    \vspace{-0.1in}
-    \end{center}
-  \end{figure}
-}
-
-\newcommand{\figOpBreakdown}{
-    \begin{figure}[h]
-    \begin{center}
-        \includegraphics[width=0.7\columnwidth]{plots/lolaptwTimeplot.pdf}
-        \caption{Functional unit and HBM utilization over time for the LoLa-MNIST PTW benchmark.}
-        \label{fig:opBreakdown}
-    \end{center}
+            \includegraphics[width=0.85\columnwidth]{figures/ag_bootstrapping.pdf}
+            \caption{Multiplicative budget over time. Bootstrapping can be used to reset a ciphertext's multiplicative budget.}
+            \label{fig:bootstrapping}
+        \end{center}
     \end{figure}
 }
 
-\newcommand{\figCompilerOverview}{
-  \begin{figure}[h]
-        \begin{center}
-     \includegraphics[width=\columnwidth]{figures/ag_compiler_overview.pdf}
-    \caption{Overview of the \name compiler.}
-    \label{fig:compilerOverview}
-    %\vspace{-0.06in} %dsm: Shaves off a line, but looks bad
-    \end{center}
-  \end{figure}
-}
-
-\newcommand{\figautfu}{
-\setlength{\columnsep}{7pt}
-  \begin{figure}[h]
+\newcommand{\figKScompare}{
+  \begin{figure}[t]
     \begin{center}
-      \vspace{-0.8em}
-     \includegraphics[width=0.25\columnwidth]{figures/ag_aut_fu.pdf}
-    \caption{Automorphism unit.}
-    \label{fig:aut_fu}
-    \vspace{-0.4em} 
+        \includegraphics[width=\columnwidth]{plots/ks_comparison.pdf}
+	\caption{Comparison of footprint and compute for standard and boosted keyswitching.}
+        \label{fig:ksCompare}
     \end{center}
   \end{figure}
 }
 
-\newcommand{\figAutomorphism}{
-  \begin{figure}[h]
+\newcommand{\figBootstrappingFrequency}{
+  \begin{figure}[t]
+    \begin{center}
+        \includegraphics[width=\columnwidth]{figures/ag_bootstrappingFrequency.pdf}
+        \caption{Computation cost as a function of max ciphertext size for narrow (left) and wide (right) deep FHE programs.}
+        \label{fig:bootstrappingFrequency}
+    \end{center}
+  \end{figure}
+}
+
+\newcommand{\tblOpBalance}{
+    \begin{table}[t]
+            \begin{footnotesize}
         \begin{center}
-    \includegraphics[width=0.99\columnwidth]{figures/ag_automorphism.pdf}
-    \caption{Applying $\sigma_3$ on a ciphertext of four 4-element chunks by using only permutations local to chunks.}
-    \label{fig:automorphism}
+            \begin{footnotesize}
+            \begin{tabular}{lrclr}
+                \toprule
+                         & \multicolumn{3}{c}{\textbf{Boosted keyswitching}} & \textbf{Standard} \\
+                Ops      & changeRNSBase  & + & other &  \textbf{keyswitching}\\
+                % alex: Changed the numbers to reflect only keyswitching; not
+                %       full homomorphic multiply. This is a homomorphic rotate
+                %       minus one add.
+                % alex: Technically, the L^2 Add terms in both boosted and
+                %       standard should be L(L-1) as it takes L-1 additions to
+                %       sum up L numbers. But, we probably don't care...
+                \midrule
+                Mult     & $3L^2$  & + & $4L$    & $2L^2$ \\
+                Add      & $3L^2$  & + & $2L$    & $2L^2$ \\
+                NTT      &         &   & $6L$    & $L^2$ \\
+                \midrule
+                % alex: I don't think it N=64K is necessary as N doesn't appear
+                %       anywhere in the formulas. Alternatively, we should
+                %       multiply everything by N.
+                %\multicolumn{3}{l}{At $N$=64K, $L$=64:} \\
+                \multicolumn{3}{l}{At $L$=60:} \\
+                \midrule
+                Mult     & 10,800 & + & 240         & 7,200 \\
+                Add      & 10,800 & + & 120         & 7,200 \\
+                NTT      &        &   & 360         & 3,600 \\
+                \bottomrule
+            \end{tabular}
+            \end{footnotesize}
+        \end{center}
+            \end{footnotesize}
+            \caption{Operation breakdown for boosted vs.\ standard keyswitching as a function of multiplicative budget ($L$), and for $L$=60. Boosted keyswitching operations are split by whether they happen within or outside \texttt{changeRNSBase()}.}
+        \label{tbl:opBalance}
+    \end{table}
+}
+
+\newcommand{\figPipeline}{
+    \begin{figure}[t]
+        \begin{center}
+            \includegraphics[width=\columnwidth]{figures/ag_pipeline.pdf}
+            \caption{Illustration of how vector chaining is used for part of a homomorphic multiply.}
+            \label{fig:pipeline}
+        \end{center}
+    \end{figure}
+}
+
+\newcommand{\figInterClusterTiling}{
+    \begin{figure}[t]
+        \begin{center}
+            \includegraphics[width=0.7\columnwidth]{figures/ag_interClusterTiling.pdf}
+            \caption{Transposing a 16-element vector across two lane groups.}
+            \label{fig:interClusterTiling}
+        \end{center}
+    \end{figure}
+}
+
+\begin{comment}
+\newcommand{\tblParams}{
+    \begin{table}[t]
+        \begin{center}
+            \begin{tabular}{ll}
+                \toprule
+                Parameter &Definition \\
+                \midrule
+                $N$ &Degree of ciphertext polynomials \\
+                $Q$ &Modulus of ciphertext polynomial coefficients \\
+                \bottomrule
+            \end{tabular}
+        \end{center}
+        \caption{FHE parameters and their definitions.}
+        \label{tbl:params}
+    \end{table}
+}
+\end{comment}
+
+\newcommand{\tblUtilization}{
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{plots/utils.pdf}
+    \caption{Functional unit and memory bandwidth utilization.}
+    \label{tbl:utilization}
+\end{figure}
+}
+
+\newcommand{\figNewKS}{
+    \begin{figure}[t]
+        \begin{center}
+            \includegraphics[width=\columnwidth]{figures/ag_newKS.pdf}
+            \caption{New keyswitching implementation.}
+            \label{lst:newKeyswitching}
+        \end{center}
+    \end{figure}
+}
+
+\newcommand{\figWorkflow}{
+  \begin{figure}[t]
+    \begin{center}
+        \includegraphics[width=0.8\columnwidth]{figures/ag_workflow.pdf}
+        \caption{FHE can offload computation to the cloud securely.}
+        \label{fig:workflow}
     \end{center}
   \end{figure}
 }
-
-\newcommand{\figTranspose}{
-  \begin{figure}[h]
-    \centering
-    \includegraphics[width=0.5\columnwidth]{figures/ag_transpose.pdf}
-    \caption{The transpose unit.}
-    \label{fig:transpose}
-  \end{figure}
-}
-
-\newcommand{\figFourStepNTT}{
-  \begin{figure}[h]
-    \includegraphics[width=0.99\columnwidth]{figures/ag_four_step_ntt.pdf}
-    \caption{Example of a four-step NTT datapath that uses 4-point NTTs to implement 16-point NTTs.}
-    \label{fig:fourStepNTT}
-    \vspace{1em}
-  \end{figure}
-}
-
-\newcommand{\figQuadrantSwap}{
-  \begin{figure}[h]
-    \centering
-    \includegraphics[width=0.75\columnwidth]{figures/ag_quadrant_swap.pdf}
-    \caption{Transpose unit (right) and its component quadrant-swap unit (left).}
-    \label{fig:quadrantSwap}
-    \vspace{0.1in}
+\newcommand{\figCRB}{
+  \setlength{\columnsep}{7pt}
+  \begin{figure}[t]
+      \begin{center}
+      \includegraphics[width=0.7\columnwidth]{figures/ag_crb.pdf}
+      \caption{Microarchitecture of the change RNS Base (CRB) unit.}
+      \label{fig:crb}
+    \end{center}
   \end{figure}
 }
 
 \newcommand{\figOverview}{
-  \begin{figure}[h]
-    \centering
-    \vspace{-0.11in}
-    \includegraphics[width=.8\columnwidth]{figures/ag_overview.pdf}
-    \caption{FHE allows a user to securely offload computation to an untrusted server.}
-    %old: \caption{Workflow showing how FHE is used to securely offload computation to an untrusted server.}
-    \label{fig:overview}
-    \vspace{0.2cm}
-  \end{figure}
-}
-
-\newcommand{\figFUSweep}{
-  \begin{figure}[h]
-        \begin{center}
-     \includegraphics[width=\columnwidth]{plots/sweepFUs.pdf}
-    \caption{Performance of our benchmarks with varying number of functional unit clusters.}
-    \label{fig:sweepFUs}
-    \vspace{-0.03in}
-    \end{center}
-  \end{figure}
-}
-
-\newcommand{\figBWSweep}{
-  \begin{figure}[h]
-        \begin{center}
-     \includegraphics[width=\columnwidth]{plots/sweepBW.pdf}
-    \caption{Performance of our benchmarks across various main memory bandwidths.}
-    \label{fig:sweepBW}
-    \vspace{-0.03in}
-    \end{center}
-  \end{figure}
-}
-
-\newcommand{\figDataMovement}{
-\begin{figure}
-  \centering
-  \subfloat[]{
-    \includegraphics[width=0.4\linewidth]{plots/dataMovement.pdf}
-    \label{fig:dataMovement}
-  }
-  \subfloat[]{
-    \includegraphics[width=0.4\linewidth]{plots/power.pdf}
-    \label{fig:power}
-  }
-  \caption{Per-benchmark breakdowns of \textbf{(a)} data movement and \textbf{(b)} average power for \name.}
-  %\vspace{0.1in}
-\end{figure}
-}
-
-\newcommand{\figConfigs}{
-    % \setlength{\columnsep}{7pt}
-  \begin{figure}[h]
-    % \vspace{-0.55in}
+  \begin{figure}[t]
     \begin{center}
-     \includegraphics[width=0.45\columnwidth]{plots/configs.pdf}
-    % \vspace{-0.26in}
-    \caption{Performance vs. area across \name configurations.}
-    \label{fig:pareto}
-    % \vspace{-18pt}
-    % \hspace{-0.03in}
+        \includegraphics[width=\columnwidth]{plots/overview.pdf}
+        \caption{Overview of the \name architecture.}
+        \label{fig:overview}
     \end{center}
   \end{figure}
 }
 
-\newcommand{\figScratchpadSweep}{
-  \begin{figure}[h]
+\begin{comment}
+\newcommand{\figTilingExample}{
+    \begin{figure}[t]
         \begin{center}
-     \includegraphics[width=\columnwidth]{plots/sweepScratchpad.pdf}
-    \caption{Performance of our benchmarks across various scratchpad sizes.}
-    \label{fig:sweepScratchpad}
-    \vspace{-0.03in}
+            \includegraphics[width=\columnwidth]{figures/ag_tilingExample.pdf}
+            \caption{Dividing the \emph{coeffToSlot} dataflow into partitions that fit on chip.}
+            \label{fig:tilingExample}
+        \end{center}
+    \end{figure}
+}
+\end{comment}
+
+\newcommand{\figTiling}{
+  \begin{figure}[t]
+    \begin{center}
+        \includegraphics[width=\columnwidth]{figures/ag_tiling.pdf}
+        \caption{Breakdown of different components of a ciphertext.}
+        \label{fig:tiling}
     \end{center}
   \end{figure}
+}
+
+\newcommand{\tblBenchmarks}{
+    \begin{table}[t]
+        \begin{center}
+           \resizebox{!}{0.85in}{
+            \begin{footnotesize}
+                \begin{tabular}{lrrrrr}
+                    \toprule
+                    Execution time (ms) on  & \name  & F1+   & CPU      & vs. F1+ & vs. CPU \\
+                    \midrule
+                    ResNet-20               & 249.45 & 2,693 & 23\,min &         10.8\x &          5,519\x \\
+                    Logistic Regression     & 119.52 &   639 &  356\,s &         5.34\x &          2,978\x \\
+                    LSTM                    & 138.00 & 2,573 &  859\,s &         18.6\x &          6,225\x \\
+                    Packed Bootstrapping    &   3.91 &  58.3 & 17.2\,s &         14.9\x &          4,398\x \\
+                    \midrule
+                    \textbf{deep gmean speedup}  &&&                   & \textbf{11.2\x} & \textbf{4,611\x} \\
+                    \midrule
+                    Unpacked bootstrapping  &  0.10  & 0.21    &    877 &         2.04\x &          8,612\x \\
+                    CIFAR Unencryp. Wghts.  & 50.50  & 94.1    & 187\,s &         1.86\x &          3,695\x \\
+                    MNIST Unencryp. Wghts.  &  0.14  & 0.13    &    561 &         0.97\x &          4,152\x \\
+                    MNIST Encryp. Wghts.    &  0.24  & 0.22    &   1369 &         0.88\x &          5,621\x \\
+                    \midrule
+                    \textbf{shallow gmean speedup} &&&                  &\textbf{1.34\x} & \textbf{5,220\x}  \\
+                    \bottomrule
+               \end{tabular}
+            \end{footnotesize}
+            }
+       \end{center}
+       \caption{Performance of \name, F1+, and CPU on full FHE benchmarks.}
+       \label{tbl:benchmarks}
+    \end{table}
+}
+
+\newcommand{\tblSecureBenchmarks}{
+    \begin{table}[t]
+        \begin{center}
+            \begin{footnotesize}
+                \begin{tabular}{lrr|rr}
+                    \toprule
+                    Execution time (ms) for & 128-bit  & vs. 80-bit & 200-bit ($N$=128k) & vs. 80-bit \\
+                    \midrule
+                    ResNet-20               & 321.26   & 1.29\x & 588.70 & 2.36\x \\
+                    Logistic Regression     & 121.91   & 1.02\x & 123.10 & 1.03\x \\
+                    LSTM                    & 223.56   & 1.62\x & 596.16 & 4.32\x \\
+                    Packed Bootstrapping    &   6.33   & 1.62\x &  17.01 & 4.35\x \\
+                    \midrule
+                    \textbf{gmean slowdown}  && \textbf{1.36\x} & & \textbf{2.60\x} \\
+                    \bottomrule
+               \end{tabular}
+            \caption{Performance of \name at 128-bit security and at 240-bit ($N$=128k) with comparisons to performance at 80-bit security.}
+           \label{tbl:securebenchmarks}
+            \end{footnotesize}
+       \end{center}
+    \end{table}
+}
+
+\newcommand{\figGmeanVsStorage}{
+    \begin{figure}
+            \centering
+            \includegraphics[width=0.8\columnwidth]{plots/scratchpad_sweep.pdf}
+            \caption{Gmean performance of \name on deep benchmarks as a function of on-chip storage size.}
+            \label{fig:gmeanVsStorage}
+    \end{figure}
+}
+
+\newcommand{\tblPerformanceBreakdown}{
+    \begin{table}[t]
+        \begin{footnotesize}
+        \begin{center}
+            \begin{tabular}{lrrrr}
+                \toprule
+                Speedup vs.             & KSHGen & CRB/chain & Network \\
+                \midrule
+                ResNet-20               & 2.0\x    & 20.0\x  & 1.7\x \\
+                Logistic Regression     & 1.3\x    &  8.8\x  & 1.2\x \\
+                LSTM                    & 2.5\x    & 34.5\x  & 1.3\x \\
+                Packed Bootstrapping    & 2.0\x    & 27.4\x  & 1.3\x \\
+                \midrule
+                \textbf{deep gmean speedup} & \textbf{1.9\x} & \textbf{20.2\x} & \textbf{1.3\x} \\
+                \midrule
+                Unpacked Bootstrapping  &1.9\x & 3.7\x       & 1.0\x \\
+                CIFAR Unencrypt. Wghts. &1.0\x & 3.7\x       & 2.0\x \\
+                MNIST Unencrypt. Wghts. &1.1\x & 1.3\x       & 1.5\x \\
+                MNIST Encryp. Wghts.    &1.1\x & 1.0\x       & 1.3\x \\
+                \midrule
+                \textbf{shallow gmean speedup}  &\textbf{1.2\x}    &\textbf{2.0\x} & \textbf{1.4\x} \\
+                \bottomrule
+            \end{tabular}
+            \caption{Speedups of \name over configurations without KSHGen, CRB or chaining, and the fixed network.}
+            \label{tbl:performanceBreakdown}
+        \end{center}
+        \end{footnotesize}
+    \end{table}
+}
+
+\newcommand{\tblBenchmarksAndPerformanceBreakdown}{
+    \tblBenchmarks
+    \tblPerformanceBreakdown
+}
+
+
+
+\newcommand{\figDataMovementAndPower}{
+    \begin{figure}[t]
+        \begin{center}
+            \captionsetup[subfigure]{labelformat=empty}
+            \begin{subfigure}[b]{0.46\columnwidth}
+                \includegraphics[width=\linewidth]{plots/cl_data_movement.pdf}
+                \caption{}
+                \label{fig:dataMovement}
+            \end{subfigure}
+            \hfil %%
+            \begin{subfigure}[b]{0.46\columnwidth}
+                \includegraphics[width=\linewidth]{plots/cl_power.pdf}
+                \caption{}
+                \label{fig:power}
+            \end{subfigure}
+            \begin{center}
+                (a) \hspace{0.45\columnwidth} (b)
+            \end{center}
+            \caption{Per-benchmark breakdown of (a) data movement and (b) average power for \name.}
+        \end{center}
+    \end{figure}
+}
+
+\newcommand{\tblMicrobenchmarks}{
+    \begin{table}[t]
+        \begin{footnotesize}
+            \begin{center}
+                \begin{tabular}{l|rr|rr|rr}
+                    \toprule
+                    & \multicolumn{2}{c|}{$N$=64K} & \multicolumn{2}{c|}{$N$=32K} & \multicolumn{2}{c}{$N$=16K} \\
+                    Operation        & Ours  & vs. F1+ & Ours  & vs. F1+ & Ours & vs. F1+ \\
+                    \midrule
+                    Ct. mult.        & 8,436 & 6.13\x  & 2,260 & 3.00\x  &  708 & 1.31\x \\
+                    Ct. rotate       & 6,388 & 7.85\x  & 1,748 & 3.66\x  &  580 & 1.43\x \\
+                    Pt. rotate       & 4,096 & 0.25\x  & 1,024 & 0.25\x  &  256 & 0.25\x \\
+                    Ct. add          & 1,024 & 0.25\x  &   256 & 0.25\x  &   64 & 0.25\x \\
+                    Pt.-Ct. mult.    & 1,024 & 0.25\x  &   256 & 0.25\x  &   64 & 0.25\x \\
+                    \bottomrule
+                \end{tabular}
+            \end{center}
+            \caption{Performance of \name vs. F1+ on ciphertext operations. We report results in reciprocal throughput, in nanoseconds per ciphertext operation (lower is better). The benchmarks are in order: $(N, \log Q) = (64K, 1,664), (32K, 832), (16K, 416)$.}
+            \label{tbl:microbenchmarks}
+        \end{footnotesize}
+    \end{table}
+}
+
+\newcommand{\tblDataTypes}{
+    \begin{table}[t]
+        \begin{center}
+            \begin{tabular}{lrrr}
+                \toprule
+                Data type & Size vs. Pt & $L=10$ & $L=32$ \\
+                \midrule
+                Old Keyswitch Hint & $2L$\x & $20\,$MB & $208\,$MB \\
+                New Keyswitch Hint & $4$\x & $4\,$MB & $12\,$MB \\
+                Ciphertext & $2$\x & $2\,$MB & $6\,$MB \\
+                Plaintext & $1$\x & $1\,$MB & $3\,$MB \\
+                \bottomrule
+            \end{tabular}
+        \end{center}
+        \caption{Comparison of sizes of different data types used in FHE.}
+    \end{table}
+}
+
+\newcommand{\tblOpCost}{
+    \begin{table}[t]\label{tbl:opCost}
+        \begin{center}
+            \begin{tabular}{lrrr}
+                \toprule
+                Operation & Integer mults & \% KS & \% total ops \\
+                \midrule
+                Ct-ct multiplication &$3 \times 10^{12}$ & $99.99\%$ & ??? \\
+                Ct rotation &$3 \times 10^{12}$ & $100.00\%$ & ??? \\
+                Pt-ct multiplication & $10^6$ & - & ??? \\
+                Ct-ct addition &0 & - & ??? \\
+                Pt-ct addition &0 & - & ??? \\
+                Pt rotation &0 & - & ??? \\
+                \bottomrule
+            \end{tabular}
+        \end{center}
+        \caption{Computational cost of FHE operations.}
+    \end{table}
 }
 
 \newcommand{\tblGF}{
-  \begin{table}[h]
+  \begin{table}[t]
+       \begin{footnotesize}
     \begin{center}
       \begin{footnotesize}
-        \begin{tabular}{lrrr}
+        \begin{tabular}{lr}
           \toprule
-          Component & Area [mm$^2$] & TDP [W] \\
-          \midrule
-          NTT FU & 2.27 & 4.80  \\
-          Automorphism FU & 0.58 & 0.99  \\
-          %Transpose & 0.28 & \tmp{???} & - \\
-          Multiply FU & 0.25 & 0.60  \\
-          Add FU & 0.03 & 0.05  \\
-          Vector RegFile (512\,KB) & 0.56 & 1.67 \\
-          \textbf{Compute cluster} & 3.97 & 8.75 \\
-          (NTT, Aut, 2$\times$ Mul, 2$\times$ Add, RF) & & \\
-          \textbf{Total compute} (16 clusters) &  \textbf{63.52} & \textbf{140} \\
-          \midrule
-          Scratchpad (16$\times$4\,MB banks) & 48.09 & 20.35 \\
-          3$\times$NoC (16$\times$16 512\,B bit-sliced~\cite{passas:tocaid12:crossbar}) & 10.02 & 19.65 \\
-          Memory interface (2$\times$HBM2 PHYs) & 29.8 & 0.45 \\
-          \textbf{Total memory system} &  \textbf{87.91} & \textbf{40.45} \\
-          \midrule
-          \textbf{Total \name} &  \textbf{151.43} & \textbf{180.45} \\
-          \bottomrule
-        \end{tabular}
-      \end{footnotesize}
-    \end{center}
-    \vspace{-0.08in}
-    \caption{Area and Thermal Design Power (TDP) of \name, and breakdown by component.}
-    \label{tbl:GF12}
-    \vspace{-0.1in}
-  \end{table}
+    Component                                           & Area [mm$^2$] \\
+    \midrule
+    CRB FU                                              & 158.8 \\
+    NTT FU                                              &  28.1 \\
+    Automorphism FU                                     &   9.0 \\
+    KSHGen FU                                           &   3.3 \\
+    Multiply FU                                         &   2.2 \\
+    Add FU                                              &   0.8 \\
+    \mbox{\textbf{Total FUs} (CRB, 2$\times$NTT,}  & \textbf{240.5} \\
+    \mbox{\hspace{2pt} Aut, KSHGen, 5$\times$Mul, 5$\times$Add)} & \\
+    \midrule
+    \mbox{Register file (256\,MB)}                      & 192.0 \\
+    \mbox{On-chip interconnect}                         &  10.0 \\
+    \mbox{Mem. PHYs (2$\times$HBM2E)}                   &  29.8 \\
+    \midrule
+    \textbf{Total \name}                                &  \textbf{472.3} \\
+    \bottomrule
+\end{tabular}
+\end{footnotesize}
+\caption{Area breakdown of \name by component.}
+\label{tbl:GF12}
+\end{center}
+       \end{footnotesize}
+\end{table}
 }
-
-
-\newcommand{\tblNomenclature}{
-   \begin{table}[h]
-     \begin{footnotesize}
-        \begin{center}
-           \begin{tabular}{ll}
-              \toprule
-              \textbf{Param} & \textbf{Definition} \\
-              \midrule
-               \multicolumn{2}{c}{FHE Parameters} \\
-              \midrule
-              $N$ & Number of vector elements / polynomial coefficients \\
-              $Q$ & Ciphertext modulus \\
-              $t$ & Plaintext modulus \\
-              \midrule
-               \multicolumn{2}{c}{Architecture Parameters} \\
-              \midrule
-              $L$ & Number of RNS polynomials per ciphertext polynomial \\
-              $q_i$ & The $i$-th RNS modulus ($Q = q_0q_1...q_{L-1}$) \\
-              $E$ & Number of vector lanes \\
-              $V$ & Vector operation initiation interval ($V = N/E$) \\ % dsm: Chimes? I don't know of a good nomenclature for this...
-              \bottomrule
-           \end{tabular}
-           \label{tbl:nomenclature}
-        \end{center}
-        \caption{Nomenclature of key parameters in this paper.}
-     \end{footnotesize}
-   \end{table}
-}
-
-\newcommand{\tblModMult}{
-  \begin{table}[h]
-    \begin{footnotesize}
-      \begin{center}
-        \begin{tabular}{lrrr}
-          \toprule
-          Multiplier & Area [$\mu$m$^2$] & Power [mW] & Delay [ps] \\
-          \midrule
-          Barrett & $5,271$ & $18.4$ & 1,317 \\
-          Montgomery & $2,916$ & $9.2$ & 1,040 \\
-          NTT-friendly & $2,165$ & $5.36$ & 1,000 \\ % assumes q = 2^11m+1
-          \midrule
-          \textbf{FHE-friendly (ours)} & $1,817$ & $4.1$ & 1,000 \\
-          \bottomrule
-        \end{tabular}
-        \vspace{0.02in}
-        \caption{Area, power, and delay of modular multipliers.}
-        \label{tbl:modMult}
-      \end{center}
-    \end{footnotesize}
-    \vspace{-0.18in}
-  \end{table}
-}
-
-\newcommand{\x}{$\times$}
-
-
-\newcommand{\tblMicrobenchmark}{
-  \begin{table}[t]
-      % \vspace{-0pt}
-      \begin{center}
-      \resizebox{\columnwidth}{!}{%
-      \begin{tabular}{l|rrr|rrr|rrr}
-        \toprule
-        & \multicolumn{3}{c|}{$N = 2^{12}$, $\log Q = 109$} &
-        \multicolumn{3}{c|}{$N = 2^{13}$, $\log Q = 218$} &
-        \multicolumn{3}{c}{$N = 2^{14}$, $\log Q = 438$} \\
-        
-        & \textbf{\name} & vs.\ CPU & vs.\ HEAX$_\sigma$ & \textbf{\name} & vs.\ CPU & vs.\ HEAX$_\sigma$ & \textbf{\name} & vs.\ CPU & vs.\ HEAX$_\sigma$\\
-
-        \midrule
-
-        % --- NTT
-
-        % N=2**12, logQ = 109
-        NTT
-        &\textbf{12.8} % our
-        &17,148$\times$ % CPU
-        &1,600$\times$ % HEAX
-
-        % N=2**13, logQ = 218
-        &\textbf{44.8} % our
-        &10,736$\times$ % CPU
-        &1,733$\times$ % HEAX
-
-        % N=2**14, logQ = 438
-        &\textbf{179.2} % our
-        &8,838$\times$ % CPU
-        &1,866$\times$ % HEAX
-        \\
-        % --- Automorph. w/out k-s
-        
-        % N=2**12, logQ = 109
-        Automorphism 
-        &\textbf{12.8} % our
-        &7,364$\times$ % CPU
-        &440$\times$ % HEAX
-
-        % N=2**13, logQ = 218   
-        &\textbf{44.8} % our
-        &8,250$\times$ % CPU
-        &426$\times$ % HEAX
-
-        % N=2**14, logQ = 438
-        &\textbf{179.2} % our
-        &16,957$\times$ % CPU
-        &430$\times$ % HEAX
-        \\
-
-        \midrule
-
-        % --- Ctxt-Ctxt Mult.
-
-        % N=2**12, logQ = 109    
-        Homomorphic multiply
-        &\textbf{60} % our - % 60 MULS * 32 * 1/(32) = 60 cycles
-        &48,640$\times$ % CPU
-        &172$\times$ % HEAX
-
-        % N=2**13, logQ = 218
-        &\textbf{300} % our
-        &27,069$\times$ % CPU
-        &148$\times$ % HEAX
-
-        % N=2**14, logQ = 438
-        &\textbf{2,000} % our
-        &14,396$\times$ % CPU
-        &190$\times$ % HEAX
-        \\
-
-        % --- Automorph. w/ k-s
-
-        % N=2**12, logQ = 109    
-        Homomorphic permutation
-        &\textbf{40} % our
-        &17,488$\times$ % CPU
-        &256$\times$ % HEAX
-
-        % N=2**13, logQ = 218
-        &\textbf{224} % our
-        &10,814$\times$ % CPU
-        &198$\times$ % HEAX
-
-        % N=2**14, logQ = 438
-        &\textbf{1,680} % our
-        &6,421$\times$ % CPU
-        &227$\times$ % HEAX
-        \\
-        
-        \bottomrule
-      \end{tabular}
-      }
-      %}
-      \end{center}
-      %\vspace{-5pt}
-      \caption{Performance on microbenchmarks: \name's \textbf{reciprocal throughput, in nanoseconds per ciphertext operation} (lower is better) and speedups over CPU and HEAX$_\sigma$ (HEAX augmented with scalar automorphism units) (higher is better).}
-      \label{tbl:microbenchmark}
-      %\vspace{-3pt} % dsm: Leaves flush with other pages
-  \end{table}
-    % dsm: Now explained in text
-    %\footnotetext[2]{We assume an SRAM array is used to perform an automorphism via random reads because HEAX does not report how they implement automorphisms.}
-    %     \footnotetext[3]{We assume throughput is bottleneck on either the automorphism or keyswitching throughput, whichever is smaller.}
-}
-
-
-\newcommand{\tblBenchmark}{
-  \begin{table}[t]
-    \begin{footnotesize}
-      \begin{center}
-      \begin{tabular}{lrrr}
-        \toprule
-        Execution time (ms) on & CPU & \name & Speedup \\
-        
-        \midrule
-        LoLa-CIFAR Unencryp. Wghts. & $1.2\times10^6$ & \textbf{241} & $5,011$\x \\
-        LoLa-MNIST Unencryp. Wghts. & $2,960$ & \textbf{0.17} & $17,412$\x \\
-        LoLa-MNIST Encryp. Wghts. & $5,431$ & \textbf{0.36} & $15,086$\x \\
-        Logistic Regression & $8,300$ & \textbf{1.15} & $7,217$\x \\
-        BGV Bootstrapping & ---\footnotemark[2] & \textbf{1.8} & ---\footnotemark[2] \\  % L=24
-        CKKS Bootstrapping & $1,554$ & \textbf{1.3} & $1,195$\x \\    % L=24
-        \midrule
-
-        \textbf{gmean speedup} &&& 6,471\x \\
-        % CKKS Bootstrapping $L=22$ & $1456$ & \textbf{2.2} & $662$\x \\
-        % CKKS Bootstrapping $L=20$ & $1314$ & \textbf{1.9} & $692$\x \\
-        \bottomrule
-      \end{tabular}
-   \end{center}
-    \vspace{-8pt}
-      \hfill\footnotemark[1]{LoLa's release did not include MNIST with encrypted weights, so we reimplemented it in HELib.}\quad\mbox{} \\
-      \hfill\footnotemark[2]{BGV bootstrapping in HELib crashes for this input, and we could not find an alternative implementation or fix HELib. We expect \name's speedup to be at least 3,000$\times$}.\quad\mbox{}
-    \end{footnotesize}
-    \vspace{4pt}
-      \caption{Performance of \name and CPU on full FHE benchmarks: execution times in milliseconds
-      and \name's speedup.}      
-      \label{tbl:benchmark}
-      \vspace{-6pt}
-  \end{table}
-}
-
-\newcommand{\tblPrimitiveOps}{
-  \begin{table}[h]
-    \begin{footnotesize}
-      \begin{center}
-        \caption{Operations in BGV \cite{}, CKKS \cite{}, and GSW \cite{} schemes and their constituent
-        \textit{primitive operations}, which \name FUs acelerate. BGV and CKKS use very similar FHE operations
-        and differ mainly in encryption/decryption.}
-        \begin{tabular}{l|rr}
-          \toprule
-          & \multicolumn{2}{c}{\textbf{Required primitive operations}} \\
-          \textbf{Operation} & \textbf{BGV/CKKS} & \textbf{GSW} \\
-          \midrule
-          Ciphertext add & add & add \\
-          Ciphertext mult & NTT, mult & NTT, mult, add \\
-          Key switching/relin & NTT, mult, add & N/A \\
-          Mod switching & NTT, reduce, add & NTT, reduce, add \\
-          Bootstrapping & automorphism, all ops & automorphism, all ops \\
-          \bottomrule
-        \end{tabular}
-        \label{tbl:primitiveOps}
-      \end{center}
-    \end{footnotesize}
-  \end{table}
-}
-
-\newcommand{\cipher}{\textsf{Ciphertext}}
-\newcommand{\plain}{\textsf{Plaintext Vector}}
-\newcommand{\scalar}{\textsf{Plaintext Scalar}}
-
-\newcommand{\tblDSLOps}{
-  \begin{table}[h]
-    \begin{footnotesize}
-      \begin{center}
-        \caption{Supported FHE Operations and Types}
-        \begin{tabular}{l|r}
-            \textbf{Operation} & \textbf{Type}\\
-            \midrule
-            \textsf{Mul} & $\cipher \times \cipher \rightarrow \cipher$ \\
-            \textsf{MulPlaintext} & $\cipher \times \plain \rightarrow \cipher$ \\
-            \textsf{MulScalar} & $\cipher \times \scalar \rightarrow \cipher$ \\
-            \textsf{Add} & $\cipher \times \cipher \rightarrow \cipher$ \\
-            \textsf{AddPlaintext} & $\cipher \times \plain \rightarrow \cipher$ \\
-            \textsf{AddScalar} & $\cipher \times \scalar \rightarrow \cipher$ \\
-            \textsf{Rotate} & $\cipher \times \scalar \rightarrow \cipher$ \\
-            \textsf{ModDown} & $\cipher \times \scalar \rightarrow \cipher$ \\
-        \end{tabular}
-      \end{center}
-    \end{footnotesize}
-  \end{table}
-}
-
-
-\newcommand{\tblSensitivity}{
-  \begin{table}[h]
-    \begin{footnotesize}
-      \begin{center}
-        \begin{tabular}{lrrr}
-            \toprule
-            Benchmark & LT NTT & LT Aut & CSR \\
-            \midrule
-            LoLa-CIFAR Unencryp. Wghts. & 3.5\x & 12.1\x & ---\footnotemark[1] \\
-            LoLa-MNIST Unencryp. Wghts. & 5.0\x & 4.2\x & 1.1\x \\
-            LoLa-MNIST Encryp. Wghts. & 5.1\x & 11.9\x & 7.5\x \\
-            Logistic Regression & 1.7\x & 2.3\x & 11.7\x \\
-            BGV Bootstrapping & 1.6\x & 1.1\x & 5.4\x \\
-            CKKS Bootstrapping & 1.1\x & 1.2\x & 2.7\x \\
-            \midrule
-            \textbf{gmean speedup} & 2.5\x & 5.5\x & 4.2\x \\
-            \bottomrule
-        \end{tabular}
-      \end{center}
-      \vspace{-8pt}
-      \hfill\footnotemark[1]{CSR is intractable for this benchmark.}\quad\mbox{}
-    \end{footnotesize}
-    \vspace{4pt}
-        \caption{Speedups of \name over alternate configurations: %without our contributions:
-          LT NTT/Aut = Low-throughput NTT/Automorphism FUs; CSR = Code Scheduling to minimize Register Usage \cite{goodman:ics1988:code}.}
-        \label{tbl:sensitivity}
-    \vspace{-2pt}
-  \end{table}
-}
-
-\newcommand{\C}{\textsf{Scalar}}
-\newcommand{\V}{\textsf{Vector}}
-\newcommand{\q}{\textsf{Modulus}}
-
-\newcommand{\tblISA}{
-  \begin{table}[h]
-  \begin{footnotesize}
-  \begin{center}
-  \caption{\name ISA}
-  \begin{tabular}{lr}
-  \toprule
-  Instruction & Type \\
-  \midrule
-  \texttt{ADD} & $\V \times \V \times \q \rightarrow \V$ \\
-  \texttt{ADD\_SCALAR} & $\V \times \C \times \q \rightarrow \V$ \\
-  \texttt{MUL} & $\V \times \V \times \q \rightarrow \V$ \\
-  \texttt{MUL\_SCALAR} & $\V \times \C \times \q \rightarrow \V$ \\
-  \texttt{NTT} & $\V \times \q \rightarrow \V$ \\
-  \texttt{INTT} & $\V \times \q \rightarrow \V$ \\
-  \texttt{AUTOMORPHISM} & $\V \times \C \rightarrow \V$ \\
-  \end{tabular}
-  \label{tbl:isa}
-  \end{center}
-  \end{footnotesize}
-  \end{table}
-}
-

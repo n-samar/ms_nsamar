@@ -1,0 +1,36 @@
+\section{Additional Related Work}\label{sec:related}
+
+We now present related work not discussed so far.
+
+\paragraph{HE-MPC accelerators are hampered by communication:}
+To avoid the overheads of FHE, recent work has proposed accelerators
+for private deep learning
+that combine shallow homomorphic encryption (HE) with multi-party computation (MPC):
+Gazelle~\cite{juvekar2018gazelle} and Cheetah~\cite{reagen:hpca21:cheetah}.
+These systems require very frequent communication with the client,
+essentially after every single level of multiplication.
+So while they reduce accelerator overheads, they are limited by high client-server communication
+and client encryption/decryption overheads.
+Delphi~\cite{mishra2020delphi} shows that each DNN inference takes gigabytes of traffic,
+which dominates performance; yet, the above accelerators do not consider this traffic.
+CHOCO~\cite{vanderhagen:arxiv21:choco} shows that, even after accelerating client operations,
+communication costs dominate.
+
+By dramatically accelerating bootstrapping, \name eliminates the high communication costs of HE-MPC and shallow HE designs.
+To avoid bootstrapping, these prior approaches require the \emph{client} to receive, reencrypt, and resend ciphertexts that have exhausted their multiplicative budgets.
+In our benchmarks, avoiding each bootstrapping would require transferring over 13\,MB between client and server
+(as the client must resend the ciphertext with a reasonable noise budget).
+Even if we ignore client computation and network latency, on a 100\,Mbps connection this would
+require over 1 \emph{second} per ciphertext.
+By contrast, \name bootstraps this ciphertext in 3.9\,ms, 256$\times$ faster.
+Bootstrapping also allows the client to send narrow inputs (e.g., with 32 instead of 1,500 bits per coefficient),
+which the server can bootstrap before computation.
+This greatly reduces encryption and network overheads.
+
+\paragraph{GPUs are inefficient on FHE:}
+Prior work has studied the use of GPUs to accelerate FHE~\cite{wang:hpec12:fhe-gpu,wang:tc13:fhe-gpu,wang:iscas14:leveled-gpu,al:emerging19:implementation,jung2021over}.
+While the data-parallel nature of GPUs may seem a good fit for FHE, these efforts achieve modest speedups over multicore CPUs.
+This is because GPUs lack modular arithmetic, cannot implement all-to-all operations like NTTs and automorphisms efficiently,
+and their on-chip memories are too small to enable sufficient reuse (\autoref{fig:gmeanVsStorage}), despite their use of HBM. Specifically, state-of-the-art GPU approaches carefully tune algorithms to achieve high off- and on-chip bandwidth utilization~\cite{jung2021over}; however, \cite{jung2021over} is 200$\times$ slower than \name.
+This shows that \name's high reuse is crucial: to achieve the same throughput as \name,
+a GPU would need over 100\,TB/s of memory bandwidth.

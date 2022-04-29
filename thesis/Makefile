@@ -2,17 +2,17 @@ PAPER_NAME=ms_thesis
 CAMERA_NAME=$(PAPER_NAME)
 # Halt on errors instead of going to the shell
 LATEX_OPTS=-halt-on-error -mode=batch
+BIB = refs.bib confs.bib
 
 default: paper
 
 figs:
 	make -C figures/
-	#make -C plots/
 
 fast: figs Makefile
 	pdflatex $(LATEX_OPTS) $(PAPER_NAME)
 
-paper: figs Makefile
+paper: figs Makefile $(BIB)
 	date > auto_header.tex
 	echo "--- rev" >> auto_header.tex
 	python scripts/gitver.py >> auto_header.tex

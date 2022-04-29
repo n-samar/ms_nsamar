@@ -1,0 +1,139 @@
+\section{Experimental Methodology}\label{sec:methodology}
+
+\paragraph{Modeled system:}
+We evaluate our \name implementation from \autoref{sec:implementation}
+using a cycle-accurate simulator to execute \name programs.
+We use activity-level energies from synthesized components to produce energy breakdowns.
+
+\paragraph{Benchmarks:}
+We use several FHE programs to evaluate \name.
+All programs come from state-of-the-art software implementations, and use the CKKS scheme.
+To show that \name is efficient on unbounded computations,
+we use four \emph{deep} benchmarks, which have a high multiplicative depth and require bootstrapping.
+We also use four \emph{shallow} benchmarks,
+with low multiplicative depth
+and no bootstrapping, to show that \name is also efficient at low depths.
+
+We meet 80-bit security for all benchmarks by using a combination of
+2-digit and 1-digit keyswitching (\autoref{sec:boostedSecurity}). 
+We also use non-sparse keys and the most recent bootstrapping techniques~\cite{bossuat2021efficient} in order to
+maximize our multiplicative budget without losing precision.
+We later
+benchmark performance for 128-bit security and beyond (\autoref{sec:moreSecurity}).
+We use the LWE estimator~\cite{albrecht2018estimate} to derive security parameters.
+
+\paragraph{Deep benchmarks} include:
+
+\noindent \emph{\textbf{(1) LSTM}} is a Long-Term Short-Term (LSTM) NLP 
+benchmark~\cite{podschwadt:2020:classification}. 
+This benchmark boils down to computing $h_{i+1} = \sigma(W_0h_i + W_1x_i)$ many times. 
+$\sigma$ is an activation function approximated by a degree-3 polynomial, and 
+$W_0h_i$, $W_1x_i$ are 128$\times$128 matrix-vector multiplies. 
+%Since $h_{i+1}$ has a dependence on $h_i$,
+This computation is multiplicatively deep and requires 50 bootstrappings per inference. 
+% dsm: Frontloaded
+%This makes it particularly challenging for prior work to manage.
+
+\noindent \emph{\textbf{(2) ResNet-20}} is an FHE implementation~\cite{lee:2021:privacy} of 
+the ResNet-20 DNN. 
+We benchmark an inference on a single~encrypted~image.
+
+% dsm: This is not specific to this algorithm
+%We use recent advances in bootstrapping algorithms to pack all channels into a single 
+%ciphertext before bootstrapping. This reduces the total number of bootstrapping from 1,888
+%to about 50. This improves performance on all hardware by about 5$\times$. 
+%Further, on this benchmark both our baselines
+%and \name spend only about 25\% of their
+%execution time bootstrapping. This is in contrast to the generally-held belief
+%that bootstrapping is usually responsible for over 90\% of execution time when it
+%is used.
+
+\tblBenchmarksAndPerformanceBreakdown % dsm: And babysitted because latex thinks table*s belong to the end of the paper, WTF...
+
+\noindent \emph{\textbf{(3) Logistic regression}}
+uses the HELR algorithm~\cite{han:aaai19:logistic}, which is based on CKKS.
+We compute many batches of logistic regression training with 256 features,
+and 256 samples per batch,
+starting at computational depth $L$=38. This benchmark is different from
+the one reported in F1, as it performs multiple logistic regression iterations.
+F1 reported performance on only a single iteration, thereby avoiding frequent
+bootstrapping that is necessary for running multiple training iterations.
+
+%We leverage recent advances in bootstrapping algorithms and pack ciphertexts
+%to reduce the total number of bootstrappings; this is the same technique as
+%described in the ResNet-20 benchmark above.
+
+\noindent \emph{\textbf{(4) Fully-packed bootstrapping}}
+takes an $L$=3 and $N$=64K ciphertext with an exhausted multiplicative budget and refreshes it
+by bringing it up to $L$=57, then performs the bootstrapping computation
+to obtain a usable ciphertext at a lower budget. The \emph{fully-packed}
+version implies the ciphertext uses all $N$/2=32K available slots.
+Bootstrapping costs grow with the number of slots (both in multiplicative depth and
+compute).
+
+We use the state-of-the-art fully packed bootstrapping algorithm~\cite{mouchet2020lattigo},
+and use Lattigo's implementation~\cite{lattigo} as the baseline.
+We tune \name's bootstrapping implementation
+to maximize performance as discussed in \autoref{sec:algorithmicInsights}.
+
+For consistency, \emph{we also use this bootstrapping algorithm in all benchmarks that require bootstrapping}.
+This is important, because this algorithm is not yet widely implemented in other libraries,
+so the original ResNet-20 and LogReg used much slower bootstrapping algorithms.
+In fact, the cost of older bootstrapping algorithms grows very quickly with the number of plaintext elements
+encoded in each ciphertext, so the baselines used \emph{partially packed ciphertexts}
+(e.g., packing 128 elements per $N$=64K ciphertext) to reduce overall overheads.
+But with efficient bootstrapping, using fully packed ciphertexts is more efficient.
+For instance, we modify ResNet-20 to pack all channels into a single 
+ciphertext before bootstrapping. This reduces the number of bootstrappings by 38$\times$ % from 1,888 to about 50
+and improves performance on all hardware platforms by about 10$\times$. 
+
+\paragraph{Shallow benchmarks} come from F1~\cite{feldmann:micro21:f1}. They include three neural networks from Low-Latency CryptoNets 
+(LoLa)~\cite{brutzkus:icml19:low}.
+LoLa-MNIST is a simple, LeNet-style network used on the MNIST 
+dataset~\cite{lecunn:ieee98:gradient-document},
+while LoLa-CIFAR is a 6-layer network (similar in computation to MobileNet v3~\cite{howard2019searching})
+used on the CIFAR-10 dataset~\cite{cifar10}.
+LoLa-MNIST includes two variants with unencrypted and encrypted weights;
+LoLa-CIFAR is available only with unencrypted weights.
+These benchmarks do not use bootstrapping and their max $L$ is between 4 and 8.
+
+Finally, we also benchmark \emph{unpacked bootstrapping}, which bootstraps a ciphertext 
+that packs a single element.
+This makes it shallower ($L{\leq}23$) and less computationally demanding,
+but performance per slot is a lot worse than fully packed bootstrapping. Thus,
+it isn't used much in practice. We include it because it is the bootstrapping
+benchmark used in F1~\cite{feldmann:micro21:f1}.
+
+
+% dsm: Threadripper pro uses Zen 2, which has 8 cores/chiplet in 74mm2 in TSMC7. Our CPU has 4 chiplets.
+% Where things get interesting is in the IO die. Zen 2 comes in 2 configs: client chips use a 125mm2 IO die on GF12, and server chips use a 416mm2 IO die in GF14. My guess is that thredripper is very close to the server I/O die, as it has tons of I/O. At the same time, there isn't anything definitve published, and compute is ~300mm2, so we can just give it the benefit of the doubt and assume the client IO die. But then, that's GF12, so changed it to that.
+\paragraph{Compared systems:}
+We compare \name with a CPU system. 
+We use a 32-core, 64-thread, 3.5\,GHz AMD Ryzen Threadripper PRO 3975WX;
+at 420mm$^2$ in a mix of 7nm and 12nm technology, this CPU has a comparable
+transistor count and power budget (280\,W TDP) to \name.
+
+% dsm: Area comparison: F1 -> F1+ (mm2)
+% HBM: 29.8 --> 29.8 (same)
+% Scratchpad (4x, 64 -> 256MB): 48.09 * 4
+% Compute clusters (4x conservatively; 2x clusters, 2x lanes, but NTT/aut scale superlinearly): 63.52 * 4
+% Network (16x: 2x inputs, 2x outputs, 2x width each for each of the nets, so 4x bits on each side = 16x): 10.0 * 16
+% Total: 29.8 + (48.09 + 63.52 + 40)*4 = 636.24 mm2
+
+We also compare performance to prior accelerators, in particular to 
+F1~\cite{feldmann:micro21:f1}.
+For fairness, we evaluate \emph{F1+}, a version of F1 that is scaled to a 256\,MB 32-bank
+scratchpad, 32 compute clusters with 256 lanes each, and 1\,MB register file per cluster.
+This makes F1+ have the same or higher throughput on basic operations as \name.
+However, F1+ takes 636\,mm$^2$, 35\% more than \name, because its network scales poorly:
+F1+'s on-chip network takes 160\,mm$^2$, 16$\times$ more than \name's fixed permutation network.
+This large overhead shows that \name's novel hardware organization is crucial to scale.
+
+%this makes F1+'s area ($\sim$500\,mm$^2$) similar to \name's. 
+%We allow F1+ to have infinite on-chip bandwidth, since scaling its network is hard.
+Finally, although F1 is tailored to standard keyswitching,
+boosted keyswitching becomes more efficient for $L>14$.
+Thus, F1+ uses the most efficient keyswitching algorithm at each level.
+In short, \emph{these changes allow comparing the F1 and \name architectures}
+without the confounding factors of different hardware budgets or subpar algorithms.
+

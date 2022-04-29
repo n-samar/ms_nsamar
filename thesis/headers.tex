@@ -1,3 +1,194 @@
+% dsm: Place new refs last
+\usepackage[hyphens]{url}
+
+\usepackage{siunitx}
+\usepackage{verbatim}
+\usepackage{graphicx,afterpage}
+\usepackage{yfonts}
+%\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{stmaryrd}
+%\usepackage{amsfonts}
+\usepackage{calc}
+\usepackage{xspace}
+\usepackage{listings}
+\usepackage{multirow, booktabs}
+\usepackage{wrapfig}
+\usepackage{enumitem}
+\usepackage{caption}
+% \usepackage[labelformat=simple]{subcaption}
+\usepackage{dblfloatfix} % to allow two-column floats at the bottom of the page
+\usepackage{fixltx2e}
+\usepackage{fancyhdr}
+\usepackage{paralist}
+\usepackage{color}
+
+
+% https://tex.stackexchange.com/questions/240141/
+\usepackage[T1]{fontenc} % Avoid garbling symbols and accents
+
+\usepackage[keeplastbox]{flushend}
+
+
+
+
+%For fancy tables
+\usepackage{array} % decent table formatting
+\usepackage{rotating}
+
+\begin{comment}
+
+\newcommand{\zzzNoOpSortToEnd}{}
+
+% \usepackage[activate={true,nocompatibility},final,tracking=false,kerning=true,spacing=true]{microtype}
+\setdefaultleftmargin{1.3em}{2em}{}{}{}{}
+
+% asf: stole this from HATS
+\lstdefinestyle{custompython}{ %aboveskip=0in,
+ basewidth=0.5em,
+ belowskip=0in,
+ belowcaptionskip=-10pt,
+ breaklines=true,
+ captionpos=b,
+ language=Python,
+ showstringspaces=false,
+ numbers=left,
+ stepnumber=1,
+ % dsm: semibold
+ basicstyle={\linespread{0.9}\fontseries{sb}\small\ttfamily},
+ keywordstyle=\bfseries,
+ xleftmargin=2em,
+ frame=single,
+ framexleftmargin=2em,
+ commentstyle=\itshape\color{green!40!black},
+ morekeywords={to,yield},
+}
+
+
+% from figures.pptx
+\definecolor{ltred}{HTML}{FB9A99}
+\definecolor{dkred}{HTML}{E41A1C}
+\definecolor{dkorange}{HTML}{F07F03}
+\definecolor{ltorange}{HTML}{F7C090}
+\definecolor{dkgreen}{HTML}{3BA32F}
+\definecolor{ltgreen}{HTML}{B2E089}
+\definecolor{dkblue}{HTML}{2879B4}
+\definecolor{ltblue}{HTML}{A6CEE2}
+\definecolor{dkpurple}{HTML}{6A3D9A}
+\definecolor{ltpurple}{HTML}{CAB1D7}
+
+
+% Spacing
+\setlength{\textfloatsep}{8pt}
+\setlist[enumerate]{leftmargin=0.25in,itemsep=1pt,topsep=1pt}
+
+% More compact paragraphs
+\makeatletter
+\renewcommand{\paragraph}[1]{\noindent {\bf #1}}
+\makeatother
+
+\newcommand{\topbanner}{\textbf{DRAFT --- \input{auto_header.tex}}}
+%\newcommand{\topbanner}{\textsc{Under Submission --- Please Do Not Distribute}}
+
+
+% dsm: Fix citation format
+\makeatletter
+\def\citepunct{, }
+\def\citedash{--}
+\makeatother
+
+% submission/web version
+%\pagenumbering{arabic}
+
+\captionsetup[figure]{aboveskip=2pt,belowskip=-12pt}
+
+% If you comment hyperref and then uncomment it, make clean first (or kill .aux files)
+\definecolor{lcolor}{RGB}{0, 56, 186} % {0, 35, 102}
+
+
+\def\figureautorefname{Fig.}
+\def\subfigureautorefname{Fig.}
+\def\sectionautorefname{Sec.}
+\def\subsectionautorefname{Sec.}
+\def\algorithmautorefname{Algorithm\xspace}
+\def\paragraphautorefname{Sec.}
+\def\equationautorefname{Eq.}
+
+% Temporary macros. Comment for submission!
+% \newcommand{\note}[1]{{\bf [~NOTE:~#1~]}}
+% \newcommand{\fixme}[1]{{\textcolor{red}{{\bf [~FIXME:~#1~]}}}}
+% \newcommand{\todo}[1]{\textcolor{red}{{\bf [~TODO:~#1~]}}}
+% \newcommand{\tmp}[1]{{\textcolor{red}{#1}}}
+% \newcommand{\OK}[1]{{#1}}
+
+\renewcommand*{\ttdefault}{txtt}
+
+\renewcommand{\iscasubmissionnumber}{194}
+
+%dsm: all these are retweaked
+% Alter some LaTeX defaults for better treatment of figures:
+% See p.105 of "TeX Unbound" for suggested values.
+% See pp. 199-200 of Lamport's "LaTeX" book for details.
+%   General parameters, for ALL pages:
+\renewcommand{\topfraction}{0.9}        % max fraction of floats at top
+\renewcommand{\bottomfraction}{0.8}     % max fraction of floats at bottom
+%   Parameters for TEXT pages (not float pages):
+\setcounter{topnumber}{5}
+\setcounter{bottomnumber}{5}
+\setcounter{totalnumber}{4}     % 2 may work better
+\setcounter{dbltopnumber}{5}    % for 2-column pages
+\renewcommand{\dbltopfraction}{0.9}     % fit big float above 2-col. text
+\renewcommand{\textfraction}{0.07}      % allow minimal text w. figs
+%   Parameters for FLOAT pages (not text pages):
+\renewcommand{\floatpagefraction}{0.9}  % require fuller float pages
+% N.B.: floatpagefraction MUST be less than topfraction !!
+\renewcommand{\dblfloatpagefraction}{0.9}       % require fuller float pages
+
+\definecolor{tableaublue}{rgb}{0.44,0.62,0.81}
+\definecolor{tableauorange}{rgb}{0.9,0.55,0.25} % original tableau value: {1.,0.62,0.29}
+\definecolor{tableaugreen}{rgb}{0.4,0.75,0.36}
+\definecolor{tableaured}{rgb}{0.93,0.4,0.36}
+\definecolor{tableaupurple}{rgb}{0.68,0.55,0.79}
+\newcommand{\green}[1]{\textcolor{tableaugreen}{\sf\bfseries #1}}
+\newcommand{\orange}[1]{\textcolor{tableauorange}{\sf\bfseries #1}}
+%\newcommand{\blue}[1]{\textcolor{tableaublue}{\sf\bfseries #1}}
+\newcommand{\red}[1]{\textcolor{tableaured}{\sf\bfseries #1}}
+%\newcommand{\purple}[1]{\textcolor{tableaupurple}{\sf\bfseries #1}}
+
+
+\usepackage{pifont}
+\usepackage{fourier-orns}
+\definecolor{darkred}{rgb}{.65,0,0}
+\definecolor{darkgreen}{rgb}{0,.5,0}
+\definecolor{darkyellow}{rgb}{0.95,.6,0.1}
+\newcommand{\cmark}{\normalsize \textcolor{darkgreen}{\ding{52}}}
+\newcommand{\xmark}{\normalsize \textcolor{darkred}{\ding{56}}}
+%\newcommand{\qmark}{\normalsize \textcolor{darkyellow}{\ding{115}}}%\ding{51}\hspace{-.0981in}\ding{55}}}
+\newcommand{\qmark}{\normalsize \textcolor{darkyellow}{\decofourleft}}%\ding{51}\hspace{-.0981in}\ding{55}}}
+\newcommand{\badyes}{\normalsize \textcolor{darkred}{$\bullet$}}
+\newcommand{\goodno}{}
+\newcommand*{\thead}[1]{%
+\multicolumn{1}{c}{\begin{tabular}{@{}c@{}}#1\end{tabular}}}
+\newcommand*{\theadbf}[1]{%
+\multicolumn{1}{c}{\bfseries\begin{tabular}{@{}c@{}}#1\end{tabular}}}
+
+
+% names, abbreviations
+\usepackage{textcomp}
+
+
+% Author notes
+
+%\newcommand{\kenote}[1]{\textcolor{blue}{\textbf{(Karim: \emph{#1})}}}
+%\newcommand{\nikola}[1]{\textcolor{teal}{\textbf{(Nikola: \emph{#1})}}}
+%\newcommand{\axelf}[1]{\textcolor{orange}{\textbf{(Axel: \emph{#1})}}}
+
+
+\end{comment}
+
+
+% OLD HEADER START
+
 \usepackage[normalem]{ulem}
 
 %\usepackage{xparse} % makes build fail on mads, ???
@@ -19,6 +210,7 @@
 %\usepackage{enumerate}
 % \usepackage{subcaption}
 % \usepackage{subfigure}
+\usepackage{subcaption}
 %\usepackage{dblfloatfix} % to allow two-column floats at the bottom of the page
 
 % dsm: Per ASPLOS 2018 submission instructions, we can have 9pt captions. Problem is, they look worse and don't really save space.
@@ -34,7 +226,7 @@
 %\usepackage[activate={true,nocompatibility},final,tracking=false,kerning=true,spacing=true]{microtype}
 
 %\usepackage[caption=false]{subfig} % for when sig-alternate + caption messes things up
-\usepackage{subfig}
+% \usepackage{subfig}
 \usepackage[labelfont=bf]{caption}
 % \renewcommand\thesubfigure{(\alph{subfigure})}
 
@@ -58,7 +250,6 @@
 
 %Use this instead of a hyphen to allow the word itself to be hyphenated
 \usepackage{hyphenat}
-\usepackage[hyphens]{url}
 
 \usepackage{tikz}
 

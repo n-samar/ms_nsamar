@@ -1,156 +1,164 @@
-\chapter{Introduction}
-\label{sec:intro}
+\section{Introduction}\label{sec:intro}
 
-% TODO(group): Spend more time on motivation, concrete example. Link to Figure 1. Point to recent efforts by companies, government, academia as high-level motivation.
+A large and increasing fraction of the world's compute runs on the cloud,
+which is vulnerable to data breaches.
+Conventional techniques to mitigate attacks offer limited 
+security, as cloud servers must decrypt data in order to process it.
 
-Despite massive efforts to improve the security of computer systems,
-security breaches are only becoming more frequent and damaging,
-as more sensitive data is processed in the cloud~\cite{malekos-smith:csis20:hidden-costs-cybercrime,ibm20:breach-cost-report}.
-Current encryption technology is of limited help,
-%they protect data in transit or at rest,
-because servers must decrypt data before processing it.
-Once data is decrypted, it is vulnerable to breaches.
+\emph{Fully homomorphic encryption (FHE)} is a special type of encryption scheme
+that enables \emph{computing on encrypted data directly}, without decrypting it.
+FHE allows a client to offload a computation
+to an untrusted server \emph{without} revealing any data (\autoref{fig:workflow}).
+This enables the client to harness the compute power of the cloud while maintaining cryptographic privacy.
+Though FHE has some limitations (e.g., data-dependent branching is not possible), 
+it is general enough to support many compelling use cases,
+such as privacy-preserving machine learning, secure genome analysis, private set intersection,
+private information retrieval, and many more~\cite{kim2020semi,gilad:icml16:cryptonets,han:aaai19:logistic,han:iacr18:efficient,juvekar2018gazelle,DBLP:conf/ccs/ChenLR17,DBLP:conf/tcc/GentryH19}. 
+%\nnote{add citations and more examples}
 
-Fully Homomorphic Encryption (FHE) is a class of encryption schemes that
-address this problem by enabling \emph{generic computation on encrypted data}.
-\autoref{fig:overview} shows how FHE enables secure offloading of computation.
-The client wants to compute an expensive function $f$
-(e.g., a deep learning inference) on some private data $x$.
-To do this, the client encrypts $x$ and sends it to an untrusted server,
-which computes $f$ on this encrypted data \emph{directly} using FHE,
-and returns the encrypted result to the client.
-%
-FHE provides ideal security properties: even if the server is compromised,
-attackers cannot learn anything about the data,
-as it remains encrypted throughout.
+% axelf: purging unfortunately/fortunately from the whole paper
+Despite its ideal privacy, FHE is rarely used today because it incurs prohibitive overheads:
+in CPUs, FHE computations are 10,000$\times$ to 100,000$\times$
+slower than equivalent unencrypted computations, even when using highly optimized FHE libraries.
+% dsm: I don't think this adds much here, other than distance to get to the actual point
+%Some of these overhead costs are due
+%to the size of FHE ciphertexts while
+%others are due to the additional complexity
+%of representing arbitrary functions in a form suitable for
+% computing using FHE.
 
-% dsm: Split 
-FHE is a young but quickly developing technology.
-First realized in 2009~\cite{gentry09}, early FHE schemes were
-about 10$^9$ times slower than performing computations on unencrypted data.
-Since then, improved FHE schemes have greatly reduced these overheads
-and broadened its applicability~\cite{albrecht:hesg18:standard,peikert2016decade}.
-FHE has inherent limitations---for example, data-dependent branching is impossible,
-since data is encrypted---so it will not subsume all computations.
-Nonetheless, important classes of computations, like deep learning inference~\cite{cheon:ictaci17:homomorphic,dathathri:pldi19:chet,dathathri:pldi20:eva},
-linear algebra~\cite{halevi:crypto14:algorithms}, genomics~\cite{blatt:nas20:secure}, and other inference and learning tasks~\cite{han:aaai19:logistic} are a good fit for FHE.
-This has sparked significant industry and government investments~\cite{ibm,intel,dprive}
-to widely deploy FHE.
+Fortunately, state-of-the-art FHE schemes are well-suited to hardware acceleration.
+First, they are regular and structured:
+FHE programs operate on very long vectors, and all operations are known ahead of time.
+Second, FHE requires several non-SIMD operations,
+such as \emph{number-theoretic transforms} (NTTs),
+that are inefficient on CPUs and GPUs.
+But these operations can be accelerated by specialized functional units,
+avoiding these inefficiencies.
+As a result, prior work has proposed FPGA and ASIC-based
+accelerators~\cite{riazi:asplos20:heax,cousins:hpec12:sipher-fpga,cousins:tetc17:fpga-he,turan:tc20:heaws,cousins:hpec14:fpga-he, roy:hpca19:fpga-he,feldmann:micro21:f1}.
+While most prior accelerators achieve limited speedups, a recent design,
+F1~\cite{feldmann:micro21:f1}, achieves speedups of
+%2,000-15,000$\times$ 
+% dsm: Let's avoid the 15000x speedup, we don't have anything that large but we're using a different baseline, diff configs, etc.
+about 5,000$\times$
+on FHE programs.
 
-\figOverview
+% dsm: Unfortunately here is important. We were just describing potential, we want to signpost that we're entering negative territory.
+Unfortunately, prior accelerators are efficient only on a limited subset of simple FHE
+computations---those of \emph{shallow multiplicative depth}.
+% FIXME(dsm): I think this may be from edits, but right now several terms are left undefined: DEPTH and MULTIPLICATIVE DEPTH. I think this is because the text below does not talk about multiplications.
+For example, prior FHE accelerators can run neural network inference efficiently only for networks with few layers (3-6),
+but they cannot accelerate state-of-the-art deep neural networks (DNNs) with tens to hundreds of layers.
 
-Unfortunately, FHE still carries substantial performance overheads:
-despite recent advances~\cite{dathathri:pldi19:chet, dathathri:pldi20:eva, roy:hpca19:fpga-he, brutzkus:icml19:low, polyakov:17:palisade},
-FHE is still 10,000$\times$ to 100,000$\times$ slower than unencrypted computation when executed in carefully optimized software.
-Though this slowdown is large, it can be addressed with hardware acceleration:
-\emph{if a specialized FHE accelerator provides large speedups over software execution,
-it can bridge most of this performance gap and enable new use cases.}
+This limitation stems from the characteristics of FHE schemes:
+each ciphertext has some associated noise, which grows with each homomorphic operation, and especially with multiplications.
+If noise becomes too large, it garbles the message, making decryption impossible. 
+%To support computations with higher multiplicative depth, the size of ciphertexts must increase to counteract the additional noise growth, resulting in each FHE operation being more computationally expensive.
+Larger ciphertexts tolerate more noise before becoming undecryptable. 
+However, operations on larger ciphertexts are also more expensive.
+To enable computations of unbounded depth, ciphertexts can be ``refreshed'' using a procedure called \emph{bootstrapping}
+that reduces noise. But bootstrapping is expensive, 
+% dsm: multiplicative depth is NOT YET DEFINED
+%and itself consumes multiplicative depth, 
+so ciphertexts must be very large (10s of MBs) for bootstrapping to be
+efficient.
 
-For an FHE accelerator to be broadly useful, it should be programmable, i.e., capable of executing arbitrary FHE computations.
-%and flexible, i.e., capable of achieving high performance over a wide range of parameters and, ideally, be able to accelerate multiple FHE schemes (such as BGV for integer operations and CKKS for fixed-point and approximate computations).
-% TODO(group): FHE schemes were not defined, and caused general confusion. Try to avoid introducing them till later. Focus on programmability, and make it clear what a program is (examples).
-While prior work has proposed several FHE accelerators, they do not meet this goal.
-Prior FHE accelerators~\cite{cousins:hpec14:fpga-he,cousins:tetc17:fpga-he,doroz:tc15:accelerating-fhe,roy:hpca19:fpga-he,riazi:asplos20:heax,turan:tc20:heaws} target individual FHE operations,
-and miss important ones that they leave to software.
-These designs are designed for a Field Programmable Gate Arrays (FPGA), so they are small and 
-miss the data movement issues facing an FHE Application specific Integrated Circuit (ASIC) accelerator.
-These designs also overspecialize their functional units to specific parameters,
-and cannot efficiently handle the range of parameters needed within a program or across programs.
-% dsm: Note that HEAX etc don't vary Q, right? It's not even that they don't allow for variable N.
-%
-%Specifically, prior FHE accelerators~\cite{roy:hpca19:fpga-he, riazi:asplos20:heax} are small and target FPGAs, 
-%missing the opportunities and challenges of an ASIC design.
-%First, existing accelerators target individual FHE operations, and miss important operations that they delegate to software.
-%Second, FPGA designs miss the large data movement issues that an FHE ASIC accelerator incurs,
-%which requires new techniques to decouple and minimize data movement.
-%Third, because they are FPGA-based, existing designs are tailored to specific parameters,
-%whereas an FHE ASIC must balance specialization and flexibility \nikola{this seems like a disadvantage for ASICs?}.
-% dsm: Now discussed only in related work, since it's a bit of a detour here
-%Recent work has also proposed ASIC accelerators for some homomorphic encryption primitives
-%in the context of oblivious neural networks~\cite{juvekar:usenixsecurity18:gazelle,reagen:hpca21:cheetah}, but these approaches target a fixed algorithm
-%and combine homomorphic encryption with multi-party computation,
-%so their techniques are quite different from FHE.
-% TODO(group): Trim a bit; align with later description of challenges.
+Prior FHE accelerators do not efficiently handle unbounded-depth computations because
+they natively support vectors of a limited size and they use algorithms that scale poorly
+to the large ciphertexts in high-depth programs.
+As a result, they can only run small FHE computations, and they do not support sufficient depth
+to run the full bootstrapping procedure.
 
-In this thesis we present \name, the first programmable FHE accelerator.
-\name builds on an in-depth architectural analysis of the characteristics of FHE computations, which exposes the main challenges and reveals the design principles a programmable FHE architecture should exploit.
+\figWorkflow
 
-%Based on this analysis, we design \name as a \emph{wide vector processor} with \emph{specialized functional units},
-%\emph{static VLIW scheduling}, and a \emph{scratchpad-based memory hierarchy} with techniques to \emph{decouple data movement from computation}.
+In this paper we tackle this challenge through \name, the first FHE accelerator
+to support \emph{FHE computations of unbounded depth}.
+To achieve this, we contribute new algorithms, specialized functional units,
+hardware architecture, and compiler techniques that overcome the key challenge
+of deep FHE computations---its extreme data movement demands.
 
-% TODO(group): This part should include the minimum infor on FHE schemes that conveys the challenges:
-%  - Operations on long vectors (~10K elems); complex transforms that don't map to SIMD/vector execution.
-%  - Ciphertext much larger than plaintext + some operations use large auxiliary data -> data movement challenges
-%  - Regular computation: No data-dependent branching, all operations and dependences known ahead -> static scheduling.
-\paragraph{Harnessing opportunities and challenges in FHE:}
-\name is tailored to the three defining characteristics of FHE:
+\paragraph{Deep FHE is limited by data movement:}
+FHE schemes encode information over very long vectors of wide elements.
+Concretely, supporting unbounded-depth computations requires vectors of
+64K elements with 1,600 bits per element.
+This takes 25\,MB per ciphertext, 12$\times$ larger than what prior FHE accelerators target.
+% nikola; 25MB = 2 * 1600 bits * 64*1024 elements * (1/8) bytes / bit * 1/2^20 bytes / MB
 
-\noindent \textbf{\emph{(1) Complex operations on long vectors:}}
-FHE encodes information using very large vectors, several thousand elements long,
-and processes them using modular arithmetic.
-%
-\name employs \emph{vector processing} with \emph{wide functional units} tailored to FHE operations
-to achieve large speedups.
-The challenge is that two key operations on these vectors, the Number-Theoretic Transform (NTT) and automorphisms, are not element-wise and require complex dataflows that are hard to implement as vector operations. 
-To tackle these challenges, \name features specialized NTT units and the first vector implementation of an automorphism functional unit.
+% (alex): I changed the comparisson from to 32 MB to 23 MB ciphertexts;
+%         Being charittable, this is L = 1500/32 = 46 for F1 and KSH is 23*46 = 1058MB
+% nikola: 2MB ciphertext in F1 => 1MB per ciphertext polynomial => 512 bits per coeff at N=16K
+% => L = 16 (32-bit moduli) => KSH = 2*L^2*N * 32 bits / elem = 32 MB
+% nikola: 26MB ciphertext in F1 => 13MB per ciphertext polynomial + assume N=64K
+% => log Q = 1,664 => L = 52 => KSH = 2*L^2*N * 32 bits / elem * (1/8) B/bit * 1/2^30 GB/B
+% = 1.32 GB
+% At the same log Q = 1,664, CL needs L = 1664/28 = 60: KSH = 2*2*L*N = 
+% = 2*2 * 60 (L) * 64*1024 (N) * 28 bits / elem * (1/8) B/bit * 1/2^20 MB/B = 52.5 MB
+% (note that L is actually 1668/26.7, but we divide by 28 to be consistent with the F1
+% methodology, where we multiply by 32)
+Moreover, prior work has employed FHE algorithms that require even larger amounts of auxiliary data.
+For example, multiplying 2\,MB ciphertexts in F1~\cite{feldmann:micro21:f1} requires 32\,MB of auxiliary data,
+and scaling their algorithm to 26\,MB ciphertexts would require over
+1.3\,GB 
+of auxiliary data---far too large to fit on-chip.
+To tackle this challenge, our \emph{key insight} is to adopt an FHE
+algorithm called \emph{boosted keyswitching} (\autoref{sec:keyswitching}) that eliminates most of the
+auxiliary data,
+% (alex): KSH it's 2 ciphertexts without PRG
+reducing this overhead from 1.3\,GB to 52.5\,MB.
+%We further reduce this overhead to 23\,MB by introducing a new functional unit that
+%generates half of this auxiliary data on the fly, rather than fetching it from memory.
+Boosted keyswitching also reduces computation costs.
+However, this new algorithm is a poor match for prior accelerators:
+it is dominated by simple operations where these designs have limited efficiency,
+and makes poor use of the specialized functional units that prior designs leverage.
 
-\noindent \textbf{\emph{(2) Regular computation:}}
-FHE programs are dataflow graphs of arithmetic operations on vectors.
-All operations and their dependences are known ahead of time (since data is encrypted, branches
-or dependences determined by runtime values are impossible).
-%
-\name exploits this by adopting \emph{static scheduling}:
-in the style of Very Long Instruction Word (VLIW) processors,
-all components have fixed latencies and the compiler is in charge of scheduling
-operations and data movement across components, with no hardware mechanisms to handle hazards (i.e., no stall logic).
-%A scheduler exploits knowledge of the computation to be performed  to orchestrate operations across several clusters of functional units.
-Thanks to this design, \name can issue many operations per cycle with minimal control overheads;
-%out the complexities of superscalar processors;
-combined with vector processing, \name can issue tens of thousands of scalar operations per cycle. %in a programmable way
-%with minimal control overheads.
-
-\noindent \textbf{\emph{(3) Challenging data movement:}}
-In FHE, encrypting data increases its size (typically by at least 50$\times$);
-data is grouped in long vectors; and some operations require large amounts (tens of megabytes) of auxiliary data.
-Thus, we find that data movement is \emph{the key challenge} for FHE acceleration:
-despite requiring complex functional units, in current technology, limited on-chip storage and memory bandwidth are the bottlenecks for most FHE programs.
-%
-Therefore, \name is primarily designed to minimize data movement.
-First, \name features an explicitly managed on-chip memory hierarchy,
-with a heavily banked scratchpad and distributed register files.
-Second, \name uses mechanisms to decouple data movement and hide access latencies by loading data far ahead of its use.
-Third, \name uses new, FHE-tailored scheduling algorithms that maximize reuse and make the best out of limited memory bandwidth.
-Fourth, \name uses relatively \emph{few functional units with extremely high throughput}, rather than lower-throughput functional units as in prior work.
-This \emph{reduces the amount of data that must reside on-chip simultaneously}, allowing higher reuse.
-
-In summary, \name brings decades of research in architecture to bear, including vector processing and static scheduling, and combines them with new techniques and scheduling algorithms (\autoref{sec:scheduler}), to design a programmable FHE accelerator.
-The main components of \name were implemented in RTL and synthesized in a commercial 14nm/12nm process.
-With a modest area budget of 151\,mm$^2$, our \name implementation 
-%features functional units that provide a modular arithmetic throughput exceeding 
-% dsm: 128*14+128*4 = 2304 GOps/cluster, *16 -> 36.864 TOps
-provides 36 tera-ops/second of 32-bit modular arithmetic, 64\,MB of on-chip storage, and a 1\,TB/s high-bandwidth memory.
-% dsm: Not very relevant, and definitely less relevant than making the point on apps.
-%This system is the first to accelerate all FHE operations, and supports multiple FHE schemes (BGV, CKKS, and GSW).
-
-We evaluate \name using cycle-accurate simulation running complete FHE applications,
-and demonstrate speedups of 1,200$\times$--17,000$\times$ over state-of-the-art software implementations.
-These dramatic speedups counter most of FHE's overheads and enable new applications.
-For example, \name executes a deep learning inference that used to take 20 minutes in 240 milliseconds,
-enabling secure real-time deep learning in the cloud.
-
-\section{Contributions}
-
-\name is a collaborative project. This thesis describes the full design and implementation of \name, while emphasizing the author's key contributions:
-
-\begin{itemize}
-\item \textbf{Design and implementation of the \name software stack:} We implement a complete software stack that takes high level descriptions of FHE computations and compiles them down to \name instructions issued at precise cycles. Because our computations are statically scheduled, the scheduled programs also provide the basis for our performance evaluation (\autoref{sec:scheduler}, \autoref{sec:implementation}).
-\item \textbf{Design space exploration:} Using the \name scheduler, we perform a design-space exploration to select efficient configurations of our accelerator (\autoref{sec:scalability}).
-\item \textbf{FHE benchmark programs:} We implement FHE programs from the literature in the \name DSL to evaluate our accelerator's performance on relevant workloads (\autoref{sec:benchmarks}).
-\end{itemize}
-
-%\paragraph{Contributions:} In summary, in this paper, we
-%(1) articulate the architectural design principles needed for programmable FHE acceleration (e.g., vector processing, static scheduling, VLIW, specialized hardware functional units, and decoupled data movement); (2) design and present an architecture that leverages these principles; and (3) evaluate the performance, area, and power of this architecture with a combination of timing simulation and logic synthesis. 
-%We demonstrate speedups of \tmp{XXX-YYY}  on important computations.
+Beyond being inefficient, prior accelerators suffer from a hard-to-scale vector multicore architecture:
+to support the needed non-SIMD operations with reasonable cost,
+they implement multiple independent cores with narrower vector datapaths~\cite{feldmann:micro21:f1}.
+However, this causes excessive inter-core communication,
+and the high-bandwidth interconnect
+needed grows superlinearly with the number of cores.
 
 
+\paragraph{Deep FHE demands new hardware techniques:}
+To tackle these challenges, we introduce the \emph{\name} architecture (\autoref{sec:overview}, \autoref{sec:architecture}),
+the first FHE accelerator that achieves high performance on unbounded FHE programs.
+\name is a wide-vector uniprocessor with specialized functional units.
+The design is statically scheduled to leverage the regularity of FHE computations.
+We contribute several new techniques that make this possible, including:
+\begin{compactitem}
+\item A new extremely wide (2,048 lanes) vector uniprocessor architecture that
+    spreads each vector operation across the chip, departing from prior vector multicore architectures.
+The uniprocessor approach reduces the number of concurrent operations, which minimizes footprint,
+  reducing off-chip traffic, and simplifies the compiler.
+\item An efficient implementation of the above architecture, which is challenging for non-SIMD FHE operations, NTTs and automorphisms,
+  by decomposing these operations in a novel way that allows the use of a \emph{fixed transpose network} among physically distributed groups of lanes.
+  This reduces on-chip data movement and interconnect cost over prior approaches.
+\item A new functional unit that encapsulates the bulk of operations in boosted keyswitching, improving efficiency and enabling high utilization across ciphertexts of all sizes.
+\item A new functional unit that generates half of the required auxiliary data on the fly (reducing overheads from 52\,MB to 26\,MB), saving on-chip storage and memory bandwidth.
+\item A vector chaining technique that builds long FU pipelines to enable many concurrent operations with few register ports.
+\end{compactitem}
+To program \name, we develop a novel compiler (\autoref{sec:compiler}) that produces efficient code from high-level FHE programs.
+The compiler schedules operations to maximize reuse, decouples data movement from computation,
+and adapts the state-of-the-art bootstrapping algorithm to achieve high
+utilization~\cite{bossuat:crypto21:efficient}.
+
+
+We evaluate \name through a combination of simulation and RTL synthesis (to find its area and power).
+We use a broad range of FHE benchmarks, including programs with high multiplicative depth
+that require bootstrapping.
+\name outperforms a scaled-up and improved version of the state-of-the-art FHE accelerator, F1, by gmean 
+11.2$\times$ on these deep computations,
+and is 4,600$\times$ faster than a 32-core CPU.
+These speedups enable new use cases for FHE.
+For example, deep neural networks like ResNet
+% which takes tens of \emph{minutes} per inference on CPUs,
+% nikola: again, it really takes tens of minutes, but that's cuz of hours algo improvements
+% dsm: Let's not confuse the reader, we can mention that this used to be hours in the eval but saying hours to ms is comparing apples to oranges
+take 23 minutes per inference on the CPU,
+whereas \name achieves 250 \emph{milliseconds} per inference,
+enabling real-time private deep learning.
+% 23 minutes = 1.37694e+12 ns / (10^9*60) = 22.9 min
+% 265 ms = 2.64245e+08 / (10^6) = 264 ms
 

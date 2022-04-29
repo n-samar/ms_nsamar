@@ -5,14 +5,14 @@
 %%
 %%            Please verify your thesis' formatting and copyright
 %%            assignment before submission.  If you notice any
-%%            discrepancies between these templates and the 
+%%            discrepancies between these templates and the
 %%            MIT Libraries' specs, please let us know
 %%            by e-mailing thesis@mit.edu
 
 %% The documentclass options along with the pagestyle can be used to generate
 %% a technical report, a draft copy, or a regular thesis.  You may need to
 %% re-specify the pagestyle after you \include  cover.tex.  For more
-%% information, see the first few lines of mitthesis.cls. 
+%% information, see the first few lines of mitthesis.cls.
 
 %\documentclass[12pt,vi,twoside]{mitthesis}
 %%
@@ -23,10 +23,9 @@
 %%
 %% If you want blank pages before new chapters to be labelled ``This
 %% Page Intentionally Left Blank'', use the ``leftblank'' option, as
-%% above. 
+%% above.
 
 \documentclass[12pt,twoside]{mitthesis}
-%\documentclass[12pt]{article}
 \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{epsfig}
@@ -50,7 +49,7 @@
 \usepackage{setspace}
 \singlespacing
 \def\baselinestretch{1.4}
-\setlength{\oddsidemargin}{0.25in}	% 1.25in left margin 
+\setlength{\oddsidemargin}{0.25in}	% 1.25in left margin
 \setlength{\evensidemargin}{0.25in}	% 1.25in left margin (even pages)
 \setlength{\topmargin}{0.0in}		% 1in top margin
 \setlength{\textwidth}{6.0in}		% 6.0in text - 1.25in rt margin
@@ -77,6 +76,10 @@
 %\def\all{all}
 %\ifx\files\all \typeout{Including all files.} \else \typeout{Including only \files.} \includeonly{\files} \fi
 
+\renewcommand{\name}{CraterLake\xspace}
+\newcommand{\Nmax}{N_{\textrm{max}}}
+\newcommand{\Lmax}{L_{\textrm{max}}}
+
 \begin{document}
 
 \include{cover}
@@ -88,12 +91,15 @@
 \include{contents}
 \include{1_intro}
 \include{2_background}
-\include{3_architecture}
-\include{4_scheduler}
-% \include{5_functional_units}
-\include{6_results}
-\include{7_related}
-\include{8_conclusion}
+\include{3_overview}
+\include{4_tiling}
+\include{5_architecture}
+\include{6_algorithms}
+\include{7_implementation}
+\include{8_methodology}
+\include{9_results}
+\include{10_related}
+\include{11_conclusion}
 
 \begin{singlespacing}
 \bibliographystyle{IEEEtranS} % order references by author name

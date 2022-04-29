@@ -1,0 +1,45 @@
+\section{Conclusion}\label{sec:conclusion}
+
+For widespread adoption of FHE, accelerators must efficiently support deep computations.
+\name is the first accelerator to achieve this.
+By adopting state-of-the-art algorithms and using them to design \name,
+we target a new regime of FHE not explored by prior approaches.
+Through new architectural and compiler techniques, \name addresses the overheads
+of deep computations and provides order-of-magnitude speedups over prior accelerators
+(even when that prior work is scaled up and allowed several idealizations).
+As a result, \name enables new applications for FHE, such as real-time inference
+using deep neural networks like ResNet or LSTMs.
+
+
+%% overheads inherent in deep computations. Prior work falls short of this goal 
+%% because FHE is well- suited to vector processors and does not require any dynamic 
+%% flow control; this makes CPUs inadequate for FHE. GPUs are also inappropriate 
+%% because (1) although many FHE operations are amenable to GPUs’ vector processor 
+%% style, some crucial operations have complicated dependencies between vectors 
+%% which cannot be handled well by GPUs, and (2) FHE relies on modular arithmetic 
+%% and has little use for GPUs’ floating-point pipelines. \name accelerates 
+%% computation on encrypted data with arbitrary depth. Our main contributions are:
+%% 1) First accelerator to target arbitrary depth computations and show that it can be done.
+%% 2) Show that new keyswitching algorithm is actually the only way to go if you 
+%% want deep computation (for some reason, prior work like heax, bajard, F1 does not use it)
+%% 3) Builds customized pipelines to accelerate critical computation. Argues why 
+%% customized pipelines are the way to go and what they should be.
+%% 4) Providing a simple interface to the programmer. There
+%% is sufficient parallelism within FHE operations so programmer does not have 
+%% to worry about finding parallelism themselves. This increases utilization.
+%% 5) Improve on FHE algorithms for deep computations cuz nobody else saw the use 
+%% of these algorithms (considered intractable)
+%% 6) Choosing the optimal keyswitching algorithm for CKKS.
+
+\section*{Acknowledgments}
+
+We thank the anonymous reviewers, Hyun Ryong Lee, Quan Nguyen, Yifan Yang,
+Victor Ying, Shabnam Sheikhha, Fares Elsabbagh, Robert Durfee, Nythia Attaluri,
+and Joel Emer for feedback on the paper; we thank Joon-Woo Lee for helping us
+set up the ResNet benchmark, and Ronald Dreslinski for help with synthesis.
+This research was funded in part by the Defense Advanced Research Projects
+Agency (DARPA) under contract number Contract No. HR0011-21-C-0035, and by a
+Wistron research grant. The views, opinions and/or findings expressed are those
+of the authors and should not be interpreted as representing the official views
+or policies of the Department of Defense or the U.S. Government.
+
