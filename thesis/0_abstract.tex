@@ -1,14 +1,16 @@
-Fully Homomorphic Encryption (FHE) enables 
+Fully Homomorphic Encryption (FHE) enables
 offloading computation to untrusted servers with cryptographic privacy.
 Despite its attractive security,
 FHE is not yet widely~adopted due to its prohibitive overheads,
 about 10,000$\times$ over unencrypted computation.
-Recent FHE accelerators have made strides to bridge this performance gap.
-Unfortunately, prior accelerators only work well for simple programs,
-but become inefficient for complex programs,
-which bring additional costs and challenges.
 
-We present \name, the first FHE accelerator that enables
+We first present F1, the first \emph{programmable} FHE accelerator,
+i.e., capable of executing full FHE programs. F1 is a wide-vector
+processor with novel functional units deeply specialized to FHE
+primitives. When introduced, F1 outperformed state-of-the-art software implementations
+by gmean 5,400$\times$.
+
+Then, we present \name, the first FHE accelerator that enables
 FHE programs of \emph{unbounded} size
 (i.e., programs with unbounded multiplicative depth).
 Such computations require very large ciphertexts (tens of MBs each)
@@ -22,7 +24,7 @@ We evaluate \name on deep FHE programs,
 including deep neural networks like ResNet and LSTMs,
 where prior work takes minutes to hours per inference on a CPU.
 \name outperforms a CPU by gmean 4,600$\times$ and
-the best prior FHE accelerator by 11.2$\times$ under similar area
+F1 by 11.2$\times$ under similar area
 and power budgets.
 These speeds enable for the first time real-time performance
 on unbounded FHE programs.
