@@ -1,6 +1,6 @@
 \section{F1 Architecture}\label{sec:arch}
 
-\autoref{fig:arch} shows an overview of F1, which we derive from the insights in \autoref{sec:fhe_analysis}.
+\autoref{fig:f1arch} shows an overview of F1, which we derive from the insights in \autoref{sec:fhe_analysis}.
 
 \paragraph{Vector processing with specialized functional units:}
 F1 features wide-vector execution with functional units (FUs) tailored to 
@@ -26,18 +26,18 @@ This is important because, as we saw in \autoref{sec:fhe_analysis},
 \emph{having fewer high-throughput FUs reduces parallelism and thus memory footprint}.
 
 \paragraph{Compute clusters:}
-Functional units are grouped in \emph{compute clusters}, as \autoref{fig:arch} shows.
+Functional units are grouped in \emph{compute clusters}, as \autoref{fig:f1arch} shows.
 Each cluster features several FUs (1 NTT, 1 automorphism, 2 multipliers, and 2 adders in our implementation)
 and a banked register file that can (cheaply) supply enough operands each cycle to keep all FUs busy.
 The chip has multiple clusters (16 in our implementation).
 
 % TODO(dsm): This may be a good place to explain the banking approach.
 
-\figArch
+\figFOneArch
 
 
 \paragraph{Memory system:}
-F1 features an explicitly managed memory hierarchy. As \autoref{fig:arch} shows,
+F1 features an explicitly managed memory hierarchy. As \autoref{fig:f1arch} shows,
 F1 features a large, heavily banked scratchpad (64\,MB across {16} banks in our implementation).
 The scratchpad interfaces with both high-bandwidth off-chip memory (HBM2 in our implementation)
 and with compute clusters through an on-chip network.

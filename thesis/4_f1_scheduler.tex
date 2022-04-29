@@ -4,9 +4,9 @@ We now describe F1's software stack,
 focusing on the new static scheduling algorithms
 needed to use hardware well.
 
-\figCompilerOverview
+\figFOneCompilerOverview
 
-\autoref{fig:compilerOverview} shows an overview of the F1 compiler.
+\autoref{fig:f1compilerOverview} shows an overview of the F1 compiler.
 The compiler takes as input an FHE program written in a high-level domain specific language (\autoref{sec:programming}).
 The compiler is structured in three stages.
 First, the \emph{homomorphic operation compiler} 
@@ -61,12 +61,12 @@ To illustrate this DSL and provide a running example,
 \autoref{listing:mv} shows the code for matrix-vector multiplication.
 This follows HELib's algorithm~\cite{halevi:crypto14:algorithms}
 % dsm: Commented out for revision
-, which \autoref{fig:MultDataflow} shows.
+, which \autoref{fig:f1MultDataflow} shows.
 This toy $4 \times 16K$ matrix-vector multiply uses input ciphertexts with $N=16K$.
 Because accessing individual vector elements is not possible, the code uses homomorphic rotations %(specific homomorphic permutations)
 to produce each output element.
 
-\figMultDataflow
+\figFOneMultDataflow
 
 \begin{figure}
 \begin{center}
@@ -188,4 +188,4 @@ This stage works by iterating through all instructions in the order produced by 
 During this final compiler pass, we finally account for store bandwidth, scheduling stores (which result from spills) as needed. In practice, we find that this does not hurt our performance much, as stores are infrequent across most of our benchmarks due to our global schedule and replacement policy design. After the final schedule is generated, we validate it by simulating it forward to ensure that no clobbers or resource usage violations occur.
 
 % axelf: from masters thesis
-It is important to note that because our schedules are fully static, our scheduler also doubles as a performance measurement tool. As illustrated in \autoref{fig:compilerOverview}, the compiler takes in an architecture description file detailing a particular configuration of F1. This flexibility allows us to conduct design space explorations very quickly (\autoref{sec:scalability}).
+It is important to note that because our schedules are fully static, our scheduler also doubles as a performance measurement tool. As illustrated in \autoref{fig:f1compilerOverview}, the compiler takes in an architecture description file detailing a particular configuration of F1. This flexibility allows us to conduct design space explorations very quickly (\autoref{sec:scalability}).

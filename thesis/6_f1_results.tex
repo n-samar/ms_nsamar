@@ -18,7 +18,7 @@ By keeping most of the logic at 1\,GHz, we achieve higher energy efficiency.
 We explored several non-blocking on-chip networks (Clos, Benes, and crossbars).
 We use 3 16$\times$16 bit-sliced crossbars~\cite{passas:tocaid12:crossbar} (scratch\-pad$\rightarrow$cluster, cluster$\rightarrow$scratchpad, and cluster$\rightarrow$cluster). %that provide an aggregate 24\,TB/s.
 
-\autoref{tbl:GF12} shows a breakdown of area by component, as well as the area of our F1 configuration,
+\autoref{tbl:f1GF12} shows a breakdown of area by component, as well as the area of our F1 configuration,
 151.4\,mm$^2$.
 FUs take 42\% of the area, with 31.7\% going to memory,
 6.6\% to the on-chip network, and 19.7\% to the two HBM2 PHYs.
@@ -79,13 +79,13 @@ They also feature frequent automorphisms,
 showing the need for a fast automorphism~unit.
 
 
-\tblGF % dsm: Babysitted
+\tblFOneGF % dsm: Babysitted
 
 \subparagraph{DB Lookup} is adapted from HELib's \texttt{BGV\_country\_db\_lookup}~\cite{helib:db-lookup}. A BGV-encrypted query string is used to traverse an encrypted key-value store and return the corresponding value. The original implementation uses a low security level for speed of demonstration, but in our version, we implement it at $L=$17, $N=$16K for realism. We also parallelize the CPU version so it can effectively use all available cores. DB Lookup is both deep and wide, so running it on F1 incurs substantial off-chip data movement.
 
 % dsm: Babysitted
 \addtocounter{table}{1}
-\tblMicrobenchmark
+\tblFOneMicrobenchmark
 
 \subparagraph{Bootstrapping:} We evaluate bootstrapping benchmarks for BGV and CKKS.
 Bootstrapping takes an $L=1$ ciphertext with an exhausted noise budget and refreshes it
@@ -121,12 +121,12 @@ and compare against HEAX~\cite{riazi:asplos20:heax}, the fastest prior accelerat
 
 % HACK(dsm): See above
 \addtocounter{table}{-2}
-\tblBenchmark
+\tblFOneBenchmark
 \addtocounter{table}{1}
 
 
 \paragraph{Benchmarks:}
-\autoref{tbl:benchmark} compares the performance of F1 and the CPU on full benchmarks.
+\autoref{tbl:f1benchmark} compares the performance of F1 and the CPU on full benchmarks.
 It reports execution time in milliseconds for each program (lower is better), and F1's speedup over the CPU (higher is better).
 F1 achieves dramatic speedups, from 1,195$\times$ to 17,412$\times$ (5,432$\times$ gmean).
 CKKS bootstrapping has the lowest speedups as it's highly memory-bound;
@@ -141,7 +141,7 @@ when offloading inferences to a server, this time is comparable
 to the roundtrip latency between server and client.
 
 \paragraph{Microbenchmarks:}
-\autoref{tbl:microbenchmark} compares the performance of F1, the CPU, and HEAX$_\sigma$ on four microbenchmarks:
+\autoref{tbl:f1microbenchmark} compares the performance of F1, the CPU, and HEAX$_\sigma$ on four microbenchmarks:
 the basic NTT and automorphism operations on a single ciphertext,
 and homomorphic multiplication and permutation (which uses automorphisms).
 We report three typical sets of parameters.
@@ -151,7 +151,7 @@ But prior accelerators do not implement automorphisms,
 so we extend each HEAX key-switching pipeline with an SRAM-based, scalar automorphism unit.
 We call this extension HEAX$_\sigma$.
 
-\autoref{tbl:microbenchmark} shows that
+\autoref{tbl:f1microbenchmark} shows that
 F1 achieves large speedups over HEAX$_\sigma$,
 ranging from 172\x to 1,866\x.
 %and those become more significant for larger parameters.
@@ -165,13 +165,13 @@ and thus miss the data movement bottlenecks of FHE programs.
 To gain more insights into these results, we now analyze F1's data movement, power consumption, and compute.
 
 \paragraph{Data movement:}
-\autoref{fig:dataMovement} shows a breakdown of off-chip memory traffic across data types:
+\autoref{fig:f1dataMovement} shows a breakdown of off-chip memory traffic across data types:
 key-switch hints (KSH), inputs/outputs, and intermediate values.
 KSH and input/output traffic is broken into compulsory and
 non-compulsory (i.e., caused by limited scratchpad capacity).
 Intermediates, which are always non-compulsory, are classified as loads or stores.
 
-\autoref{fig:dataMovement} shows that key-switch hints dominate in high-depth workloads
+\autoref{fig:f1dataMovement} shows that key-switch hints dominate in high-depth workloads
 (LogReg, DB Lookup, and bootstrapping), taking up to 94\% of traffic.
 Key-switch hints are also significant in the LoLa-MNIST variants.
 This shows why scheduling should prioritize them.
@@ -183,12 +183,12 @@ LoLa-CIFAR has very high reuse of key-switch hints,
 %which F1 exploits.
 and exploiting it requires spilling intermediate ciphertexts.
 
-\figDataMovement
-\figOpBreakdown
+\figFOneDataMovement
+\figFOneOpBreakdown
 
 \paragraph{Power consumption:}
-\autoref{fig:power} reports average power for each benchmark, broken down by component.
-This breakdown also includes off-chip memory power (\autoref{tbl:GF12} only included the on-chip component).
+\autoref{fig:f1power} reports average power for each benchmark, broken down by component.
+This breakdown also includes off-chip memory power (\autoref{tbl:f1GF12} only included the on-chip component).
 Results show reasonable power consumption for an accelerator card.
 Overall, computation consumes 20-30\% of power, and data movement dominates.
 
@@ -198,9 +198,9 @@ However, this doesn't mean that fewer FUs could achieve the same performance:
 benchmarks have memory\hyp{}bound phases 
 that weigh down average FU utilization.
 %and phases with high FU utilization.
-To see this, \autoref{fig:opBreakdown} shows a breakdown of FU utilization over 
+To see this, \autoref{fig:f1opBreakdown} shows a breakdown of FU utilization over 
 time for LoLa-MNIST Plaintext Weights.
-\autoref{fig:opBreakdown} also shows off-chip bandwidth utilization over time (black line).
+\autoref{fig:f1opBreakdown} also shows off-chip bandwidth utilization over time (black line).
 The program is initially memory-bound, and few FUs are active.
 As the memory-bound phase ends, compute intensity grows, 
 utilizing a balanced mix of the available FUs.
@@ -221,10 +221,10 @@ the final (fully connected) layer, which is highly parallel and already has all 
 \subsection{Sensitivity studies}
 \label{sec:sensitivity}
 
-\tblSensitivity
+\tblFOneSensitivity
 
 To understand the impact of our FUs and scheduling algorithms, we evaluate F1 variants without them.
-\autoref{tbl:sensitivity} reports the \emph{slowdown (higher is worse)} of F1 with:
+\autoref{tbl:f1sensitivity} reports the \emph{slowdown (higher is worse)} of F1 with:
 \emph{(1)} low\hyp{}throughput NTT FUs that follow the same design as HEAX
 (processing one stage of NTT butterflies per cycle); %rather than full pipelining);
 \emph{(2)} low\hyp{}throughput automorphism FUs using a serial SRAM memory,
@@ -246,7 +246,7 @@ This algorithm was proposed for VLIW processors and register files; we apply it 
 The large slowdowns show that prior capacity-aware schedulers are ineffective on F1.
 
 
-\figConfigs
+\figFOneConfigs
 
 \subsection{Scalability}
 \label{sec:scalability}
@@ -254,7 +254,7 @@ The large slowdowns show that prior capacity-aware schedulers are ineffective on
 Finally, we study how F1's performance changes with its area budget: 
 we sweep the number of compute clusters, scratchpad banks, HBM controllers,
 and network topology to find the most efficient design at each area.
-\autoref{fig:pareto} shows this
+\autoref{fig:f1pareto} shows this
 Pareto frontier, with
 area in the $x$-axis and performance in the $y$-axis.
 This curve shows that, as F1 scales, it uses resources efficiently:
@@ -262,7 +262,7 @@ performance grows about linearly through a large range of areas.
 
 %\vspace{2em} % dsm: Leave enough space for the wrapfig
 
-%\paragraph{LRU vs. Min:} We quantified the performance gains from the fact that we are able to use Belady's Min as a replacement policy instead of a least-recently used (LRU) policy in \ref{tbl:sensitivity}.
+%\paragraph{LRU vs. Min:} We quantified the performance gains from the fact that we are able to use Belady's Min as a replacement policy instead of a least-recently used (LRU) policy in \ref{tbl:f1sensitivity}.
 %As expected, we see no difference for computations that fit or almost-fit on-chip.
 %However, for bootstrapping at higher values of $L$, we start to see increasing benefits to our Min replacement policy.
 
@@ -283,6 +283,6 @@ Note that at $t = L$, all relinearizations will use the standard approach.
 
 In our bootstrapping algorithm, we perform many distinct automorphisms on a single ciphertext at our maximum $L$ value, leading to a lot of KHS matrices with no reuse.
 While the computation blow-up from the non-standard relinearization method is substantial, we notice significant speedups when we use the non-standard method for all operations at the highest value of $L$.
-Performance figures are presented in figure \ref{fig:sweepRelinThresh}.
+Performance figures are presented in figure \ref{fig:f1sweepRelinThresh}.
 
 \end{comment}
