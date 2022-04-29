@@ -1,11 +1,10 @@
 \usepackage{comment}
 \usepackage{multicol}
 
-
 \newcommand{\figFOneArch}{
   \begin{figure}[t]
         \begin{center}
-     \includegraphics{f1_figures/ag_arch.pdf}
+        \includegraphics[width=0.7\linewidth]{f1_figures/ag_arch.pdf}
      \caption{Overview of the F1 architecture.}
     \label{fig:f1arch}
   \end{center}
@@ -15,10 +14,9 @@
 \newcommand{\figFOneMultDataflow}{
   \begin{figure}[t]
         \begin{center}
-     \includegraphics[width=0.99\columnwidth]{f1_figures/ag_mult_dataflow.pdf}
+     \includegraphics[width=0.7\columnwidth]{f1_figures/ag_mult_dataflow.pdf}
     \caption{Example matrix-vector multiply using FHE.}
     \label{fig:f1MultDataflow}
-    \vspace{0.2cm}
     \end{center}
   \end{figure}
 }
@@ -26,10 +24,8 @@
 \newcommand{\figFOneOpBreakdown}{
     \begin{figure}[t]
     \begin{center}
-        \includegraphics[width=0.99\columnwidth]{f1_plots/lolaptwTimeplot.pdf}
-        \vspace{-0.05in}
+        \includegraphics[width=0.65\columnwidth]{f1_plots/lolaptwTimeplot.pdf}
         \caption{Functional unit and HBM utilization over time for the LoLa-MNIST PTW benchmark.}
-        \vspace{0.2cm}
         \label{fig:f1opBreakdown}
     \end{center}
     \end{figure}
@@ -38,23 +34,19 @@
 \newcommand{\figFOneCompilerOverview}{
   \begin{figure}[t]
         \begin{center}
-     \includegraphics[width=\columnwidth]{f1_figures/ag_compiler_overview.pdf}
+     \includegraphics[width=0.65\columnwidth]{f1_figures/ag_compiler_overview.pdf}
     \caption{Overview of the F1 compiler.}
     \label{fig:f1compilerOverview}
-    %\vspace{-0.06in} %dsm: Shaves off a line, but looks bad
-    \vspace{0.2cm}    
     \end{center}
   \end{figure}
 }
 
 \newcommand{\figFOneautfu}{
 \setlength{\columnsep}{7pt}
-  \begin{wrapfigure}{r}{0.22\linewidth}
-      \vspace{-1.8em}
+  \begin{wrapfigure}{r}{0.3\linewidth}
      \includegraphics[width=0.25\columnwidth]{f1_figures/ag_aut_fu.pdf}
     \caption{Automorphism unit.}
     \label{fig:f1aut_fu}
-    %\vspace{-0.4em} 
   \end{wrapfigure}
 }
 
@@ -63,7 +55,6 @@
         \begin{center}
     \includegraphics[width=0.1\columnwidth]{f1_figures/ag_automorphism.pdf}
     \caption{Applying $\sigma_3$ on an RNS polynomial of four 4-element chunks by using only permutations local to chunks.}
-    \vspace{0.2cm}
     \label{fig:f1automorphism}
     \end{center}
   \end{figure}
@@ -80,32 +71,30 @@
 
 \newcommand{\figFOneFourStepNTT}{
   \begin{figure}[t]
-    \includegraphics[width=0.99\columnwidth]{f1_figures/ag_four_step_ntt.pdf}
+    \begin{center}
+    \includegraphics[width=0.8\columnwidth]{f1_figures/ag_four_step_ntt.pdf}
     \caption{Example of a four-step NTT datapath that uses 4-point NTTs to implement 16-point NTTs.}
     \label{fig:f1fourStepNTT}
-    \vspace{0.2cm}
+    \end{center}
   \end{figure}
 }
 
 \newcommand{\figFOneQuadrantSwap}{
   \begin{figure}[t]
     \centering
-    \includegraphics[width=0.99\columnwidth]{f1_figures/ag_quadrant_swap.pdf}
+    \includegraphics[width=0.8\columnwidth]{f1_figures/ag_quadrant_swap.pdf}
     \caption{Transpose unit (right) and its component quadrant-swap unit (left).}
     \label{fig:f1quadrantSwap}
-    \vspace{0.2cm}
   \end{figure}
 }
 
 \newcommand{\figFOneOverview}{
   \begin{figure}[h] % dsm: acmart crap bleeds onto the second column, makes it hard for this figure to be on top, so make it [h]
-    \vspace{-0.07in} % dsm: equalize [h] margins
     \centering
     \includegraphics[width=\columnwidth]{f1_figures/ag_overview.pdf}
     \caption{FHE allows a user to securely offload computation to an untrusted server.}
     %old: \caption{Workflow showing how FHE is used to securely offload computation to an untrusted server.}
     \label{fig:f1overview}
-    \vspace{0.07in} % dsm: equalize [h] margins
   \end{figure}
 }
 
@@ -115,7 +104,6 @@
      \includegraphics[width=\columnwidth]{f1_plots_unused/sweepFUs.pdf}
     \caption{Performance of our benchmarks with varying number of functional unit clusters.}
     \label{fig:f1sweepFUs}
-    %\vspace{-0.03in}
     \end{center}
   \end{figure}
 }
@@ -126,7 +114,6 @@
      \includegraphics[width=\columnwidth]{f1_plots_unused/sweepBW.pdf}
     \caption{Performance of our benchmarks across various main memory bandwidths.}
     \label{fig:f1sweepBW}
-    %\vspace{-0.03in}
     \end{center}
   \end{figure}
 }
@@ -135,38 +122,32 @@
 \begin{figure}
   \centering
   \captionsetup[subfigure]{labelformat=empty}
-  \begin{subfigure}[b]{0.49\columnwidth}
+  \begin{subfigure}[b]{0.4\columnwidth}
     \includegraphics[width=\linewidth]{f1_plots/dataMovement.pdf}
     \caption{}
     \label{fig:f1dataMovement}
   \end{subfigure}
   \hfill %%
-  \begin{subfigure}[b]{0.49\columnwidth}
+  \begin{subfigure}[b]{0.4\columnwidth}
     \includegraphics[width=\linewidth]{f1_plots/power.pdf}
     \caption{}
     \label{fig:f1power}
   \end{subfigure}
-  % dsm: Extremely ghetto superimposed subfigure labels
-  %\vspace*{-0.31in}
   \begin{center}
-    (a) \hspace{0.45\columnwidth} (b)
+    (a) \hspace{0.6\columnwidth} (b)
   \end{center}
-  %\vspace{-0.13in}
   \caption{Per-benchmark breakdowns of (a) data movement and (b) average power for F1.}
-  \vspace{-0.1in}
 \end{figure}
 }
 
 \newcommand{\figFOneConfigs}{
-    \setlength{\columnsep}{7pt}
-  \begin{wrapfigure}{t}{0.5\linewidth}
+  \begin{figure}[t]
     \begin{center}
-    \vspace{-0.3in}
-     \includegraphics[width=0.5\columnwidth]{f1_plots/configs.pdf}
+     \includegraphics[width=0.35\columnwidth]{f1_plots/configs.pdf}
     \caption{Performance vs. area across F1 configurations.}
     \label{fig:f1pareto}
     \end{center}
-  \end{wrapfigure}
+  \end{figure}
 }
 
 \newcommand{\figFOneScratchpadSweep}{
@@ -175,7 +156,6 @@
      \includegraphics[width=\columnwidth]{f1_plots_unused/sweepScratchpad.pdf}
     \caption{Performance of our benchmarks across various scratchpad sizes.}
     \label{fig:f1sweepScratchpad}
-    %\vspace{-0.03in}
     \end{center}
   \end{figure}
 }
@@ -208,10 +188,8 @@
         \end{tabular}
       \end{normalsize}
     \end{center}
-    %\vspace{-0.08in}
     \caption{Area and Thermal Design Power (TDP) of F1, and breakdown by component.}
     \label{tbl:f1GF12}
-    \vspace{-0.1in}
   \end{table}
 }
 
@@ -260,20 +238,17 @@
           \textbf{FHE-friendly (ours)} & $1,817$ & $4.10$ & 1,000 \\
           \bottomrule
         \end{tabular}
-        %\vspace{0.02in}
         \caption{Area, power, and delay of modular multipliers.}
         \label{tbl:f1modMult}
       \end{center}
     \end{normalsize}
-    \vspace{-0.1in}
   \end{table}
 }
 
 
 \newcommand{\tblFOneMicrobenchmark}{
   \begin{table*}[b]
-      %\vspace{-8pt}
-    \begin{normalsize}
+    \begin{scriptsize}
       \begin{center}
 %\resizebox{\linewidth}{!}{
       \begin{tabular}{l|rrr|rrr|rrr}
@@ -281,7 +256,7 @@
         & \multicolumn{3}{c|}{$N = 2^{12}$, $\log Q = 109$} &
         \multicolumn{3}{c|}{$N = 2^{13}$, $\log Q = 218$} &
         \multicolumn{3}{c}{$N = 2^{14}$, $\log Q = 438$} \\
-        
+
         & \textbf{F1} & vs.\ CPU & vs.\ HEAX$_\sigma$ & \textbf{F1} & vs.\ CPU & vs.\ HEAX$_\sigma$ & \textbf{F1} & vs.\ CPU & vs.\ HEAX$_\sigma$\\
 
         \midrule
@@ -305,14 +280,14 @@
         &1,866$\times$ % HEAX
         \\
         % --- Automorph. w/out k-s
-        
+
         % N=2**12, logQ = 109
-        Automorphism 
+        Automorphism
         &\textbf{12.8} % our
         &7,364$\times$ % CPU
         &440$\times$ % HEAX
 
-        % N=2**13, logQ = 218   
+        % N=2**13, logQ = 218
         &\textbf{44.8} % our
         &8,250$\times$ % CPU
         &426$\times$ % HEAX
@@ -327,8 +302,8 @@
 
         % --- Ctxt-Ctxt Mult.
 
-        % N=2**12, logQ = 109    
-        Homomorphic multiply
+        % N=2**12, logQ = 109
+        Hom. mult.
         &\textbf{60.0} % our - % 60 MULS * 32 * 1/(32) = 60 cycles
         &48,640$\times$ % CPU
         &172$\times$ % HEAX
@@ -346,8 +321,8 @@
 
         % --- Automorph. w/ k-s
 
-        % N=2**12, logQ = 109    
-        Homomorphic permutation
+        % N=2**12, logQ = 109
+        Hom. rot.
         &\textbf{40.0} % our
         &17,488$\times$ % CPU
         &256$\times$ % HEAX
@@ -362,16 +337,14 @@
         &6,421$\times$ % CPU
         &227$\times$ % HEAX
         \\
-        
+
         \bottomrule
       \end{tabular}
       %}
       \end{center}
-      %\vspace{-5pt}
       \caption{Performance on microbenchmarks: F1's \textbf{reciprocal throughput, in nanoseconds per ciphertext operation} (lower is better) and speedups over CPU and HEAX$_\sigma$ (HEAX augmented with scalar automorphism units) (higher is better).}
       \label{tbl:f1microbenchmark}
-      %\vspace{-3pt} % dsm: Leaves flush with other pages
-    \end{normalsize}
+    \end{scriptsize}
   \end{table*}
     % dsm: Now explained in text
     %\footnotetext[2]{We assume an SRAM array is used to perform an automorphism via random reads because HEAX does not report how they implement automorphisms.}
@@ -386,7 +359,7 @@
       \begin{tabular}{lrrr}
         \toprule
         Execution time (ms) on & CPU & F1 & Speedup \\
-        
+
         \midrule
         LoLa-CIFAR Unencryp. Wghts. & $1.2\times10^6$ & \textbf{241} & $5,011$\x \\
         LoLa-MNIST Unencryp. Wghts. & $2,960$ & \textbf{0.17} & $17,412$\x \\
@@ -403,14 +376,11 @@
         \bottomrule
       \end{tabular}
    \end{center}
-    %\vspace{-8pt}
       \hfill\footnotemark[1]{LoLa's release did not include MNIST with encrypted weights, so we reimplemented it in HELib.}\quad\mbox{}
     \end{normalsize}
-    %\vspace{4pt}
       \caption{Performance of F1 and CPU on full FHE benchmarks: execution times in milliseconds
       and F1's speedup.}      
       \label{tbl:f1benchmark}
-      %\vspace{-2pt}
   \end{table}
 }
 
@@ -486,14 +456,11 @@
             \bottomrule
         \end{tabular}
       \end{center}
-      %\vspace{-8pt}
       \hfill\footnotemark[1]{CSR is intractable for this benchmark.}\quad\mbox{}
     \end{normalsize}
-    %\vspace{4pt}
         \caption{Speedups of F1 over alternate configurations: %without our contributions:
           LT NTT/Aut = Low-throughput NTT/Automorphism FUs; CSR = Code Scheduling to minimize Register Usage~\cite{goodman:ics1988:code}.}
         \label{tbl:f1sensitivity}
-    %\vspace{-2pt}
   \end{table}
 }
 

@@ -3,7 +3,7 @@
 \newcommand{\figBootstrapping}{
     \begin{figure}[t]
         \begin{center}
-            \includegraphics[width=0.85\columnwidth]{figures/ag_bootstrapping.pdf}
+            \includegraphics[width=0.65\columnwidth]{figures/ag_bootstrapping.pdf}
             \caption{Multiplicative budget over time. Bootstrapping can be used to reset a ciphertext's multiplicative budget.}
             \label{fig:bootstrapping}
         \end{center}
@@ -13,7 +13,7 @@
 \newcommand{\figKScompare}{
   \begin{figure}[t]
     \begin{center}
-        \includegraphics[width=\columnwidth]{plots/ks_comparison.pdf}
+        \includegraphics[width=0.75\columnwidth]{plots/ks_comparison.pdf}
 	\caption{Comparison of footprint and compute for standard and boosted keyswitching.}
         \label{fig:ksCompare}
     \end{center}
@@ -23,7 +23,7 @@
 \newcommand{\figBootstrappingFrequency}{
   \begin{figure}[t]
     \begin{center}
-        \includegraphics[width=\columnwidth]{figures/ag_bootstrappingFrequency.pdf}
+        \includegraphics[width=0.85\columnwidth]{figures/ag_bootstrappingFrequency.pdf}
         \caption{Computation cost as a function of max ciphertext size for narrow (left) and wide (right) deep FHE programs.}
         \label{fig:bootstrappingFrequency}
     \end{center}
@@ -111,7 +111,7 @@
 \newcommand{\tblUtilization}{
 \begin{figure}[t]
     \centering
-    \includegraphics[width=0.9\columnwidth]{plots/utils.pdf}
+    \includegraphics[width=0.7\columnwidth]{plots/utils.pdf}
     \caption{Functional unit and memory bandwidth utilization.}
     \label{tbl:utilization}
 \end{figure}
@@ -130,7 +130,7 @@
 \newcommand{\figWorkflow}{
   \begin{figure}[t]
     \begin{center}
-        \includegraphics[width=0.8\columnwidth]{figures/ag_workflow.pdf}
+        \includegraphics[width=0.65\columnwidth]{figures/ag_workflow.pdf}
         \caption{FHE can offload computation to the cloud securely.}
         \label{fig:workflow}
     \end{center}
@@ -140,7 +140,7 @@
   \setlength{\columnsep}{7pt}
   \begin{figure}[t]
       \begin{center}
-      \includegraphics[width=0.7\columnwidth]{figures/ag_crb.pdf}
+      \includegraphics[width=0.6\columnwidth]{figures/ag_crb.pdf}
       \caption{Microarchitecture of the change RNS Base (CRB) unit.}
       \label{fig:crb}
     \end{center}
@@ -150,7 +150,7 @@
 \newcommand{\figOverview}{
   \begin{figure}[t]
     \begin{center}
-        \includegraphics[width=\columnwidth]{plots/overview.pdf}
+        \includegraphics[width=0.7\columnwidth]{plots/overview.pdf}
         \caption{Overview of the \name architecture.}
         \label{fig:overview}
     \end{center}
@@ -181,9 +181,8 @@
 
 \newcommand{\tblBenchmarks}{
     \begin{table}[t]
+        \begin{normalsize}
         \begin{center}
-           \resizebox{!}{0.85in}{
-            \begin{footnotesize}
                 \begin{tabular}{lrrrrr}
                     \toprule
                     Execution time (ms) on  & \name  & F1+   & CPU      & vs. F1+ & vs. CPU \\
@@ -203,11 +202,10 @@
                     \textbf{shallow gmean speedup} &&&                  &\textbf{1.34\x} & \textbf{5,220\x}  \\
                     \bottomrule
                \end{tabular}
-            \end{footnotesize}
-            }
        \end{center}
        \caption{Performance of \name, F1+, and CPU on full FHE benchmarks.}
        \label{tbl:benchmarks}
+    \end{normalsize}
     \end{table}
 }
 
@@ -237,7 +235,7 @@
 \newcommand{\figGmeanVsStorage}{
     \begin{figure}
             \centering
-            \includegraphics[width=0.8\columnwidth]{plots/scratchpad_sweep.pdf}
+            \includegraphics[width=0.65\columnwidth]{plots/scratchpad_sweep.pdf}
             \caption{Gmean performance of \name on deep benchmarks as a function of on-chip storage size.}
             \label{fig:gmeanVsStorage}
     \end{figure}
@@ -245,7 +243,7 @@
 
 \newcommand{\tblPerformanceBreakdown}{
     \begin{table}[t]
-        \begin{footnotesize}
+        \begin{normalsize}
         \begin{center}
             \begin{tabular}{lrrrr}
                 \toprule
@@ -269,7 +267,7 @@
             \caption{Speedups of \name over configurations without KSHGen, CRB or chaining, and the fixed network.}
             \label{tbl:performanceBreakdown}
         \end{center}
-        \end{footnotesize}
+        \end{normalsize}
     \end{table}
 }
 
@@ -284,19 +282,19 @@
     \begin{figure}[t]
         \begin{center}
             \captionsetup[subfigure]{labelformat=empty}
-            \begin{subfigure}[b]{0.46\columnwidth}
+            \begin{subfigure}[b]{0.4\columnwidth}
                 \includegraphics[width=\linewidth]{plots/cl_data_movement.pdf}
                 \caption{}
                 \label{fig:dataMovement}
             \end{subfigure}
             \hfil %%
-            \begin{subfigure}[b]{0.46\columnwidth}
+            \begin{subfigure}[b]{0.4\columnwidth}
                 \includegraphics[width=\linewidth]{plots/cl_power.pdf}
                 \caption{}
                 \label{fig:power}
             \end{subfigure}
             \begin{center}
-                (a) \hspace{0.45\columnwidth} (b)
+                (a) \hspace{0.47\columnwidth} (b)
             \end{center}
             \caption{Per-benchmark breakdown of (a) data movement and (b) average power for \name.}
         \end{center}

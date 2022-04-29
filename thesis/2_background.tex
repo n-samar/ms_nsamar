@@ -196,270 +196,297 @@ Keyswitching is central to \name, so we discuss it in detail in \autoref{sec:key
 %The implementation of homomorphic multiplication is shown in
 %\autoref{listing:homomorphicMult}.
 
+\subsection{Algorithmic insights and optimizations}\label{sec:algoInsights}
+\label{sec:fhe_optimizations}
+
+F1 leverages two optimizations developed in prior work:
+
+\paragraph{Fast polynomial multiplication via NTTs:}
+Multiplying two polynomials requires convolving their coefficients, an
+expensive (naively $O(N^2)$) operation.
+Just like convolutions can be made faster with the Fast Fourier Transform,
+polynomial multiplication can be made faster with the Number-Theoretic Transform (NTT)~\cite{moenck1976practical},  % victor asked for a  ``reassuring read-more-about-NTT citation''
+a variant of the discrete Fourier transform for modular arithmetic.
+The NTT takes an $N$\hyp{}coefficient polynomial as input and returns an $N$\hyp{}element vector representing the input in the
+\textit{NTT domain}. Polynomial multiplication can be performed as element-wise multiplication in the NTT domain. Specifically,
+\begin{equation*}
+    NTT(\mathfrak{a}\mathfrak{b}) = NTT(\mathfrak{a}) \odot NTT(\mathfrak{b}),
+\end{equation*}
+where $\odot$ denotes component-wise multiplication.
+(For this relation to hold with $N$\hyp{}point NTTs, a \emph{negacyclic} NTT~\cite{lyubashevsky:tact10:ideal} must be used (\autoref{sec:fourStepNTT}).)
+
+Because an NTT requires only $O(N \log N)$ modular operations,
+multiplication can be performed in $O(N \log N)$ operations by using two forward NTTs,
+element-wise multiplication, and an inverse NTT.
+And in fact, optimized FHE implementations often store polynomials in the NTT domain
+rather than in their coefficient form \emph{across operations}, further reducing the number of NTTs.
+This is possible because the NTT is a linear transformation, so additions and automorphisms can also be performed in the NTT domain:
+\vspace{-0.05in} % FIXME(dsm): Terrible break
+\begin{align*}
+    NTT(\sigma_k(\mathfrak{a})) &= \sigma_k(NTT(\mathfrak{a})) \\
+    NTT(\mathfrak{a} + \mathfrak{b}) &= NTT(\mathfrak{a}) + NTT(\mathfrak{b})
+\end{align*}
+\vspace{-0.2in}
+
+\paragraph{Avoiding wide arithmetic via Residue Number System (RNS) representation:}
+FHE requires wide ciphertext coefficients (e.g., 512 bits), but wide arithmetic is expensive:
+the cost of a modular multiplier (which takes most of the compute)
+grows quadratically with bit width in our range of interest.
+Moreover, \mbox{we need to efficiently} % HACK(dsm): Fix acmart brain damage and bad break
+support a broad range of widths (e.g., 64 to 512 bits in 32-bit increments),
+both because programs need different widths, and because modulus switching progressively reduces coefficient widths.
+
+RNS representation \cite{garner1959residue}  % victor asked for a ``reassuring read-more-about-RNS citation''
+enables representing a single polynomial with wide coefficients as multiple polynomials with narrower coefficients,
+called \emph{residue polynomials}.
+To achieve this, the modulus~$Q$  is chosen to be the product of $L$
+smaller distinct primes, $Q = q_1q_2\cdots\ q_L$.
+Then, a polynomial in $R_Q$ can be represented as $L$ polynomials in
+$R_{q_1}, \ldots, R_{q_L}$,
+where the coefficients in the $i$-th polynomial are simply the wide coefficients modulo $q_i$.
+%
+For example, with $W = 32$-bit words, a ciphertext polynomial with $512$-bit modulus~$Q$ is represented as
+$L = \log Q/W = 16$ polynomials with $32$-bit coefficients.
+
+All FHE operations can be carried out under RNS representation, and have either better or equivalent bit-complexity than
+  operating on one wide-coefficient polynomial.
+  %For example, using an RNS representation of a polynomial of length $N$, addition
+%requires $2NL$ $32$-bit additions module the $q_i$s, and a homomorphic multiplication requires $L^2$ NTTs, $2L^2$ 32-bit
+%coefficient multiplications, and $2L^2$ 32-bit additions.
+
+\subsection{Architectural analysis of FHE}
+\label{sec:fhe_analysis}
+
+We now analyze a key FHE kernel in depth to understand how we can (and cannot) accelerate it.
+Specifically, we consider the the standard keyswitching operation,
+which is expensive and takes the majority of work in all of F1's benchmarks.
+CraterLake implements \emph{boosted} keyswitching, a variant of keyswitching more amenable
+to acceleration (\autoref{sec:keyswitching}); however, F1 does not target boosted keyswitching.
+Nonetheless, many of the conclusions from this section carry over to the boosted keyswitching setting.
+
+\autoref{listing:keyswitch} shows an implementation of standard keyswitching.
+Standard keyswitching takes three inputs: a polynomial \texttt{x}, and two
+\emph{keyswitch hint matrices} \texttt{ksh0} and \texttt{ksh1}. \texttt{x} is
+stored in RNS form as $L$ residue polynomials (\texttt{RVec}). Each residue
+polynomial \texttt{x[i]} is a vector of $N$ 32-bit integers modulo $q_i$.
+Inputs and outputs are in the NTT domain; only the \texttt{y[i]} polynomials
+(line 3) are in coefficient form.
+
+
+% dsm: RPoly is confusing, because most of these are NOT the coefficients of a polynomial.
+\begin{figure}
+\begin{center}
+  \begin{lstlisting}[caption={Standard keyswitch implementation. \texttt{RVec} is an $N$-element vector of 32-bit values, storing a single RNS polynomial in either the coefficient or the NTT domain.
+    }, mathescape=true, style=custompython, label=listing:keyswitch]
+  def keySwitch(x: RVec[L],
+        ksh0: RVec[L][L], ksh1: RVec[L][L]):
+    y = [INTT(x[i],$q_i$) for i in range(L)]
+    u0: RVec[L] = [0, ...]
+    u1: RVec[L] = [0, ...]
+    for i in range(L):
+      for j in range(L):
+        xqj = (i == j) ? x[i] : NTT(y[i], $q_j$)
+        u0[j] += xqj * ksh0[i,j] mod $q_j$
+        u1[j] += xqj * ksh1[i,j] mod $q_j$
+    return (u0, u1)
+  \end{lstlisting}
+\end{center}
+\end{figure}
+
+%Each automorphism, in addition to ciphertext multiplication, requires a different pair of key-switch hint matrices.
+
+\paragraph{Computation vs.\ data movement:}
+A single key-switch requires $L^2$ NTTs, $2L^2$ multiplications, and $2L^2$
+additions of $N$-element \mbox{vectors}. In RNS form, the rest of a homomorphic
+multiplication (excluding key-switching) is $4L$ multiplications and $3L$
+additions (\autoref{sec:fhe_operation}), so key-switching is dominant.
+
+However, the main cost at high values of $L$ and $N$ is data movement. For
+example, at $L = 16$, $N = 16K$, each RNS polynomial (\texttt{RVec}) is 64\,KB;
+each ciphertext polynomial is 1\,MB; each ciphertext is 2\,MB; and the
+key-switch hints dominate, taking up 32\,MB. With F1's compute throughput,
+fetching the inputs of each key-switching from off-chip memory would demand
+about 10\,TB/s of memory bandwidth. Thus, it is crucial to reuse these values
+as much as possible.
+
+Fortunately, keyswitch hints can be reused: all homomorphic multiplications
+use the same keyswitch hint matrices, and each automorphism has its own pair
+of matrices. But values are so large that few of them fit on-chip.
+
+Finally, note that there is no effective way to decompose or tile this
+operation to reduce storage needs while achieving good reuse: tiling the
+keyswitch hint matrices on either dimension produces many long-lived
+intermediate values; and tiling across \texttt{RVec} elements is even worse
+because in NTTs every input element affects every output element.
+
+\paragraph{Performance requirements:}
+We conclude that, to accommodate these large operands, an FHE accelerator
+requires a memory system that \emph{(1)} decouples data movement from
+computation, as demand misses during frequent key-switches would tank
+performance; and \emph{(2)} implements a large amount of on-chip storage (over
+32\,MB in our example) to allow reuse across entire homomorphic operations
+(e.g., reusing the same key-switch hints across many homomorphic
+multiplications).
+
+Moreover, the FHE accelerator must be designed to use the memory system well.
+First, scheduling data movement and computation is crucial: data must be
+fetched far ahead of its use to provide decoupling, and operations must be
+ordered carefully to maximize reuse. Second, since values are large, excessive
+parallelism can increase footprint and hinder reuse. Thus, the system should
+use relatively few high-throughput functional units rather than many
+low-throughput ones.
+
+\paragraph{Functionality requirements:}
+Programmable FHE accelerators must support a wide range of parameters, both $N$
+(polynomial/vector sizes) and $L$ (number of RNS polynomials, i.e., number of
+32-bit prime factors of $Q$). While $N$ is generally fixed for a single
+program, $L$ changes as modulus switching sheds off polynomials.
+
+Moreover, FHE accelerators must avoid overspecializing in order to support algorithmic diversity.
+For instance, we have described \emph{an} implementation of keyswitching, but
+there are others~\cite{kim:jmir18:helr,gentry:crypto2012:homomorphic}
+with different tradeoffs.
+
+F1 accelerates \emph{primitive operations on large vectors}:
+modular arithmetic, NTTs, and automorphisms. It exploits wide vector processing
+to achieve very high throughput, even though this makes NTTs and automorphisms
+costlier. F1 avoids building functional units for coarser primitives, like
+key-switching, which would hinder algorithmic diversity.
+
 \subsection{Challenges of Deep FHE Computation}\label{sec:deepChallenges}
 
-%add overheads to FHE programs beyond those
-%inherent in computation on encrypted data, as mentioned in \autoref{sec:intro}.
-
-FHE ciphertexts include some \emph{noise} or \emph{error} %(the $\mathfrak{e}$ term above)
-to ensure cryptographic privacy~\cite{lyubashevsky:tact10:ideal}.
-Noise compounds during homomorphic operations, which adds overheads.
-Noise increases primarily during ciphertext multiplications;
-each ciphertext can tolerate
-only a fixed amount of noise before decryption becomes impossible.
-Therefore, we say that the \emph{multiplicative depth} a ciphertext can tolerate
-is the ciphertext's \emph{multiplicative budget}.
-% nikola: I try to use multiplicative budget instead of noise budget cuz I want it to
-% simplify things: it's a little confusing that "spending noise budget gives you multiplicative levels"
-% it is more intuitive to "spend multiplicative budget to get multiplicative levels"
+FHE ciphertexts include some \emph{noise} or \emph{error} %(the $\mathfrak{e}$
+term above) to ensure cryptographic privacy~\cite{lyubashevsky:tact10:ideal}.
+Noise compounds during homomorphic operations, which adds overheads. Noise
+increases primarily during ciphertext multiplications; each ciphertext can
+tolerate only a fixed amount of noise before decryption becomes impossible.
+Therefore, we say that the \emph{multiplicative depth} a ciphertext can
+tolerate is the ciphertext's \emph{multiplicative budget}.
 
 Supporting a high multiplicative budget requires using ciphertexts with wide
-coefficients and a large ciphertext modulus $Q$.
-For example, ciphertexts with 512-bit coefficients have a multiplicative budget of about 16.
-After each multiplication, the ciphertext is \emph{rescaled} to use a smaller modulus
+coefficients and a large ciphertext modulus $Q$. For example, ciphertexts with
+512-bit coefficients have a multiplicative budget of about 16. After each
+multiplication, the ciphertext is \emph{rescaled} to use a smaller modulus
 (e.g., dropping 32 bits).
-% nikola: modulo switching and rescaling are not the same; in CKKS, you use rescaling (though you sometimes may need modulo-switching, but that's a detail)
 This trims the noise and makes computation more efficient over time, as
-narrower coefficients are cheaper to operate on.
-Ciphertexts run out of multiplicative depth when their coefficients become too
-narrow to support further operations (e.g., 32 bits).
-In CKKS, the specific number of bits to drop per operation is not fixed, but depends on the precision
-that the application requires.
+narrower coefficients are cheaper to operate on. Ciphertexts run out of
+multiplicative depth when their coefficients become too narrow to support
+further operations (e.g., 32 bits). In CKKS, the specific number of bits to
+drop per operation is not fixed, but depends on the precision that the
+application requires.
 
-A high multiplicative depth computation can be supported by simply using ciphertexts with
-sufficiently high multiplicative budgets, but this adds major overheads.
-First, it requires using very wide coefficients, which take more storage per plaintext element and make computations more complex.
-Moreover, wide coefficients induce a second hurdle: they force the use of larger vectors.
+A high multiplicative depth computation can be supported by simply using
+ciphertexts with sufficiently high multiplicative budgets, but this adds major
+overheads. First, it requires using very wide coefficients, which take more
+storage per plaintext element and make computations more complex. Moreover,
+wide coefficients induce a second hurdle: they force the use of larger vectors.
 This is because, for security, $N/\log Q$ must be above a certain threshold.
-For instance, a multiplicative budget of 16 requires $Q$ of about 512 bits and $N$=16K (i.e., 2\,MB per ciphertext),
-and a multiplicative budget of 32 requires $Q$ of about 1,024 bits and $N$=32K (i.e., 8\,MB per ciphertext).
-Though larger vectors can pack more plaintext elements, %and the overheads of larger $N$ are amortized relatively well per plaintext element,
-this quickly results in vectors so large that they cannot fit on-chip.
-Overall, ciphertext size grows quadratically with multiplicative budget, and compute cost cubically
-(inducing linear and quadratic overheads per plaintext element, respectively).
+For instance, a multiplicative budget of 16 requires $Q$ of about 512 bits and
+$N$=16K (i.e., 2\,MB per ciphertext), and a multiplicative budget of 32
+requires $Q$ of about 1,024 bits and $N$=32K (i.e., 8\,MB per ciphertext).
+Though larger vectors can pack more plaintext elements, this quickly results in
+vectors so large that they cannot fit on-chip. Overall, ciphertext size grows
+quadratically with multiplicative budget, and compute cost cubically (inducing
+linear and quadratic overheads per plaintext element, respectively).
 
 
 \figBootstrapping
 
 \paragraph{Bootstrapping:} FHE schemes limit the overheads of deep computation
-through a procedure called bootstrapping that refreshes the multiplicative budget of a ciphertext.
-Bootstrapping enables computations of arbitrary depth by separating them into regions of limited depth.
-But bootstrapping~is~an~expensive and deep computation,
-so it should happen infrequently.
+through a procedure called bootstrapping that refreshes the multiplicative
+budget of a ciphertext. Bootstrapping enables computations of arbitrary depth
+by separating them into regions of limited depth. But
+bootstrapping~is~an~expensive and deep computation, so it should happen
+infrequently.
 
 \autoref{fig:bootstrapping} illustrates a typical evolution of a ciphertext's
-multiplicative budget during execution of a program:
-computation proceeds until the ciphertext runs out of budget, then bootstrapping is applied to refresh the ciphertext.
-For example, in our LSTM benchmark, computation starts with a multiplicative budget of 57 and bootstrapping
-consumes the highest 35 levels (in red in \autoref{fig:bootstrapping}), leaving 22 levels for application computation (in blue in \autoref{fig:bootstrapping}).
-% Though bootstrapping happens at high depth and is thus more expensive, it can often be amortized well
-% if data elements are reused (e.g., when applying bootstrapping between layers of a neural network).
-% nikola: I think this is vague and may not even be true. I don't really understand what it means.
+multiplicative budget during execution of a program: computation proceeds until
+the ciphertext runs out of budget, then bootstrapping is applied to refresh the
+ciphertext. For example, in our LSTM benchmark, computation starts with a
+multiplicative budget of 57 and bootstrapping consumes the highest 35 levels
+(in red in \autoref{fig:bootstrapping}), leaving 22 levels for application
+computation (in blue in \autoref{fig:bootstrapping}).
 
 
 \paragraph{Ciphertext sizes needed for deep FHE:}
-We now show that \name supports the ciphertext sizes required for deep FHE, and why prior work falls short.
-\autoref{fig:bootstrappingFrequency} reports the cost per homomorphic operation
-(in scalar multiplies per homomorphic multiply, $y$-axis) of two deep programs,
-as a function of the maximum ciphertext size used ($x$-axis).
-This determines bootstrapping frequency:
-using larger ciphertexts requires less frequent bootstrapping.
-\autoref{fig:bootstrappingFrequency} also breaks down cost by~that used for application computation (blue)
-and bootstrapping (red).
+We now show that \name supports the ciphertext sizes required for deep FHE, and
+why prior work falls short. \autoref{fig:bootstrappingFrequency} reports the
+cost per homomorphic operation (in scalar multiplies per homomorphic multiply,
+$y$-axis) of two deep programs, as a function of the maximum ciphertext size
+used ($x$-axis). This determines bootstrapping frequency: using larger
+ciphertexts requires less frequent bootstrapping.
+\autoref{fig:bootstrappingFrequency} also breaks down cost by~that used for
+application computation (blue) and bootstrapping (red).
 
-The left plot is for a serial chain of multiplies, the worst case for bootstrapping cost, as the amount of computation between bootstrappings is minimal. Consequently, bootstrapping cost dominates.
-By contrast, the right plot is for a very wide graph with 100 multiplies per depth, which converge to a single output after each level.
-This allows boostrapping to be amortized across many operations, a best-case scenario.
+The left plot is for a serial chain of multiplies, the worst case for
+bootstrapping cost, as the amount of computation between bootstrappings is
+minimal. Consequently, bootstrapping cost dominates. By contrast, the right
+plot is for a very wide graph with 100 multiplies per depth, which converge to
+a single output after each level. This allows boostrapping to be amortized
+across many operations, a best-case scenario.
 
-Crucially, the optimal choice of maximum ciphertext size (shown with a black dot)
-is in a narrow range for both extremes, between 20\,MB (right) and 26\,MB (left).
-This is because \emph{both} application computation and bootstrapping become more expensive
-with ciphertext size, so regardless of which dominates,
-once bootstrapping is infrequent enough, moving to larger ciphertexts only hurts performance.
+Crucially, the optimal choice of maximum ciphertext size (shown with a black
+dot) is in a narrow range for both extremes, between 20\,MB (right) and 26\,MB
+(left). This is because \emph{both} application computation and bootstrapping
+become more expensive with ciphertext size, so regardless of which dominates,
+once bootstrapping is infrequent enough, moving to larger ciphertexts only
+hurts performance.
 
 Thus, 20--26\,MB max ciphertexts are the sweet spot for most deep programs,
-which fall between these extremes.
-In practice, bootstrapping placement is NP-hard~\cite{benhamouda2017optimization}, because real FHE programs are not as regular.
-But all our benchmarks show a similar tradeoff curve to these synthetic programs.
-% nikola: i think stating the NP-hardness result is important. Without it, the reviewers might say:
-% these guys only optimized for their benchmark, and they don't know whether the Q they support
-% will actually work. At least this way they know it is not knowable in general.
+which fall between these extremes. In practice, bootstrapping placement is
+NP-hard~\cite{benhamouda2017optimization}, because real FHE programs are not as
+regular. But all our benchmarks show a similar tradeoff curve to these
+synthetic programs.
 
 \figBootstrappingFrequency
 
 \emph{Prior FHE accelerators cannot efficiently support ciphertexts this large}.
-For example, F1~\cite{feldmann:micro21:f1} \emph{becomes inefficient past 2\,MB}.
-Prior accelerators~\cite{riazi:asplos20:heax} are limited to even smaller values.
-This is insufficient to run even bootstrapping itself.
+For example, F1~\cite{feldmann:micro21:f1} \emph{becomes inefficient past
+2\,MB}. Prior accelerators~\cite{riazi:asplos20:heax} are limited to even
+smaller values. This is insufficient to run even bootstrapping itself.
 (Although F1 supports \emph{unpacked} bootstrapping of ciphertexts that encode
-only a single element, this is $>$1,000$\times$ slower per element and thus impractical for
-full applications, as \autoref{sec:results} shows.)
+only a single element, this is $>$1,000$\times$ slower per element and thus
+impractical for full applications, as \autoref{sec:results} shows.)
 
-As we will see, scaling to large ciphertexts is not merely a matter of scaling up hardware;
-it requires new algorithms and a new hardware organization to support these algorithms
-and to cope with the huge footprint of ciphertexts.
+As we will see, scaling to large ciphertexts is not merely a matter of scaling
+up hardware; it requires new algorithms and a new hardware organization to
+support these algorithms and to cope with the huge footprint of ciphertexts.
 
-\subsection{Implementation Optimizations}
-\label{sec:rns}
-\label{sec:ntt}
+\subsection{CraterLake vs. F1}
 
-We use two common FHE implementations optimizations:
+Though F1 is programmable and can accelerate full computations, it targets
+shallow computations. Specifically, F1 is tailored to a keyswitching algorithm
+that does not scale to high multiplicative budgets $L$
+(\autoref{sec:keyswitching}). As a result, F1 is inefficient when using a more
+scalable keyswitching algorithm: It has an inappropriate mix of functional
+units, and even with the right mix, it would be dominated by simple operations
+that would require over 100 register file ports for the FUs to be fully
+utilized.
+Moreover, F1's organization incurs excessive communication and is hard to scale
+to larger systems.
 
-\paragraph{Residue Number System (RNS)} representation~\cite{garner:1959:residue}
-allows representing each of the wide coefficients of a ciphertext polynomial as $L$ \emph{residue polynomials}
-with narrow coefficients. This is achieved by choosing the wide modulus $Q$ to be a product of $L$ smaller factors, $Q = q_1q_2...q_L$, called \emph{small moduli}.
-% nikola: need to dene this term cuz it is used later in bitwidth section
-Then, $x \bmod Q$ is uniquely represented as $(x \bmod q_1, x \bmod q_2, ..., x \bmod q_L)$.
-
-RNS representation 
-% dsm: REVISION-TRIMMED
-%brings multiple advantages: \emph{(1)} narrower coefficients are easier to operate on,
-%and \emph{(2)} with the algorithms we use, \emph{all FHE operations have lower bit-complexity} than when using wide coefficients.
-reduces overall operation cost, and allows supporting many coefficient widths with a single narrow width in hardware.
-\name exploits this by using 28-bit elements
-(algorithm-related limits prevent using arbitrarily narrow coefficients, as \autoref{sec:bitwidth} explains).
-For example, a ciphertext polynomial with 1,500-bit $Q$ is stored using $L$=54 28-bit residue polynomials.
-
-% dsm: REVISION-TRIMMED
-\begin{comment}
-Second, RNS makes it easy to drop unneeded bits from each coefficient as multiplicative budget decreases
-by dropping residue polynomials.
-This allows us to implement efficient wide arithmetic on a broad range of widths
-while supporting a single, narrow width in hardware.
-\end{comment}
-
-%To summarize (\autoref{fig:tiling}), a single ciphertext is represented by two 
-%ciphertext polynomials. Each ciphertext polynomial is stored as $L$ RNS polynomials. 
-%Each RNS polynomial is stored as a vector of polynomial coefficients modulo a 
-%small prime $q_i$ (\autoref{fig:tiling}).
-
-\paragraph{Number-Theoretic Transform (NTT)} is a modular-arithmetic variant of the Fast Fourier Transform.
-% dsm: Mentioning complexity to give a sense of why it improves performance (+more expensive than typical FUs)
-The NTT is an $O(N\log N)$ operation
-that makes polynomial multiplications efficient:
-in the NTT domain, the convolution required for polynomial multiplication becomes element-wise multiplication.
-% alex: Should we instead say that *we* store polynomials in NTT form most of the time?
-FHE implementations often store polynomials in the NTT domain.
-\name includes NTT functional units.
-% dsm: Unnecessary
-%and \name adopts F1's specialized NTT functional unit.
-
-% dsm: REVISION-TRIMMED
-%\begin{figure}
-%  \begin{lstlisting}[caption={CKKS homomorphic multiplication implementation.\vspace{0.09in}}, mathescape=true, style=custompython, label=listing:homomorphicMult]
-%def mult((a$\textsubscript{0}$[0:L], a$\textsubscript{1}$[0:L]), (b$\textsubscript{0}$[0:L], b$\textsubscript{1}$[0:L])):
-%  p$\textsubscript{00}$[0:L] = a$\textsubscript{0}$[0:L] * b$\textsubscript{0}$[0:L]
-%  p$\textsubscript{01+10}$[0:L] = a$\textsubscript{0}$[0:L]*b$\textsubscript{1}$[0:L] + a$\textsubscript{1}$[0:L]*b$\textsubscript{0}$[0:L]
-%  (ks$\textsubscript{0}$, ks$\textsubscript{1}$) = keySwitch(a$\textsubscript{1}$[0:L] * b$\textsubscript{1}$[0:L])
-%  res$\textsubscript{0}$[0:L] = p$\textsubscript{00}$[0:L] + ks$\textsubscript{0}$[0:L]
-%  res$\textsubscript{1}$[0:L] = p$\textsubscript{01+10}$[0:L] + ks$\textsubscript{1}$[0:L]
-%  return (rescale(res$\textsubscript{0}$[0:L]), rescale(res$\textsubscript{1}$[0:L]))
-%
-%def rescale(res$\textsubscript{i}$[0:L]):
-%  xINTT$\textsubscript{i}$ = INTT(res$\textsubscript{i}$[L-1], L-1)
-%  subMe$\textsubscript{i}$[0:L-1] = [NTT(xINTT$\textsubscript{i}$, j) for j in [0:L-1]]
-%  return res$\textsubscript{i}$[0:L-1] - subMe$\textsubscript{i}$[0:L-1]
-%     \end{lstlisting}
-%\end{figure}
-
-\begin{comment}
-\paragraph{Putting it all together:} \autoref{listing:homomorphicMult} shows the implementation 
-of homomorphic multiplication in CKKS using the above techniques. Each of the input ciphertexts (\verb|a| and \verb|b|)
-consist of two ciphertext polynomials, and each ciphertext polynomial has $L$ residue polynomials (e.g., \texttt{a$\textsubscript{1}$[0:L]}).
-Each residue polynomial is an $N$-coefficient vector (the code is written using vector operations and $N$ is implicit).
-Inputs and outputs are in the NTT domain.
-The homomorphic multiplication consists of additions and multiplications of these inputs, followed by a \emph{keyswitch} (which we will detail later, and dominates execution for large $L$).
-Finally, \emph{rescaling} trims the noise of the resulting ciphertext (and drops one of 
-the $L$ residue polynomials).
-\end{comment}
+As a result, \name introduces a fundamentally different design, needed for deep
+computations: it adopts a new, simpler hardware organization and data tiling
+approach that reduces communication and scales to the large ciphertexts
+required, and it is tailored to use an efficient keyswitching algorithm, which
+requires new functional units and optimizations.
 
 \subsection{Prior FHE Accelerators and Their Limitations}\label{sec:drawbacks}
 
-Prior work has proposed multiple FHE accelerators.
-From these, F1~\cite{feldmann:micro21:f1} is the closest to \name.
-F1 is a statically scheduled processor with clusters of vector functional units
-specialized to FHE. In particular, F1 introduces new high-throughput vector 
-functional units for NTTs and automorphisms, all-to-all operations that cannot 
-be efficiently performed with conventional SIMD datapaths.
 
-Though F1 is programmable and can accelerate full computations,
-it targets shallow computations.
-Specifically, F1 is tailored to a keyswitching algorithm
-that does not scale to high multiplicative budgets $L$ (\autoref{sec:keyswitching}).
-As a result, F1 is inefficient when using a more scalable keyswitching algorithm: It has an inappropriate mix of functional units, and
-even with the right mix, it would be dominated by simple operations that would require over 100 register file ports for the FUs to be fully utilized.
-Moreover, F1's organization incurs excessive communication and is hard to scale to larger systems.
-% nikola: 100 ports comes from the fact that the CRB would have everything go through RF ports.
-% Even if we are generous, and say that the constants are not streamed from the RF, that's still
-% 2*L_max ports (one per multiply + one per add). Which is 2*60=120
-%on this algorithm.
-% dsm: Also on others though.
+Prior work has proposed several FHE accelerators for
+FPGAs~\cite{cousins:hpec14:fpga-he,cousins:tetc17:fpga-he,doroz:tc15:accelerating-fhe,roy:hpca19:fpga-he,migliore:tecs17:he-karatsuba,riazi:asplos20:heax,turan:tc20:heaws,mert:tvlsi20:bfv-accel}.
+These systems have three important limitations. First, they work by
+accelerating some primitives but defer others to a general-purpose host
+processor, and rely on the host processor to sequence operations. This causes
+excessive data movement that limits speedups. Second, these accelerators build
+functional units for \emph{fixed parameters} $N$ and $L$ (or $\log Q$ for those
+not using RNS). Third, many of these systems build overspecialized primitives
+that limit algorithmic diversity.
 
-As a result, \name introduces a fundamentally different design, needed for deep computations:
-it adopts a new, simpler hardware organization and data tiling approach
-that reduces communication and scales to the large ciphertexts required,
-and it is tailored to use an efficient keyswitching algorithm,
-which requires new functional units and optimizations.
-%\name adopts some of F1's FUs and retains its programmability.
-
-%\name leverages several of F1's contributions, including adopting its functional units and retaining its programmability.
-%Unlike F1, \name is tailored to use the efficient keyswitching needed for deep computations.
-%\name uses a simpler structure that reduces communication and footprint, introduces
-%new FUs to accelerate key kernels, and allows chaining FUs to operate
-%with few register file ports.
-
-Besides F1, prior work proposed accelerators for FPGAs~\cite{cousins:hpec14:fpga-he,cousins:tetc17:fpga-he,doroz:tc15:accelerating-fhe,roy:hpca19:fpga-he,migliore:tecs17:he-karatsuba,riazi:asplos20:heax,turan:tc20:heaws,mert:tvlsi20:bfv-accel}.
-These systems are not programmable: they accelerate a small number of primitives and use fixed parameters ($N$ and $L$),
-so they cannot execute full applications; they suffer from excessive data movement;
-and they achieve limited speedups.
-%and they often overspecialize.
-%For example, HEAX~\cite{riazi:asplos20:heax}, the state-of-the-art FPGA accelerator,
-%builds a fixed keyswitching pipeline using the inefficient algorithm.
-
-% dsm: This text is not parseable by the average reviewer. You first need to describe WHAT PRIOR accelerators do...
-\begin{comment}
-\paragraph{Optimized to wrong algorithms.} HEAX~\cite{riazi:asplos20:heax} builds
-a fixed pipeline for keyswitching, but the algorithm used in the pipeline does not
-scale to high multiplicative budgets $L$ (\autoref{sec:keyswitching}), which are necessary
-    for deep FHE (\autoref{sec:deepChallenges}).
-As the pipeline is fixed, HEAX cannot
-be adapted to new algorithms without significant rearchitecting.
-F1~\cite{feldmann:micro21:f1} is optimized to the same, suboptimal algorithm as HEAX,
-but is at least programmable: it can execute any algorithm. Nonetheless, other
-drawbacks disqualify it:
-
-\paragraph{Parallelizing across residue polynomials.} F1 parallelizes
-across residue polynomials. We show in \autoref{sec:tiling} that this
-approach does not scale to ciphertexts with large multiplicative budgets ($L$) and that
-tiling by coefficients is necessary. F1 does not have hardware to support for
-this better tiling method.
-
-\paragraph{Narrow vectors.} F1 is a 128-lane architecture. While this
-is wide for regular vectors processors, we show that FHE's low
-control overheads permit a 2K-lane architecture (\autoref{sec:tiling}).
-The main advantage of \name's wide architecture in the context of FHE 
-is that the chip's entire logic can operate in tandem on a single
-homomorphic operation. This substantially reduces on-chip storage
-requirements, as the chip only needs to keep the operands and 
-intermediates of a single homomorphic operation on-chip. 
-Additionally, \name can
-fully utilize its logic even if the FHE program it is running has
-scarce or no parallelism.
-
-\paragraph{Poor FU balance.} 
-F1 does not have the 
-proper balance of functional units for optimal FHE algorithms necessary
-for good performance at high multiplicative budgets $L$ (\autoref{sec:keyswitching}).
-
-\paragraph{Register file pressure.} 
-Even if F1 had the proper functional unit balance, it would still 
-require dozens of register file ports to match \name's performance.
-This is because the optimal FU balance prioritizes simple, low-latency FUs 
-(i.e., multipliers and adders) in comparison to NTTs;
-this increases pressure on register
-file ports to a point where F1's architecture is no longer practical.
-We show new functional units (\autoref{sec:keyswitching}) \emph{and} 
-vector chaining (\autoref{sec:keyswitchingPipeline}) are necessary to 
-reduce register file pressure to manageable levels.
-\end{comment}
-
+Most of these systems achieve limited speedups, about 10$\times$ over software
+baselines. HEAX~\cite{riazi:asplos20:heax} achieves larger speedups
+(200$\times$ vs.\ a single core). But it does so by overspecializing: it uses
+relatively low-throughput functional units for primitive operations, so to
+achieve high performance, it builds a fixed-function pipeline for
+keyswitching.
