@@ -1,0 +1,203 @@
+%\usepackage[normalem]{ulem}
+
+% dsm: Place new refs last
+\newcommand{\zzzNoOpSortToEnd}{}
+
+%\usepackage{xparse} % makes build fail on mads, ???
+\usepackage{siunitx}
+\usepackage{verbatim}
+\usepackage{graphicx,afterpage}
+\usepackage{yfonts}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{stmaryrd}
+\usepackage{amsfonts}
+%\usepackage[mathscr]{euscript}
+%\usepackage{commath}
+\usepackage{calc}
+\usepackage{xspace}
+\usepackage{listings}
+\usepackage{multirow, booktabs}
+%\usepackage{paralist} % FIXME(dsm): compactenum/item incompatible with acmart, but we're still using inparaenum...
+%\usepackage[keeplastbox]{flushend}
+\usepackage{wrapfig}
+\usepackage{enumitem}
+%\usepackage{enumerate}
+\usepackage{caption}
+\usepackage[labelformat=simple]{subcaption}
+%\usepackage{subfigure}
+\usepackage{dblfloatfix} % to allow two-column floats at the bottom of the page
+
+\usepackage{fancyhdr}
+
+%\usepackage[sort,nocompress]{cite} % autosort groups of citations
+% Override IEEEtran, restore default citepunct: https://tex.stackexchange.com/a/72932
+% (turns [1], [2], [49] -> [1, 2, 49])
+%\renewcommand{\citepunct}{,\penalty\citepunctpenalty\,}
+
+% dsm: Better typesetting
+%\usepackage[final]{microtype}
+
+% https://tex.stackexchange.com/questions/240141/
+\usepackage[T1]{fontenc} % Avoid garbling symbols and accents
+
+%For fancy tables
+\usepackage{array} % decent table formatting
+\usepackage{rotating}
+%\usepackage[usenames,dvipsnames,svgnames,table]{xcolor}
+% \definecolor{ltblue}{HTML}{A6CEE3}
+% \definecolor{dkblue}{HTML}{1F78B4}
+% \definecolor{dkgreen}{HTML}{33A02C}
+% \definecolor{ltgreen}{HTML}{B2DF8A}
+% \definecolor{dkorange}{HTML}{FF7F00}
+% \definecolor{ltorange}{HTML}{FDBF6F}
+
+% asf: stole this from HATS
+\lstdefinestyle{custompython}{
+ %aboveskip=0in,
+ belowskip=0in,
+ %abovecaptionskip=0in,
+ belowcaptionskip=-10pt,
+ %belowcaptionskip=1\baselineskip,
+ breaklines=true,
+ captionpos=b,
+ language=Python,
+ showstringspaces=false,
+ numbers=left,
+ stepnumber=1,
+ % dsm: semibold
+ basicstyle={\linespread{0.8}\fontseries{sb}\small\ttfamily},
+ %basicstyle={\small\ttfamily},
+ keywordstyle=\bfseries,
+ %% columns=fullflexible,
+ xleftmargin=2em,
+ frame=single,
+ framexleftmargin=2em,
+ commentstyle=\itshape\color{green!40!black},
+ morekeywords={to,yield},
+}
+
+% from figures.pptx
+\definecolor{ltred}{HTML}{FB9A99}
+\definecolor{dkred}{HTML}{E41A1C}
+\definecolor{dkorange}{HTML}{F07F03}
+\definecolor{ltorange}{HTML}{F7C090}
+\definecolor{dkgreen}{HTML}{3BA32F}
+\definecolor{ltgreen}{HTML}{B2E089}
+\definecolor{dkblue}{HTML}{2879B4}
+\definecolor{ltblue}{HTML}{A6CEE2}
+\definecolor{dkpurple}{HTML}{6A3D9A}
+\definecolor{ltpurple}{HTML}{CAB1D7}
+
+
+% Handle author formatting properly
+%\newcommand{\ausep}{\hspace{1.5em}}
+\newcommand{\fixAcmartBrainDamage}{Axel Feldmann$^\MIT$$^\ast$, Nikola Samardzic$^\MIT$$^\ast$, Aleksandar Krastev$^\MIT$,\\ Srini Devadas$^\MIT$, Ron Dreslinski$^\UM$, Christopher Peikert$^\UM$, Daniel Sanchez$^\MIT$}
+\makeatletter
+\def\@typeset@author@bx{\bgroup\hsize=\author@bx@wd
+  \def\and{\par}\normalbaselines
+  \global\setbox\author@bx=\vtop{\if@ACM@sigchiamode\else\centering\fi
+    \@authorfont\fixAcmartBrainDamage\par\@affiliationfont
+    \@currentaffiliation}\egroup
+  \box\author@bx\hspace{\author@bx@sep}%
+  \gdef\@currentauthors{}%
+  \gdef\@currentaffiliation{}}
+\makeatother
+
+%Use this instead of a hyphen to allow the word itself to be hyphenated
+\usepackage{hyphenat}
+%\usepackage[hyphens]{url}
+
+% Spacing
+\setlength{\textfloatsep}{8pt}
+\setlist[enumerate]{leftmargin=0.25in,itemsep=1pt,topsep=1pt}
+
+% More compact paragraphs
+\makeatletter
+\renewcommand{\paragraph}[1]{\noindent {\bf #1}}
+\renewcommand{\subparagraph}[1]{\noindent {\emph{\textbf{#1}}}}
+\makeatother
+
+\newcommand{\topbanner}{\textbf{DRAFT --- \input{auto_header.tex}}}
+%\newcommand{\topbanner}{\textsc{Under Submission --- Please Do Not Distribute}}
+
+\begin{comment}
+% Headers -- comment these for submission
+\makeatletter
+\def\ps@plain{
+  \def\@oddhead{\hbox{}\normalsize\rightmark \hfil \topbanner \hfil}
+  \def\@evenhead{\hbox{}\normalsize\rightmark \hfil \topbanner \hfil}
+  \def\@oddfoot{\hbox{}\normalsize\rightmark\hfil \thepage \hfil}
+  \def\@evenfoot{\hbox{}\normalsize\rightmark\hfil \thepage \hfil}
+}
+\makeatother
+\end{comment}
+
+% submission/web version
+%\pagenumbering{arabic}
+
+\captionsetup[figure]{aboveskip=2pt,belowskip=-12pt}
+
+% If you comment hyperref and then uncomment it, make clean first (or kill .aux files)
+\definecolor{lcolor}{RGB}{0, 56, 186} % {0, 35, 102}
+%\hypersetup{bookmarks=true,breaklinks=true,letterpaper=true,colorlinks,linkcolor=black,citecolor=black,urlcolor=lcolor}
+% \usepackage{hyperref}
+% \usepackage[bookmarks=true,breaklinks=true,colorlinks,linkcolor=black,citecolor=blue,urlcolor=black]{hyperref}
+% \usepackage[pdfa,bookmarks=true,breaklinks=true,colorlinks,linkcolor=.,citecolor=lcolor,urlcolor=black]{hyperref}
+
+
+\renewcommand{\figureautorefname}{Fig.}
+\renewcommand{\subfigureautorefname}{Fig.}
+\renewcommand{\sectionautorefname}{Sec.}
+\renewcommand{\subsectionautorefname}{Sec.}
+\renewcommand{\paragraphautorefname}{Sec.}
+\renewcommand{\equationautorefname}{Eq.}
+
+\renewcommand*{\ttdefault}{txtt}
+
+
+%dsm: all these are retweaked
+% Alter some LaTeX defaults for better treatment of figures:
+% See p.105 of "TeX Unbound" for suggested values.
+% See pp. 199-200 of Lamport's "LaTeX" book for details.
+%   General parameters, for ALL pages:
+\renewcommand{\topfraction}{0.9}        % max fraction of floats at top
+\renewcommand{\bottomfraction}{0.8}     % max fraction of floats at bottom
+%   Parameters for TEXT pages (not float pages):
+\setcounter{topnumber}{5}
+\setcounter{bottomnumber}{5}
+\setcounter{totalnumber}{4}     % 2 may work better
+\setcounter{dbltopnumber}{5}    % for 2-column pages
+\renewcommand{\dbltopfraction}{0.9}     % fit big float above 2-col. text
+\renewcommand{\textfraction}{0.07}      % allow minimal text w. figs
+%   Parameters for FLOAT pages (not text pages):
+\renewcommand{\floatpagefraction}{0.9}  % require fuller float pages
+% N.B.: floatpagefraction MUST be less than topfraction !!
+\renewcommand{\dblfloatpagefraction}{0.9}       % require fuller float pages
+
+\usepackage{color}
+\definecolor{tableaublue}{rgb}{0.44,0.62,0.81}
+\definecolor{tableauorange}{rgb}{0.9,0.55,0.25} % original tableau value: {1.,0.62,0.29}
+\definecolor{tableaugreen}{rgb}{0.4,0.75,0.36}
+\definecolor{tableaured}{rgb}{0.93,0.4,0.36}
+\definecolor{tableaupurple}{rgb}{0.68,0.55,0.79}
+
+\usepackage{pifont}
+\usepackage{fourier-orns}
+\definecolor{darkred}{rgb}{.65,0,0}
+\definecolor{darkgreen}{rgb}{0,.5,0}
+\definecolor{darkyellow}{rgb}{0.95,.6,0.1}
+
+% names, abbreviations
+\usepackage{textcomp}
+\newcommand{\resvec}{residue vector }
+\newcommand{\resvecs}{residue vectors }
+
+
+% Author notes
+
+%\newcommand{\kenote}[1]{\textcolor{blue}{\textbf{(Karim: \emph{#1})}}}
+%\newcommand{\nikola}[1]{\textcolor{teal}{\textbf{(Nikola: \emph{#1})}}} 
+%\newcommand{\axelf}[1]{\textcolor{orange}{\textbf{(Axel: \emph{#1})}}} 
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
