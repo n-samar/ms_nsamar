@@ -49,6 +49,7 @@ is the scheme best suited for machine learning tasks and has been the focus of
 recent work in FHE algorithms~\cite{han:iacr18:efficient,lee:2021:privacy,gilad:icml16:cryptonets,podschwadt:2020:classification,dathathri:pldi19:chet,dathathri:pldi20:eva}.
 
 \subsection{FHE Interface}
+\label{sec:fhe_mapping}
 
 %State-of-the-art % dsm: Whatever, once was enough
 FHE schemes implement operations on vectors of values.
@@ -100,6 +101,7 @@ still ensures the privacy of inputs and results, but does not
 protect weights~\cite{brutzkus:icml19:low}.
 
 \subsection{FHE Implementation}
+\label{sec:fhe_operation}
 
 % \nnote{some FHE schemes are actually quite different, so i changed the wording here a bit. also, GSW is kind of different from BGV and CKKS}
 We now describe how CKKS represents and operates on encrypted data (i.e., ciphertexts);
@@ -236,7 +238,7 @@ Moreover, \mbox{we need to efficiently} % HACK(dsm): Fix acmart brain damage and
 support a broad range of widths (e.g., 64 to 512 bits in 32-bit increments),
 both because programs need different widths, and because modulus switching progressively reduces coefficient widths.
 
-RNS representation \cite{garner1959residue}  % victor asked for a ``reassuring read-more-about-RNS citation''
+RNS representation \cite{garner:1959:residue}  % victor asked for a ``reassuring read-more-about-RNS citation''
 enables representing a single polynomial with wide coefficients as multiple polynomials with narrower coefficients,
 called \emph{residue polynomials}.
 To achieve this, the modulus~$Q$  is chosen to be the product of $L$
@@ -293,19 +295,19 @@ Inputs and outputs are in the NTT domain; only the \texttt{y[i]} polynomials
 \end{center}
 \end{figure}
 
-%Each automorphism, in addition to ciphertext multiplication, requires a different pair of key-switch hint matrices.
+%Each automorphism, in addition to ciphertext multiplication, requires a different pair of keyswitch hint matrices.
 
 \paragraph{Computation vs.\ data movement:}
-A single key-switch requires $L^2$ NTTs, $2L^2$ multiplications, and $2L^2$
+A single keyswitch requires $L^2$ NTTs, $2L^2$ multiplications, and $2L^2$
 additions of $N$-element \mbox{vectors}. In RNS form, the rest of a homomorphic
-multiplication (excluding key-switching) is $4L$ multiplications and $3L$
-additions (\autoref{sec:fhe_operation}), so key-switching is dominant.
+multiplication (excluding keyswitching) is $4L$ multiplications and $3L$
+additions (\autoref{sec:fhe_operation}), so keyswitching is dominant.
 
 However, the main cost at high values of $L$ and $N$ is data movement. For
 example, at $L = 16$, $N = 16K$, each RNS polynomial (\texttt{RVec}) is 64\,KB;
 each ciphertext polynomial is 1\,MB; each ciphertext is 2\,MB; and the
-key-switch hints dominate, taking up 32\,MB. With F1's compute throughput,
-fetching the inputs of each key-switching from off-chip memory would demand
+keyswitch hints dominate, taking up 32\,MB. With F1's compute throughput,
+fetching the inputs of each keyswitching from off-chip memory would demand
 about 10\,TB/s of memory bandwidth. Thus, it is crucial to reuse these values
 as much as possible.
 
@@ -322,10 +324,10 @@ because in NTTs every input element affects every output element.
 \paragraph{Performance requirements:}
 We conclude that, to accommodate these large operands, an FHE accelerator
 requires a memory system that \emph{(1)} decouples data movement from
-computation, as demand misses during frequent key-switches would tank
+computation, as demand misses during frequent keyswitches would tank
 performance; and \emph{(2)} implements a large amount of on-chip storage (over
 32\,MB in our example) to allow reuse across entire homomorphic operations
-(e.g., reusing the same key-switch hints across many homomorphic
+(e.g., reusing the same keyswitch hints across many homomorphic
 multiplications).
 
 Moreover, the FHE accelerator must be designed to use the memory system well.
@@ -351,7 +353,7 @@ F1 accelerates \emph{primitive operations on large vectors}:
 modular arithmetic, NTTs, and automorphisms. It exploits wide vector processing
 to achieve very high throughput, even though this makes NTTs and automorphisms
 costlier. F1 avoids building functional units for coarser primitives, like
-key-switching, which would hinder algorithmic diversity.
+keyswitching, which would hinder algorithmic diversity.
 
 \subsection{Challenges of Deep FHE Computation}\label{sec:deepChallenges}
 

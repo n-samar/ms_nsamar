@@ -14,8 +14,8 @@ multiplication independently: Roy et al.~\cite{roy:hpca19:fpga-he} accelerate
 B/FV multiplication by 13$\times$ over a CPU;
 HEAWS~\cite{turan:tc20:heaws} accelerates B/FV multiplication, and uses it to
 speed a simple benchmark by 5$\times$; and HEAX~\cite{riazi:asplos20:heax}
-accelerates CKKS multiplication and key-switching by up to 200$\times$. These
-designs suffer high data movement (e.g., HEAX does not reuse key-switch hints)
+accelerates CKKS multiplication and keyswitching by up to 200$\times$. These
+designs suffer high data movement (e.g., HEAX does not reuse keyswitch hints)
 and use fixed pipelines with relatively low-throughput FUs.
 
 We have shown that accelerating FHE programs requires a different approach:

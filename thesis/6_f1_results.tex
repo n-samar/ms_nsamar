@@ -75,7 +75,7 @@ LoLa-MNIST includes two variants with unencrypted and encrypted weights;
 LoLa-CIFAR is available only with unencrypted weights.
 These three benchmarks use relatively low $L$ values (their starting $L$ values are 4, 6, and 8, respectively),
 so they are less memory-bound.
-%This allows storing many key-switch hints on chip.
+%This allows storing many keyswitch hints on chip.
 They also feature frequent automorphisms,
 showing the need for a fast automorphism~unit.
 
@@ -97,14 +97,14 @@ For BGV, we use Sheriff and Peikert's algorithm~\cite{alperin:crypto13:practical
 This is a particularly challenging benchmark because it features computations at large values of $L$.
 This exercises the scheduler's 
 algorithmic choice component, which selects
-the right key-switch method to balance computation and data movement.
+the right keyswitch method to balance computation and data movement.
 
-%At $L = 24$, key-switch hints using the standard method are 72\,MB, whereas the 
+%At $L = 24$, keyswitch hints using the standard method are 72\,MB, whereas the 
 %We can get this down to 12.125MB using an alternative relinearization method, however, this comes at a huge computational cost.
 
 For CKKS, we use non-packed CKKS bootstrapping from HEA\-AN~\cite{cheon:eurocrypt2018:bootstrapping}, also with $L_{max} = 24$.
 CKKS bootstrapping has many fewer ciphertext multiplications than BGV, greatly reducing
-reuse opportunities for key-switch hints.
+reuse opportunities for keyswitch hints.
 
 %This benchmark is extremely bandwidth bound by its many large KSH matrices.
 %Like BGV Boostrapping, we implement this benchmark at $L = 24$.
@@ -149,7 +149,7 @@ We report three typical sets of parameters.
 We use microbenchmarks to compare against prior accelerators,
 in particular HEAX.
 But prior accelerators do not implement automorphisms,
-so we extend each HEAX key-switching pipeline with an SRAM-based, scalar automorphism unit.
+so we extend each HEAX keyswitching pipeline with an SRAM-based, scalar automorphism unit.
 We call this extension HEAX$_\sigma$.
 
 \autoref{tbl:f1microbenchmark} shows that
@@ -167,12 +167,12 @@ To gain more insights into these results, we now analyze F1's data movement, pow
 
 \paragraph{Data movement:}
 \autoref{fig:f1dataMovement} shows a breakdown of off-chip memory traffic across data types:
-key-switch hints (KSH), inputs/outputs, and intermediate values.
+keyswitch hints (KSH), inputs/outputs, and intermediate values.
 KSH and input/output traffic is broken into compulsory and
 non-compulsory (i.e., caused by limited scratchpad capacity).
 Intermediates, which are always non-compulsory, are classified as loads or stores.
 
-\autoref{fig:f1dataMovement} shows that key-switch hints dominate in high-depth workloads
+\autoref{fig:f1dataMovement} shows that keyswitch hints dominate in high-depth workloads
 (LogReg, DB Lookup, and bootstrapping), taking up to 94\% of traffic.
 Key-switch hints are also significant in the LoLa-MNIST variants.
 This shows why scheduling should prioritize them.
@@ -180,7 +180,7 @@ Second, due our scheduler design, F1 approaches compulsory
 traffic for most benchmarks, with non\hyp{}compulsory accesses
 adding only 5-18\% of traffic.
 The exception is LoLa-CIFAR, where intermediates consume 75\% of traffic.
-LoLa-CIFAR has very high reuse of key-switch hints,
+LoLa-CIFAR has very high reuse of keyswitch hints,
 %which F1 exploits.
 and exploiting it requires spilling intermediate ciphertexts.
 

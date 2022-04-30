@@ -102,18 +102,18 @@ provided by the DSL. It clusters operations to improve reuse, and translates
 them down to instructions.
 
 \paragraph{Ordering} homomorphic operations seeks to maximize
-the reuse of key-switch hints, which is crucial to reduce data movement (\autoref{sec:fhe_analysis}).
+the reuse of keyswitch hints, which is crucial to reduce data movement (\autoref{sec:fhe_analysis}).
 For instance, the program in  \autoref{listing:mv}
-uses 15 different sets of key-switch hint matrices: one for the multiplies (line 12), 
+uses 15 different sets of keyswitch hint matrices: one for the multiplies (line 12), 
 and a different one for \emph{each} of the rotations (line 8).
-If this program was run sequentially as written, it would cycle through all 15 key-switching hints
+If this program was run sequentially as written, it would cycle through all 15 keyswitching hints
 (which total 480\,MB, exceeding on-chip storage) four times, achieving no reuse.
 Clearly, it is better to reorder the computation to perform all four multiplies, and then all four \texttt{Rotate(X, 1)}, and so on.
-This reuses each key-switch hint four times.
+This reuses each keyswitch hint four times.
 
 To achieve this, this pass first clusters \emph{independent} homomorphic operations that reuse the same hint,
 then orders all clusters through simple list-scheduling.
-This generates schedules with good key-switch hint reuse.
+This generates schedules with good keyswitch hint reuse.
 %for all benchmarks we test.
 
 \paragraph{Translation:} Each homomorphic operation is then compiled into instructions,
@@ -124,12 +124,12 @@ The end result is an instruction-level dataflow graph where every instruction
 is tagged with a priority that reflects its global order.
 
 The compiler exploits algorithmic choice.
-Specifically, there are multiple implementations of key-switching (\autoref{sec:fhe_analysis}),
-%the standard method (\autoref{sec:fhe_analysis}) uses key-switch hints of size $2L^2$ polynomials,
-%and the alternative method uses key-switch hints of size $2(L + 73)$,
+Specifically, there are multiple implementations of keyswitching (\autoref{sec:fhe_analysis}),
+%the standard method (\autoref{sec:fhe_analysis}) uses keyswitch hints of size $2L^2$ polynomials,
+%and the alternative method uses keyswitch hints of size $2(L + 73)$,
 %but requires substantially more computation~\cite{gentry:crypto2012:homomorphic}.
 %Thus, the right choice of scheme 
-and the right choice depends on $L$, the amount of key-switch reuse,
+and the right choice depends on $L$, the amount of keyswitch reuse,
 and load on FUs.
 The compiler leverages knowledge of operation order to estimate these and choose the right variant.
 
