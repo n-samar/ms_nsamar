@@ -1,81 +1,47 @@
 \section{Compiler}\label{sec:algorithmicInsights}
 \label{sec:compiler}
 
-The \name compiler translates FHE programs written in a
-high-level language.
-It primarily seeks to minimize off-chip data movement by maximizing on-chip reuse,
-and to decouple memory accesses and computation, fetching off-chip operands ahead
-of their use to prevent stalls.
-The compiler produces a cycle-by-cycle configuration for all chip resources.
-We now describe the compiler's organization, in order of transformations applied to 
-an input program:
+\name's compiler's are similar to those of F1's compiler: it uses high-level
+programs as inputs, and seeks to minimize and decouple off-chip data movement,
+which are critical. However, \name's compiler is substantially simpler and
+achieves higher utilization. This is because \name has a simpler interface than
+F1: \name exposes a single set of wide-vector functional units, whereas F1
+organizes narrower FUs into several independent compute clusters and has two
+levels of on-chip storage (per-cluster register files and a shared scratchpad).
+Thus, F1's compiler must distribute a single homomorphic operation among
+multiple clusters, and must often overlap many homomorphic operations. This
+distributed design creates complex scheduling problems, e.g., trading off load
+balance and utilization for reuse, which \name's architecture obviates.
 
-\paragraph{1. Input FHE programs:} We use a Python-embedded DSL to describe FHE programs,
-similar to the compiler of F1~\cite{feldmann:micro21:f1}.
-
-\paragraph{2. Ordering of homomorphic operations:} The input program is first translated 
-to a dataflow graph of homomorphic operations.
-These operations are then ordered to maximize reuse of operands using a standard tiling 
-analysis~\cite{parashar:ispass19:timeloop,yang:asplos20:interstellar,huang:isca21:cosa}
-similar to Timeloop~\cite{parashar:ispass19:timeloop}.
-
-
-Ordering to maximize reuse is critical: because operands are so large, \name's on-chip storage
-can only hold a few of them. For example, for $N$=64K  and $L$=60,
-each ciphertext is 26\,MB, so on-chip storage can hold just shy of 10 ciphertexts.
-% dsm: Checked and went to L=60, but still left tmp'd.
-%\knote{Ciphertext size seems consistent with analysis in section 1. Not sure if numbers in other sections will change. Double check.}
-
-\paragraph{3. Compiling homomorphic operations:} Once ordered,
-homomorphic operations are translated one-by-one and scheduled to run
-%one-by-one % dsm: No, there's overlapping, it's xlat that happens one at a time 
-on the accelerator.
-
-The compiler first translates each homomorphic operation into a sequence of simpler operations on ciphertext polynomials.
-To achieve high utilization, the compiler implements keyswitching as a sequence of up to five FU pipelines,
-leveraging vector chaining (\autoref{sec:keyswitchingPipeline}).
-Thus, each keyswitching operation is expressed as a sequence of up to five complex operations.
-All other ciphertext polynomial computations are translated to individual multiplication, 
-addition, and automorphism operations, which use a single FU and read and write to 
-the register file.
+The compiler first translates each homomorphic operation into a sequence of
+simpler operations on ciphertext polynomials. To achieve high utilization, the
+compiler implements keyswitching as a sequence of up to five FU pipelines,
+leveraging vector chaining (\autoref{sec:keyswitchingPipeline}). Thus, each
+keyswitching operation is expressed as a sequence of up to five complex
+operations. All other ciphertext polynomial computations are translated to
+individual multiplication, addition, and automorphism operations, which use a
+single FU and read and write to the register file.
 
 The compiler then schedules memory accesses and compute operations
-cycle-by-cycle. % dsm: cycle-by-cycle was misplaced, maybe because it shaves a line... fixed that some other way
-Off-chip loads are scheduled greedily: any time the memory is free, the scheduler
-traverses operations in order and fetches the first operand that it finds~is off-chip.
-If this operand requires evicting a live value, that~value is written back first.
-We follow Belady's MIN~\cite{belady1966study} 
-and evict~the operand reused the furthest.
-The load is deferred if the victim operand is used earlier than the loaded operand,
-or if the loaded operand would have to be evicted before its use.
-Each operation is then scheduled on the earliest cycle where its 
-input operands and its FU (or FUs for keyswitch pipelines) are available.
+cycle-by-cycle. Off-chip loads are scheduled greedily: any time the memory is
+free, the scheduler traverses operations in order and fetches the first operand
+that it finds~is off-chip. If this operand requires evicting a live value,
+that~value is written back first. We follow Belady's MIN~\cite{belady1966study}
+and evict~the operand reused the furthest. The load is deferred if the victim
+operand is used earlier than the loaded operand, or if the loaded operand would
+have to be evicted before its use. Each operation is then scheduled on the
+earliest cycle where its input operands and its FU (or FUs for keyswitch
+pipelines) are available.
 
-This procedure produces a cycle-by-cycle schedule of all operations and data transfers.
-This schedule is then transformed into the configuration streams for 
+This procedure produces a cycle-by-cycle schedule of all operations and data
+transfers. This schedule is then transformed into the configuration streams for
 all components of the chip.
 
-\paragraph{Optimized bootstrapping:} Since bootstrapping uses the largest ciphertexts,
-maximizing its reuse is crucial.
-We use a state-of-the-art
-bootstrapping algorithm that recursively decomposes
-its key kernels, %(coeffToSlot and slotToCoeff),
-analogously to FFTs~\cite{chen:2019:improved}.
-We decompose the computation into many partitions, each small
-enough to fit on chip (a 4$\times$4 tile).
-% dsm: Reworded bc we're not consuming levels from the application, but starting bstrap higher.
-This decomposition makes bootstrapping consume some extra levels,
-but it achieves much higher performance overall by allowing on-chip reuse.
-
-\paragraph{Comparison with prior work:}
-\name's compiler has some similarities to that of F1: it uses high-level programs as inputs,
-and seeks to minimize and decouple off-chip data movement, which are critical.
-However, \name's compiler is substantially simpler and achieves higher utilization.
-This is because \name has a simpler interface than F1: \name exposes a single 
-set of wide-vector functional units, whereas F1 organizes narrower FUs into several independent compute clusters
-and has two levels of on-chip storage (per-cluster register files and a shared scratchpad).
-Thus, F1's compiler must distribute a single homomorphic operation among multiple clusters,
-and must often overlap many homomorphic operations.
-This distributed design creates complex scheduling problems, 
-e.g., trading off load balance and utilization for reuse.
-
+\paragraph{Optimized bootstrapping:}
+Since bootstrapping uses the largest ciphertexts, maximizing its reuse is
+crucial. We use a state-of-the-art bootstrapping algorithm that recursively
+decomposes its key kernels, analogously to FFTs~\cite{chen:2019:improved}. We
+decompose the computation into many partitions, each small enough to fit on
+chip (a 4$\times$4 tile). This decomposition makes bootstrapping consume some
+extra levels, but it achieves much higher performance overall by allowing
+on-chip reuse.
