@@ -2,35 +2,68 @@
 
 We now present related work not discussed so far.
 
-\paragraph{HE-MPC accelerators are hampered by communication:}
-To avoid the overheads of FHE, recent work has proposed accelerators
-for private deep learning
-that combine shallow homomorphic encryption (HE) with multi-party computation (MPC):
-Gazelle~\cite{juvekar2018gazelle} and Cheetah~\cite{reagen:hpca21:cheetah}.
-These systems require very frequent communication with the client,
-essentially after every single level of multiplication.
-So while they reduce accelerator overheads, they are limited by high client-server communication
-and client encryption/decryption overheads.
-Delphi~\cite{mishra2020delphi} shows that each DNN inference takes gigabytes of traffic,
-which dominates performance; yet, the above accelerators do not consider this traffic.
-CHOCO~\cite{vanderhagen:arxiv21:choco} shows that, even after accelerating client operations,
-communication costs dominate.
+\paragraph{FHE accelerators:}
+Prior work has proposed accelerators for individual FHE operations, but not
+full FHE
+computations~\cite{cousins:hpec12:sipher-fpga,cousins:hpec14:fpga-he,cousins:tetc17:fpga-he,doroz:tc15:accelerating-fhe,roy:hpca19:fpga-he,mert:tvlsi20:bfv-accel,migliore:tecs17:he-karatsuba,riazi:asplos20:heax,turan:tc20:heaws}.
+These designs target FPGAs and rely on a host processor;
+\autoref{sec:fhe_analysis} discussed their limitations. Early designs
+accelerated small primitives like NTTs, and were dominated by host-FPGA
+communication. State-of-the-art accelerators execute a full homomorphic
+multiplication independently: Roy et al.~\cite{roy:hpca19:fpga-he} accelerate
+B/FV multiplication by 13$\times$ over a CPU;
+HEAWS~\cite{turan:tc20:heaws} accelerates B/FV multiplication, and uses it to
+speed a simple benchmark by 5$\times$; and HEAX~\cite{riazi:asplos20:heax}
+accelerates CKKS multiplication and key-switching by up to 200$\times$. These
+designs suffer high data movement (e.g., HEAX does not reuse key-switch hints)
+and use fixed pipelines with relatively low-throughput FUs.
 
-By dramatically accelerating bootstrapping, \name eliminates the high communication costs of HE-MPC and shallow HE designs.
-To avoid bootstrapping, these prior approaches require the \emph{client} to receive, reencrypt, and resend ciphertexts that have exhausted their multiplicative budgets.
-In our benchmarks, avoiding each bootstrapping would require transferring over 13\,MB between client and server
-(as the client must resend the ciphertext with a reasonable noise budget).
-Even if we ignore client computation and network latency, on a 100\,Mbps connection this would
-require over 1 \emph{second} per ciphertext.
-By contrast, \name bootstraps this ciphertext in 3.9\,ms, 256$\times$ faster.
-Bootstrapping also allows the client to send narrow inputs (e.g., with 32 instead of 1,500 bits per coefficient),
-which the server can bootstrap before computation.
-This greatly reduces encryption and network overheads.
+We have shown that accelerating FHE programs requires a different approach:
+data movement becomes the key constraint, requiring new techniques
+to extract reuse {across} homomorphic operations;
+and fixed pipelines cannot support the operations of even a single benchmark.
+Instead, F1 and CraterLake achieves flexibility and high performance by exploiting
+wide-vector execution with high-throughput FUs.
+This lets F1 and CraterLake execute not only full applications, but different FHE schemes.
+
+
+\paragraph{HE-MPC accelerators are hampered by communication:}
+To avoid the overheads of FHE, recent work has proposed accelerators for
+private deep learning that combine shallow homomorphic encryption (HE) with
+multi-party computation (MPC): Gazelle~\cite{juvekar2018gazelle} and
+Cheetah~\cite{reagen:hpca21:cheetah}. These systems require very frequent
+communication with the client, essentially after every single level of
+multiplication. So while they reduce accelerator overheads, they are limited by
+high client-server communication and client encryption/decryption overheads.
+Delphi~\cite{mishra2020delphi} shows that each DNN inference takes gigabytes of
+traffic, which dominates performance; yet, the above accelerators do not
+consider this traffic. CHOCO~\cite{vanderhagen:arxiv21:choco} shows that, even
+after accelerating client operations, communication costs dominate.
+
+By dramatically accelerating bootstrapping, \name eliminates the high
+communication costs of HE-MPC and shallow HE designs. To avoid bootstrapping,
+these prior approaches require the \emph{client} to receive, reencrypt, and
+resend ciphertexts that have exhausted their multiplicative budgets. In our
+benchmarks, avoiding each bootstrapping would require transferring over 13\,MB
+between client and server (as the client must resend the ciphertext with a
+reasonable noise budget). Even if we ignore client computation and network
+latency, on a 100\,Mbps connection this would require over 1 \emph{second} per
+ciphertext. By contrast, \name bootstraps this ciphertext in 3.9\,ms,
+256$\times$ faster. Bootstrapping also allows the client to send narrow inputs
+(e.g., with 32 instead of 1,500 bits per coefficient), which the server can
+bootstrap before computation. This greatly reduces encryption and network
+overheads.
 
 \paragraph{GPUs are inefficient on FHE:}
-Prior work has studied the use of GPUs to accelerate FHE~\cite{wang:hpec12:fhe-gpu,wang:tc13:fhe-gpu,wang:iscas14:leveled-gpu,al:emerging19:implementation,jung2021over}.
-While the data-parallel nature of GPUs may seem a good fit for FHE, these efforts achieve modest speedups over multicore CPUs.
-This is because GPUs lack modular arithmetic, cannot implement all-to-all operations like NTTs and automorphisms efficiently,
-and their on-chip memories are too small to enable sufficient reuse (\autoref{fig:gmeanVsStorage}), despite their use of HBM. Specifically, state-of-the-art GPU approaches carefully tune algorithms to achieve high off- and on-chip bandwidth utilization~\cite{jung2021over}; however, \cite{jung2021over} is 200$\times$ slower than \name.
-This shows that \name's high reuse is crucial: to achieve the same throughput as \name,
-a GPU would need over 100\,TB/s of memory bandwidth.
+Prior work has studied the use of GPUs to accelerate
+FHE~\cite{wang:hpec12:fhe-gpu,wang:tc13:fhe-gpu,wang:iscas14:leveled-gpu,al:emerging19:implementation,jung2021over}.
+While the data-parallel nature of GPUs may seem a good fit for FHE, these
+efforts achieve modest speedups over multicore CPUs. This is because GPUs lack
+modular arithmetic, cannot implement all-to-all operations like NTTs and
+automorphisms efficiently, and their on-chip memories are too small to enable
+sufficient reuse (\autoref{fig:gmeanVsStorage}), despite their use of HBM.
+Specifically, state-of-the-art GPU approaches carefully tune algorithms to
+achieve high off- and on-chip bandwidth utilization~\cite{jung2021over};
+however, \cite{jung2021over} is 200$\times$ slower than \name. This shows that
+\name's high reuse is crucial: to achieve the same throughput as \name, a GPU
+would need over 100\,TB/s of memory bandwidth.
