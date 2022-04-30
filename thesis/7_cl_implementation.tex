@@ -1,32 +1,16 @@
 \section{Implementation}\label{sec:implementation}
 
-We implemented \name's components in RTL,
-and synthesized them in a commercial 14/12nm process using state-of-the-art tools.
-These include a commercial SRAM compiler that we use for register file banks.
-
-We target a configuration with area and power budgets similar to a modern GPU or server CPU.
-This design requires careful optimizations to limit power.
-We target a 1\,GHz frequency for most components, and pipeline them to their 
-energy-optimal points, using high-Vt cells and clock gating.
-Register file banks run double-pumped at 2\,GHz.
-This enables using single-ported SRAMs while serving up to two accesses per cycle and bank.
-
-\tblGF
-We use HBM2E main memory, and assume 512\,GB/s bandwidth per PHY
-(similar to NVIDIA's A100 GPU~\cite{choquette2021nvidia}, which has 2.4\,TB/s 
-with 6 PHYs~\cite{nvidiadgx}).
-We use prior work to estimate the HBM2E PHY area~\cite{rambuswhite,dasgupta20208} 
-and power~\cite{rambuswhite,ge2011design}.
+\name's implementation parameters including the technology node, synthesis,
+SRAM design, and PHY estimates match those of F1
+(\autoref{sec:f1implementation}).
 
 \autoref{tbl:GF12} shows \name's area and its breakdown by component.
 Overall, our \name configuration requires 472\,mm$^2$. % FIXME: And every other number below...
 FUs occupy 51\% of the area, with 41\% going to the register file,
 6\% to the two HBM2 PHYs,
 and 2\% to the on-chip interconnect.
-% dsm: Did a full pass on numbers, please double check
 As we will see in the evaluation, this design stays within a power budget of 320\,W,
 in line with GPUs and server CPUs.
-
 
 Finally, while these figures could be considered high,
 note that we are not using a leading-edge fabrication node:
@@ -42,23 +26,4 @@ in our benchmarks is 50\,GB/s on average and 130\,GB/s at most,
 so a commodity PCIe\,5 interface suffices to achieve full throughput.
 CPU-accelerator latency is not an issue, as these are bulk transfers
 and can be overlapped with computation.
-
-% dsm: Whatever...
-%This configuration has a peak throughput of 163 tera-ops/second worth of scalar modular multiplies.
-
-
-% dsm: Scaling methodology: extrapolate from GF12 to TSMC N10,
-% then use TSMC scaling factor for N7 and N5
-%
-% GF12LP has 36.7 Mtr/mm2 - see https://fuse.wikichip.org/news/1497/vlsi-2018-globalfoundries-12nm-leading-performance-12lp/ and https://fuse.wikichip.org/wp-content/uploads/2018/07/gf-samsung-density-14nm-10nm-8nm-12nm.png (this is with Intel's density methodology)
-% TSMC N10 has 52.5 MTr/mm2 (https://fuse.wikichip.org/news/3453/tsmc-ramps-5nm-discloses-3nm-to-pack-over-a-quarter-billion-transistors-per-square-millimeter/); N7 has 91.2, and N5 has 171.3. This *should* produce an area scaling ratio of 4.66x, resulting in 101 mm2. But these overall numbers are iffy and depend on some ratio of SRAM to logic, and SRAM has not been scaling as well. In particular, https://fuse.wikichip.org/wp-content/uploads/2019/04/sram-density-tsmc-5-est.png (note these are estimates for N5 and 12nm is missing, there's only GF14). Plus we don't get power this way. So:
-% For GF12->N10, assume area 1.43x / power 1.2x (conservative)
-% TSMC scaling numbers:
-% N7 vs N10: Logic 1.6x, Power(iso-freq) 1.4x (https://en.wikichip.org/wiki/7_nm_lithography_process, https://www.tsmc.com/english/dedicatedFoundry/technology/logic/l_7nm); SRAM not easy to find... N7 6T SRAM cell is 0.027 mm2 vs 0.042mm2 for N10 (https://en.wikichip.org/wiki/7_nm_lithography_process, https://en.wikichip.org/wiki/10_nm_lithography_process), so 1.55x --- seems fairly matched to logic, guess that's why they don't segregate it
-% N5 vs N7: Logic 1.8x, SRAM 1.35x, Power(iso-freq) 1.3x (see slides in https://fuse.wikichip.org/news/3398/tsmc-details-5-nm/, https://gigazine.net/gsc_news/en/20201029-apple-a14-bionic/)
-% Overall scaling factors:
-%   Logic: 3.456x   | SRAM: 2.511x | Power: 2.184x
-% CL GF12: 280.3mm2 |       192mm2 |          320W
-%   CL N5: (240.5+29.8+10)/3.456 + 192/2.511 = 157.5mm2
-%          320W/2.184 = 146W
 
