@@ -5,6 +5,8 @@ which is vulnerable to data breaches.
 Conventional techniques to mitigate attacks offer limited 
 security, as cloud servers must decrypt data in order to process it.
 
+\figWorkflow
+
 \emph{Fully homomorphic encryption (FHE)} is a special type of encryption scheme
 that enables \emph{computing on encrypted data directly}, without decrypting it.
 FHE allows a client to offload a computation
@@ -105,7 +107,7 @@ These dramatic speedups counter most of FHE's overheads and enable new applicati
 For example, F1 executes a deep learning inference that used to take 20 minutes in 240 milliseconds,
 enabling secure real-time deep learning in the cloud.
 
-\subsection{F1 Drawbacks}
+\subsection{Motivating CraterLake}
 
 Unfortunately, F1 is efficient only on a limited subset of simple FHE
 computations---those of \emph{shallow multiplicative depth}.
@@ -129,7 +131,6 @@ to the large ciphertexts in high-depth programs.
 As a result, they can only run small FHE computations, and they do not support sufficient depth
 to run the full bootstrapping procedure.
 
-\figWorkflow
 
 In this paper we tackle this challenge through \name, the first FHE accelerator
 to support \emph{FHE computations of unbounded depth}.
