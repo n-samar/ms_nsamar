@@ -8,9 +8,11 @@ Current encryption technology is of limited help, because servers must decrypt
 data before processing it. Once data is decrypted, it is vulnerable to
 breaches.
 
+\figWorkflow
+
 Fully Homomorphic Encryption (FHE) is a class of encryption schemes that
 address this problem by enabling \emph{generic computation on encrypted data}.
-\autoref{fig:overview} shows how FHE enables secure offloading of computation.
+\autoref{fig:workflow} shows how FHE enables secure offloading of computation.
 The client wants to compute an expensive function $f$ (e.g., a deep learning
 inference) on some private data $x$. To do this, the client encrypts $x$ and
 sends it to an untrusted server, which computes $f$ on this encrypted data
@@ -19,7 +21,6 @@ provides ideal security properties: even if the server is compromised,
 attackers cannot learn anything about the data, as it remains encrypted
 throughout.
 
-\figOverview
 
 FHE is a young but quickly developing technology. First realized in
 2009~\cite{gentry09}, early FHE schemes were about 10$^9$ times slower than
@@ -44,6 +45,9 @@ be addressed with hardware acceleration: \emph{if a specialized FHE accelerator
 provides large speedups over software execution, it can bridge most of this
 performance gap and enable new use cases.}
 
+\section{General FHE Opportunities and Challenges}
+\label{sec:general}
+
 For an FHE accelerator to be broadly useful, it should be programmable, i.e.,
 capable of executing arbitrary FHE computations. While prior work has proposed
 several FHE accelerators, they do not meet this goal. Prior FHE
@@ -55,7 +59,6 @@ overspecialize their functional units to specific parameters, and cannot
 efficiently handle the range of parameters needed within a program or across
 programs.
 
-\paragraph{Harnessing opportunities and challenges in FHE:}
 We identify three key characteristics of FHE that drive our architectures:
 
 \noindent \textbf{\emph{(1) Complex operations on long vectors:}}
@@ -89,12 +92,12 @@ key challenge} for FHE acceleration: despite requiring complex functional
 units, in current technology, limited on-chip storage and memory bandwidth are
 the bottleneck for most FHE programs. Therefore, the primary goal of an FHE
 accelerator should be to
-minimize data movement. To address these issues, we:
+minimize data movement. To that end, we design our accelerators to:
 \begin{compactenum}
-\item Use a large and explicitly managed on-chip memory hierarchy.
+\item Use a large and explicitly managed on-chip scratchpad.
 \item Decouple data movement. This allows us to hide access latencies by
     loading data far ahead of its use.
-\item Have the scheduler focus on maximizing operand reuse, which reduces
+\item Focus on maximizing operand reuse when scheduling operations. This reduces
     memory bandwidth pressure.
 \item Build relatively \emph{few functional units with extremely high
     throughput}, rather than lower-throughput functional units as in prior
@@ -106,18 +109,13 @@ F1 leverages all of these insights and brings decades of research in
 architecture to bear, including vector processing and static scheduling, and
 combines them with new specialized functional units (\autoref{sec:FUs}) and
 scheduling algorithms (\autoref{sec:scheduler}) to design a programmable FHE
-accelerator. We implement the main components of F1 in RTL and synthesize them
-in a commercial 14nm/12nm process. With a modest area budget of 151\,mm$^2$,
-our F1 implementation provides 36 tera-ops/second of 32-bit modular arithmetic,
-64\,MB of on-chip storage, and a 1\,TB/s high-bandwidth memory. We evaluate F1
-using cycle-accurate simulation running complete FHE applications, and
-demonstrate speedups of 1,200$\times$--17,000$\times$ over state-of-the-art
-software implementations. These dramatic speedups counter most of FHE's
-overheads and enable new applications. For example, F1 executes a deep learning
-inference that used to take 20 minutes in 240 milliseconds, enabling secure
-real-time deep learning in the cloud.
+accelerator. We demonstrate speedups of 1,200$\times$--17,000$\times$ over
+state-of-the-art software implementations on shallow benchmarks.
 
-\section{Motivating CraterLake}
+While F1 works well with shallow programs, deep FHE programs bring their own
+challenges, which we discuss next.
+
+\section{Challenges of Deep FHE Programs}
 
 Unfortunately, F1 is efficient only on a limited subset of simple FHE
 computations---those of \emph{shallow multiplicative depth}. For example, F1
@@ -125,48 +123,24 @@ can run neural network inference efficiently only for networks with few layers
 (3-6), but it cannot accelerate state-of-the-art deep neural networks (DNNs)
 with tens to hundreds of layers.
 
-This limitation stems from the characteristics of FHE schemes: each ciphertext
-has some associated noise, which grows with each homomorphic operation, and
-especially with multiplications. If noise becomes too large, it garbles the
-message, making decryption impossible. Larger ciphertexts tolerate more noise
-before becoming undecryptable. However, operations on larger ciphertexts are
-also more expensive. To enable computations of unbounded depth, ciphertexts can
-be ``refreshed'' using a procedure called \emph{bootstrapping} that reduces
-noise. But bootstrapping is expensive, so ciphertexts must be very large (10s
-of MBs) for bootstrapping to be efficient.
+This is because deep FHE programs present additional challenges to those
+mentioned above. These challenges are inherent to state-of-the-art FHE schemes.
+Namely, each ciphertext has some associated noise, which grows with each
+homomorphic operation, and especially with multiplications. If noise becomes
+too large, it garbles the message, making decryption impossible. Larger
+ciphertexts tolerate more noise before becoming undecryptable. However,
+operations on larger ciphertexts are also more expensive. To enable
+computations of unbounded depth, ciphertexts can be ``refreshed'' using a
+procedure called \emph{bootstrapping} that reduces noise. But bootstrapping is
+expensive, so ciphertexts must be very large (10s of MBs) for bootstrapping to
+be efficient.
 
-FHE accelerators prior to CraterLake do not efficiently handle unbounded-depth computations
-because they natively support vectors of a limited size and they use algorithms
-that scale poorly to the large ciphertexts in high-depth programs. As a result,
-they can only run small FHE computations, and they do not support sufficient
-depth to run the full bootstrapping procedure.
+F1 and prior accelerators do not efficiently handle unbounded-depth
+computations because they natively support vectors of a limited size and they
+use algorithms that scale poorly to the large ciphertexts in high-depth
+programs. As a result, they can only run small FHE computations, and they do
+not support sufficient depth to run the full bootstrapping procedure.
 
-CraterLake addresses these challenges and is thus the first FHE accelerator
-to support \emph{FHE computations of unbounded depth}. To achieve this, CraterLake
-contributes new algorithms, specialized functional units, hardware architecture,
-and compiler techniques that overcome the key challenge of deep FHE
-computations---its extreme data movement demands.
-
-\paragraph{Deep FHE is limited by data movement:}
-While even shallow FHE programs require large operands and can
-easily become memory bandwidth bound (\autoref{sec:firstissues}),
-this issues is even more pronounced for deep FHE programs.
-Concretely, supporting unbounded-depth computations requires vectors of 64K
-elements with 1,600 bits per element. This takes 25\,MB per ciphertext,
-12$\times$ larger than what prior FHE accelerators target.
-
-Moreover, prior work has employed FHE algorithms that require even larger
-amounts of auxiliary data. For example, multiplying 2\,MB ciphertexts in F1
-requires 32\,MB of auxiliary data, and scaling their algorithm to 26\,MB
-ciphertexts would require over 1.3\,GB of auxiliary data---far too large to fit
-on-chip. To tackle this challenge, CraterLake's \emph{key insight} is to adopt
-an FHE algorithm called \emph{boosted keyswitching}
-(\autoref{sec:keyswitching}) that eliminates most of the auxiliary data,
-reducing this overhead from 1.3\,GB to 52.5\,MB. Boosted keyswitching also
-reduces computation costs. However, this new algorithm is a poor match for
-prior accelerators, including F1: it is dominated by simple operations where
-these designs have limited efficiency, and makes poor use of the specialized
-functional units that prior designs leverage.
 
 Beyond being inefficient, F1 suffers from a hard-to-scale vector multicore
 architecture: to support the needed non-SIMD operations with reasonable cost,
@@ -174,19 +148,45 @@ it implement multiple independent cores with narrower vector datapaths.
 However, this causes excessive inter-core communication, and the high-bandwidth
 interconnect needed grows superlinearly with the number of cores.
 
+We address these challenges and contribute CraterLake, the first FHE
+accelerator to support \emph{FHE computations of unbounded depth}. To achieve
+this, we contribute new algorithms, specialized functional units, hardware
+architecture, and compiler techniques that overcome the key challenge of deep
+FHE computations---its extreme data movement demands.
+
+\paragraph{Deep FHE is limited by data movement:}
+While we have seen in \autoref{sec:general} that \emph{all} FHE programs
+require large operands and can easily become memory bandwidth bound, these
+issues are even more pronounced for deep FHE programs. Concretely, supporting
+unbounded-depth computations requires vectors of 64K elements with 1,600 bits
+per element. This takes 25\,MB per ciphertext, 12$\times$ larger than what
+F1 and prior FHE accelerators target.
+
+Moreover, F1 and prior work has employed FHE algorithms that require even
+larger amounts of auxiliary data. For example, multiplying 2\,MB ciphertexts in
+F1 requires 32\,MB of auxiliary data, and scaling F1's algorithm to 26\,MB
+ciphertexts would require over 1.3\,GB of auxiliary data---far too large to fit
+on-chip. To tackle this challenge, our \emph{key insight} is to adopt an FHE
+algorithm called \emph{boosted keyswitching} (\autoref{sec:keyswitching}) that
+eliminates most of the auxiliary data, reducing this overhead from 1.3\,GB to
+52.5\,MB. Boosted keyswitching also reduces computation costs. However, this
+new algorithm is a poor match for F1 and prior accelerators: it is dominated by
+simple operations where these designs have limited efficiency, and makes poor
+use of the specialized functional units that prior designs leverage.
+
 \paragraph{Deep FHE demands new hardware techniques:}
 To tackle these challenges, we introduce the \emph{CraterLake} architecture
 (\autoref{sec:overview}, \autoref{sec:architecture}), the first FHE accelerator
-that achieves high performance on unbounded FHE programs. CraterLake is a
-wide-vector \emph{uniprocessor} with specialized functional units. Like F1, the
-design is statically scheduled to leverage the regularity of FHE computations.
-We contribute several new techniques that make this possible, including:
+that achieves high performance on unbounded FHE programs. CraterLake builds on
+F1's key insights: for example, it relies on static scheduling to
+leverage the regularity of FHE computation. However, CraterLake succesfully
+addresses F1's shortcomings by contributing:
 \begin{compactitem}
-\item A new extremely wide (2,048 lanes) vector uniprocessor architecture that
-    spreads each vector operation across the chip, departing from F1's
-    multicore architectures. The uniprocessor approach reduces the number of
-    concurrent operations, which minimizes footprint, reducing off-chip
-    traffic, and simplifies the compiler.
+\item A new extremely wide (2,048 lanes) vector \emph{uniprocessor}
+    architecture that spreads each vector operation across the chip, departing
+    from F1's multicore architectures. The uniprocessor approach reduces the
+    number of concurrent operations, which minimizes footprint, reducing
+    off-chip traffic, and simplifies the compiler.
 \item An efficient implementation of the above architecture, which is
     challenging for non-SIMD FHE operations, NTTs and automorphisms, by
     decomposing these operations in a novel way that allows the use of a
@@ -203,17 +203,19 @@ We contribute several new techniques that make this possible, including:
     concurrent operations with few register ports.
 \end{compactitem}
 
-To program CraterLake, we develop a novel compiler (\autoref{sec:compiler}) that
-produces efficient code from high-level FHE programs. The compiler schedules
-operations to maximize reuse, decouples data movement from computation, and
-adapts the state-of-the-art bootstrapping algorithm to achieve high
-utilization~\cite{bossuat:crypto21:efficient}.
-
-We evaluate CraterLake through a combination of simulation and RTL synthesis
-(to find its area and power). We use a broad range of FHE benchmarks, including
-programs with high multiplicative depth that require bootstrapping. CraterLake
+We evaluate CraterLake on a broad range of FHE benchmarks, including programs
+with high multiplicative depth that require bootstrapping. CraterLake
 outperforms a scaled-up and improved version of F1, by gmean 11.2$\times$ on
 these deep computations, and is 4,600$\times$ faster than a 32-core CPU. These
 speedups enable new use cases for FHE. For example, deep neural networks like
 ResNet take 23 minutes per inference on the CPU, whereas \name achieves 250
 \emph{milliseconds} per inference, enabling real-time private deep learning.
+
+We implement the main components of F1 and CraterLake in RTL and synthesize
+them in a commercial 14nm/12nm process. We evaluate both accelerators using
+cycle-accurate simulation running complete FHE applications.
+
+While F1's area budget is modest (151\,mm$^2$) and delivers good performance,
+we will show it is insufficient for deep FHE benchmarks. By proposing
+CraterLake, we show that a 472\,mm$^2$ chip is sufficient to effectively
+accelerate unbounded depth FHE programs.
