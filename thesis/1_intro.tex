@@ -17,9 +17,7 @@ branching is not possible), it is general enough to support many compelling use
 cases, such as privacy-preserving machine learning, secure genome analysis,
 private set intersection, private information retrieval, and many
 more~\cite{kim2020semi,gilad:icml16:cryptonets,han:aaai19:logistic,han:iacr18:efficient,juvekar2018gazelle,DBLP:conf/ccs/ChenLR17,DBLP:conf/tcc/GentryH19}.
-%\nnote{add citations and more examples}
 
-% axelf: purging unfortunately/fortunately from the whole paper
 Despite its ideal privacy, FHE is rarely used today because it incurs
 prohibitive overheads: in CPUs, FHE computations are 10,000$\times$ to
 100,000$\times$ slower than equivalent unencrypted computations, even when
@@ -122,7 +120,6 @@ that scale poorly to the large ciphertexts in high-depth programs. As a result,
 they can only run small FHE computations, and they do not support sufficient
 depth to run the full bootstrapping procedure.
 
-
 In this paper we tackle this challenge through \name, the first FHE accelerator
 to support \emph{FHE computations of unbounded depth}. To achieve this, we
 contribute new algorithms, specialized functional units, hardware architecture,
@@ -154,7 +151,6 @@ reasonable cost, they implement multiple independent cores with narrower vector
 datapaths~\cite{feldmann:micro21:f1}. However, this causes excessive inter-core
 communication, and the high-bandwidth interconnect needed grows superlinearly
 with the number of cores.
-
 
 \paragraph{Deep FHE demands new hardware techniques:}
 To tackle these challenges, we introduce the \emph{\name} architecture
