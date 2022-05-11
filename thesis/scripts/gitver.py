@@ -11,4 +11,4 @@ shstat = dfstat.replace(" files changed", "fc").replace(" file changed", "fc") \
                .replace(" deletions(-)", "-").replace(" deletion(-)", "-") \
                .replace(",", "")
 diff = "clean" if len(dfstat) == 0 else shstat.lstrip()
-print "%s : %s : %s" % (revnum, rshort, diff)
+print("%s : %s : %s" % (revnum, rshort, diff))
