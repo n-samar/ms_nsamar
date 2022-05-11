@@ -4,22 +4,23 @@ yet widely~adopted due to its prohibitive overheads, about 10,000$\times$ over
 unencrypted computation.
 
 Hardware acceleration is an attractive approach to bridging this performance
-gap, but this brings new challenges. This thesis presents addresses these
-challenges and presents two FHE accelerators: F1 and CraterLake.
+gap, but it brings new challenges. This thesis presents two FHE accelerators
+which address these challenges: F1 and CraterLake.
 
 F1 speeds up shallow computations (i.e., shallow multiplicative depth) by gmean
 5,400$\times$ over the state-of-the-art. Unfortunately, F1 becomes memory
-bandwidth bound on deeper computations, like deep neural networks. CraterLake
-is the first accelerator to effectively speed up unbounded depth FHE programs.
-It builds on and addresses the shortcomings of F1. Specifically, deep FHE
-programs require very large ciphertexts (tens of MBs each) and different
-algorithms that prior work does not support well. To tackle this challenge,
-\name introduces a new hardware architecture that efficiently scales to
-very~large ciphertexts, novel functional units to accelerate key kernels, and
-new algorithms and compiler techniques to reduce data movement. These advances
-help CraterLake deliver 11.2$\times$ the performance of F1, even when we scale
-F1's architecture to the size of CraterLake.
+bandwidth bound on deeper computations (e.g., deep neural networks).
+This is because deep FHE programs require very large ciphertexts (tens of MBs each)
+and different algorithms that F1 and prior work does not support well.
+
+CraterLake addresses these shortcomings and is the first accelerator to
+effectively speed up FHE programs of unbounded depth.  CraterLake introduces a
+new hardware architecture that efficiently scales to very~large ciphertexts,
+novel functional units to accelerate key kernels, and new algorithms and
+compiler techniques to reduce data movement. These advances help CraterLake
+deliver 11.2$\times$ the performance of F1, even when we scale F1's
+architecture to the size of CraterLake.
 
 Critically both F1 and CraterLake are fully \emph{programmable}, i.e., capable
-of executing full FHE programs, and bring similar speedups across a diverse set
-of benchmarks.
+of executing \emph{any} FHE programs. Additionally, we show that CraterLake
+delivers similar speedups over CPU on a diverse set of benchmarks.
