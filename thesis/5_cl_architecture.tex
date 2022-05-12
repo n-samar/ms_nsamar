@@ -1,204 +1,170 @@
 \section{Microarchitecture}\label{sec:architecture}
-% dsm: Renamed to uarch, since uarch = implementation of arch (ISA), so this is the name that fits; if anything, the previous section's name is the one that'a bit off, as some arch details seep in.
 
-This section introduces \name's novel FUs, CRB (\autoref{sec:crb}) and KSHGen (\autoref{sec:prg});
-presents the transpose network needed by NTT and automorphism FUs (\autoref{sec:network});
-describes our implementation of FU chaining to reduce register~file pressure 
-(\autoref{sec:keyswitchingPipeline});
-and introduces new optimizations for modular multipliers, which dominate area 
+This section introduces \name's novel FUs, CRB (\autoref{sec:crb}) and KSHGen
+(\autoref{sec:prg}); presents the transpose network needed by NTT and
+automorphism FUs (\autoref{sec:network}); describes our implementation of FU
+chaining to reduce register~file pressure (\autoref{sec:keyswitchingPipeline});
+and introduces new optimizations for modular multipliers, which dominate area
 and energy~(\autoref{sec:bitwidth}).
 
 \subsection{Change-RNS-Base (CRB) Unit}\label{sec:crb}
 
-As \autoref{sec:keyswitching} discussed, the CRB unit
-encapsulates the bulk of operations in keyswitching.
-The~CRB unit~(\autoref{fig:crb}) consists of many parallel multiply-and-accumulate pipelines that
-spatially unroll the inner loop of \verb!changeRNSBase()! (\autoref{listing:boostedKeyswitching}).
-The CRB unit exploits the high internal reuse in \verb!changeRNSBase()! to allow much higher thorughput
-than independent multipliers and adders communicating through the register file.
-This is the same insight behind DNN accelerators like the TPU~\cite{jouppi:isca17:tpu}
-and Tensor Cores in GPUs~\cite{choquette2021nvidia}.
+As \autoref{sec:keyswitching} discussed, the CRB unit encapsulates the bulk of
+operations in keyswitching. The~CRB unit~(\autoref{fig:crb}) consists of many
+parallel multiply-and-accumulate pipelines that spatially unroll the inner loop
+of \verb!changeRNSBase()! (\autoref{listing:boostedKeyswitching}). The CRB unit
+exploits the high internal reuse in \verb!changeRNSBase()! to allow much higher
+thorughput than independent multipliers and adders communicating through the
+register file. This is the same insight behind DNN accelerators like the
+TPU~\cite{jouppi:isca17:tpu} and Tensor Cores in
+GPUs~\cite{choquette2021nvidia}.
 
 The CRB unit first receives as input $L$ residue polynomials, and then outputs
-produces $L$ output residue polynomials, both at $E$ elements/cycle.
-Each input polynomial is broadcast to all pipelines, with each pipeline
-producing exactly one of the output polynomials.
-The CRB unit is double-buffered so that it can simultaneously produce the
-output of one operation, and receive the input for the next one.
+produces $L$ output residue polynomials, both at $E$ elements/cycle. Each input
+polynomial is broadcast to all pipelines, with each pipeline producing exactly
+one of the output polynomials. The CRB unit is double-buffered so that it can
+simultaneously produce the output of one operation, and receive the input for
+the next one.
 
 We size the CRB unit to handle the largest ciphertexts that we find in deep
-applications, $\Nmax$=64K and $\Lmax$=60.
-This results in 60 parallel pipelines with 27\,MB of total buffers.
-% alex: 2 * 28/8 * 64K
-Smaller ciphertexts leave some of the CRB pipelines unused.
+applications, $\Nmax$=64K and $\Lmax$=60. This results in 60 parallel pipelines
+with 27\,MB of total buffers. Smaller ciphertexts leave some of the CRB
+pipelines unused.
 
 \figCRB
 
-% nikola: 120K = 60 muls / CRB * 8 groups * 256 scalar muls / mul = 120,000
-The CRB unit is by far \name's largest FU: it consists of 120K scalar multipliers and adders,
-consuming 34\% of on-chip area.
-Despite its size, the CRB unit is easy to lay out in hardware as it performs only
-element-wise operations.
-In return, the CRB unit reduces the time it takes to perform keyswitching from
-$O(L^2)$ to $O(L)$.
-This is essential for achieving high utilization across different ciphertext
-sizes, as the runtime of all other operations in FHE grows linearly with $L$.
+The CRB unit is by far CraterLake's largest FU: it consists of 120K scalar
+multipliers and adders, consuming 34\% of on-chip area. Despite its size, the
+CRB unit is easy to lay out in hardware as it performs only element-wise
+operations. In return, the CRB unit reduces the time it takes to perform
+keyswitching from $O(L^2)$ to $O(L)$. This is essential for achieving high
+utilization across different ciphertext sizes, as the runtime of all other
+operations in FHE grows linearly with $L$.
 
 \subsection{KeySwitch Hint Generator (KSHGen)}
 \label{sec:prg}
 As half of each keyswitch hint (KSH) is pseudo-random, it can be generated on
-the fly from a small seed, halving KSH storage and bandwidth.
-While this optimization has been previously implemented in
-software~\cite{halevi:2020:design}, we propose the first hardware Keyswitch-Hint
-Generator (KSHGen).
-
-% dsm: This section just used to say essentially "we implement something that produces random numbers". So what? You may as well not say anything. I've tried to explain what's hard, how we solve it, and that it matters in little space. Please fix if this is incorrect.
+the fly from a small seed, halving KSH storage and bandwidth. While this
+optimization has been previously implemented in
+software~\cite{halevi:2020:design}, we propose the first hardware
+Keyswitch-Hint Generator (KSHGen).
 
 The KSHGen generates numbers uniformly distributed modulo some prime by
 sampling random bits from a cryptographic
 PRNG~\cite{bertoni:2018:kangarootwelve}, and then performing rejection
-sampling.
-The challenge is that rejection sampling has \emph{variable throughput}, which
-plays poorly with static scheduling.
+sampling. The challenge is that rejection sampling has \emph{variable
+throughput}, which plays poorly with static scheduling.
 
-We address this in two ways:
-First, we reduce the probability of rejection by sampling additional random
-bits per generated word.
-Second, we introduce small buffers (16 words deep) that hide the occasional
-rejections.
-As these buffers are refilled between generating different KSHs, the probability
-any of them runs empty is negligible.
-Additionally, since software controls the seeds, it can test and avoid
-the few that fail to produce outputs at-speed.
+We address this in two ways: First, we reduce the probability of rejection by
+sampling additional random bits per generated word. Second, we introduce small
+buffers (16 words deep) that hide the occasional rejections. As these buffers
+are refilled between generating different KSHs, the probability any of them
+runs empty is negligible. Additionally, since software controls the seeds, it
+can test and avoid the few that fail to produce outputs at-speed.
 %
-The KSHGen unit is cheap and improves performance by up to
-1.9$\times$ % dsm: Said 90%, but keep it consistent w/ results tables
+The KSHGen unit is cheap and improves performance by up to 1.9$\times$
 (\autoref{sec:results}).
 
 \subsection{Transpose Network and FUs}\label{sec:network}
 
-\name's lane groups communicate using
-a fixed network, i.e., a network that connects specific input/output pairs
-\emph{without any control logic}. This approach reduces network area over
-the full-crossbar approach of F1 by 16$\times$, with a 2.4$\times$ reduction in
-network bandwidth for keyswitching.
+CraterLake's lane groups communicate using a fixed network, i.e., a network
+that connects specific input/output pairs \emph{without any control logic}.
+This approach reduces network area over the full-crossbar approach of F1 by
+16$\times$, with a 2.4$\times$ reduction in network bandwidth for keyswitching.
 
 NTTs and automorphisms are the only FUs with dependencies between elements of
-the same vector.
-F1 approaches these operations by laying out the $N$-element input vector as a
-$\sqrt N \times \sqrt N$ matrix.
-Then, an NTT over the whole vector can be expressed as a set of
-row-wise NTT followed by a set column-wise ones.
-A similar decomposition exists for automorphisms.
-Therefore, by introducing a fully-pipelined transpose unit, F1 efficiently maps these
-dataflows to a $\sqrt N$-lane vector processor~\cite{feldmann:micro21:f1}.
+the same vector. F1 approaches these operations by laying out the $N$-element
+input vector as a $\sqrt N \times \sqrt N$ matrix. Then, an NTT over the whole
+vector can be expressed as a set of row-wise NTT followed by a set column-wise
+ones. A similar decomposition exists for automorphisms. Therefore, by
+introducing a fully-pipelined transpose unit, F1 efficiently maps these
+dataflows to a $\sqrt N$-lane vector processor.
 
-\name differs from F1 in that it has $E$=2,048 lanes, 8$\times$ the maximum $\sqrt{N}$=256 it targets.
-F1's approach is unsuitable for \name as it results in monolithic 2,048-lane pipelines, 
-with excessive communication between lanes.
-Instead, \name partitions its lanes into $G$=8 groups of $E_G$=256 lanes each.
-All dependencies between lane groups are satisfied using a novel,
-spatially distributed transpose network that can process $E$=2,048
+CraterLake differs from F1 in that it has $E$=2,048 lanes, 8$\times$ the
+maximum $\sqrt{N}$=256 it targets. F1's approach is unsuitable for CraterLake
+as it results in monolithic 2,048-lane pipelines, with excessive communication
+between lanes. Instead, CraterLake partitions its lanes into $G$=8 groups of
+$E_G$=256 lanes each. All dependencies between lane groups are satisfied using
+a novel, spatially distributed transpose network that can process $E$=2,048
 elements per cycle:
 
 \figInterClusterTiling
 
-\name distributes the rows of the $E_G\times E_G$ matrix across lane groups in
-a round-robin fashion (\autoref{fig:interClusterTiling}, step 0).
-Then, it splits the matrix into $G \times G$ \emph{blocks}, and decomposes
-the transpose into two steps:
-\emph{(1)} transposing the $(E_G/G) \times (E_G/G)$ \emph{block-matrix}, 
-and \emph{(2)} transposing all $G\times G$ blocks.
+CraterLake distributes the rows of the $E_G\times E_G$ matrix across lane
+groups in a round-robin fashion (\autoref{fig:interClusterTiling}, step 0).
+Then, it splits the matrix into $G \times G$ \emph{blocks}, and decomposes the
+transpose into two steps: \emph{(1)} transposing the $(E_G/G) \times (E_G/G)$
+\emph{block-matrix}, and \emph{(2)} transposing all $G\times G$ blocks.
 
-\autoref{fig:interClusterTiling} illustrates transposing a
-$4\times 4$ matrix ($E_G$=4) across $G$=2 lane groups.
-The right side of the figure shows how the steps are executed in hardware, while the
-left side shows their effect on the $E_G\times E_G$ matrix. 
+\autoref{fig:interClusterTiling} illustrates transposing a $4\times 4$ matrix
+($E_G$=4) across $G$=2 lane groups. The right side of the figure shows how the
+steps are executed in hardware, while the left side shows their effect on the
+$E_G\times E_G$ matrix.
 
-\textbf{Step 1:} As lane group $i$ is responsible for row $i$ of \emph{all} $G \times G$
-blocks, the block-matrix transpose can be performed locally:
-each lane group performs a block-level transpose on the $1 \times G$ subblocks
-it holds.
-\name implements this step by using a \emph{separate} fully-pipelined transpose unit \emph{in each lane group}
-(using the same transpose unit design as F1).
+\textbf{Step 1:} As lane group $i$ is responsible for row $i$ of \emph{all} $G
+\times G$ blocks, the block-matrix transpose can be performed locally: each
+lane group performs a block-level transpose on the $1 \times G$ subblocks it
+holds. CraterLake implements this step by using a \emph{separate} fully-pipelined
+transpose unit \emph{in each lane group} (using the same transpose unit design
+as F1).
 
-\textbf{Step 2:} When transposing each $G \times G$ block, group $i$ starts off storing its
-$i$-th \emph{row}, and must end up storing its $i$-th \emph{column}.
-While this requires moving elements between lane groups, the exchange
-follows a fixed pattern:
-group $i$ sends to group $j$ the elements in the $j$-th columns of all $1 \times G$
-subblocks it holds.
-\name implements this using a \emph{fixed permutation network} with a bandwidth
-of $E$=2,048 elements/cycle.
+\textbf{Step 2:} When transposing each $G \times G$ block, group $i$ starts off
+storing its $i$-th \emph{row}, and must end up storing its $i$-th
+\emph{column}. While this requires moving elements between lane groups, the
+exchange follows a fixed pattern: group $i$ sends to group $j$ the elements in
+the $j$-th columns of all $1 \times G$ subblocks it holds. \name implements
+this using a \emph{fixed permutation network} with a bandwidth of $E$=2,048
+elements/cycle.
 
-\name adopts F1's approach for handling vectors with $N{<}\Nmax$:
-We lay out vectors as $N/E_G \times E_G$ matrices, and transpose
-only within $N/E_G \times N/E_G$ blocks. This requires only
-adjusting step 1, which is performed locally.
+CraterLake adopts F1's approach for handling vectors with $N{<}\Nmax$: We lay
+out vectors as $N/E_G \times E_G$ matrices, and transpose only within $N/E_G
+\times N/E_G$ blocks. This requires only adjusting step 1, which is performed
+locally.
 
 
 \subsection{Vector Chaining}\label{sec:keyswitchingPipeline}
 
-%\todo{Show only one of these scenarios, probably 3. Add a color legend instead of discussing it in text. Discuss total number of chaining options and ports.}
 \figPipeline
-%\figNewKS
 
-While the CRB substantially reduces register file (RF) port pressure,
-achieving high utilization requires a large number of FUs, as shown in \autoref{fig:overview}.
-If these FUs always operated on registers, keeping them busy would require dozens of RF ports.
+While the CRB substantially reduces register file (RF) port pressure, achieving
+high utilization requires a large number of FUs, as shown in
+\autoref{fig:overview}. If these FUs always operated on registers, keeping them
+busy would require dozens of RF ports.
 
-To tackle this challenge, we allow FUs to be \emph{chained}, so that the output of an FU
-can be consumed by another FU without going through the register file.
-This is similar to Cray-1's vector chaining~\cite{russell:cacm78:cray}, except that chained values
-are not written to the register file, saving write ports.
-Chaining works well because boosted keyswitching is amenable to pipelining: 
+To tackle this challenge, we allow FUs to be \emph{chained}, so that the output
+of an FU can be consumed by another FU without going through the register file.
+This is similar to Cray-1's vector chaining~\cite{russell:cacm78:cray}, except
+that chained values are not written to the register file, saving write ports.
+Chaining works well because boosted keyswitching is amenable to pipelining:
 most operands are consumed immediately after being produced.
 
-For efficiency, we tailor the allowed inter-FU chaining options to those needed by homomorphic operations.
-For example, \autoref{fig:pipeline} shows how FU chaining is used to form a pipeline that
-implements a part of homomorphic multiplication.
-% dsm: REVISION-TRIMMED
-%Labels correspond to variable names on Listings~\ref{listing:homomorphicMult} and \ref{listing:boostedKeyswitching}
-%(most operations correspond to lines 3--7 of \autoref{listing:boostedKeyswitching}).
-While this pipeline chains 10 FUs (beginning and ending in the CRB), it uses
-only 5 read and 1 write RF ports, instead of the 24 it would need without chaining.
-% Intermediates: 9 (including CRB)
-% RF Inputs: 5
-% RF Outputs: 1
-% Total ports w/o chaining = 9*2 + 5 + 1 = 24 (14 R + 10 W)
-Overall, vector chaining reduces register file traffic by 3.5$\times$ during
-keyswitching.
-% alex: keyswitching
-% with chaining:  7 reads +  4 writes = 11
-% without:       21 reads + 17 writes = 38
+For efficiency, we tailor the allowed inter-FU chaining options to those needed
+by homomorphic operations. For example, \autoref{fig:pipeline} shows how FU
+chaining is used to form a pipeline that implements a part of homomorphic
+multiplication. While this pipeline chains 10 FUs (beginning and ending in the
+CRB), it uses only 5 read and 1 write RF ports, instead of the 24 it would need
+without chaining. Overall, vector chaining reduces register file traffic by
+3.5$\times$ during keyswitching.
 
-We find that supporting four large pipelines with a few~variants suffices to chain most operations.
-% Overall, chaining reduces the number of RF ports required from 23 to 5. % TODO: max across configs; please list in comments; nikola: commented out cuz the numbers are already mentioned above (figure does illustrate the maximum across all configs)
-Chaining adds few inter-FU paths: on average, each output is connected to 3 inputs (including the RF),
-resulting in a cheap implementation.
-
-
+We find that supporting four large pipelines with a few~variants suffices to
+chain most operations. Chaining adds few inter-FU paths: on average, each
+output is connected to 3 inputs (including the RF), resulting in a cheap
+implementation.
 
 \subsection{Bitwidth and Multiplier Optimizations}\label{sec:bitwidth}
 
-% \todo{Doesn't this use better multipliers than F1? The moduli have additional optimizations, no?}
-% nikola: these optimizations were already in F1 (if you are talking about using NTT-friendly moduli
-\name's FUs are dominated by scalar modular multipliers.
-Thus, an efficient multiplier design is crucial.
-%To support NTTs, 
-RNS moduli $q_i$ must come from a set of restricted,
-\emph{NTT-friendly} primes.
-F1's FHE-specific multipliers exploit this to simplify logic~\cite{feldmann:micro21:f1}.
+CraterLake's FUs are dominated by scalar modular multipliers. Thus, an
+efficient multiplier design is crucial. RNS moduli $q_i$ must come from a set
+of restricted, \emph{NTT-friendly} primes. F1's FHE-specific multipliers
+exploit this to simplify logic~\cite{feldmann:micro21:f1}.
 
-\name improves F1's design in two ways:
-First, since multiplier area and power scale \emph{quadratically}
-with bitwidth, \name adopts a narrower, 28-bit datapath (F1 uses 32 bits).
-We cannot reduce bitwidth any further because then there would not be enough
-NTT-friendly moduli to support the deep benchmarks \name targets
-(we need 2$\Lmax$=120 small moduli).
-Second, we pipeline each multiplier to its energy-optimal point.
+CarterLake improves F1's design in two ways: First, since multiplier area and
+power scale \emph{quadratically} with bitwidth, CarterLake adopts a narrower,
+28-bit datapath (F1 uses 32 bits). We cannot reduce bitwidth any further
+because then there would not be enough NTT-friendly moduli to support the deep
+benchmarks \name targets (we need 2$\Lmax$=120 small moduli). Second, we
+pipeline each multiplier to its energy-optimal point.
 
-Together, these approaches improve
-area per bit by 1.6$\times$ and energy per bit by 1.3$\times$ over F1's multipliers.
-Without these optimizations, power draw would limit throughput.
-
+Together, these approaches improve area per bit by 1.6$\times$ and energy per
+bit by 1.3$\times$ over F1's multipliers. Without these optimizations, power
+draw would limit throughput.

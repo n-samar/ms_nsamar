@@ -2,188 +2,177 @@
 
 \subsection{Performance}
 
-\autoref{tbl:benchmarks} compares the performance of \name, CPU, and F1+ 
-on deep and shallow benchmarks. It shows execution times
-and \name's speedups over the CPU and F1+.
+\autoref{tbl:benchmarks} compares the performance of CraterLake, CPU, and F1+
+on deep and shallow benchmarks. It shows execution times and CraterLake's
+speedups over the CPU and F1+.
 
-\name achieves very large speedups over the CPU implementations, ranging from 
-2,900$\times$ to 8,600$\times$.
-Speedups are similar across deep and shallow benchmarks, showing that \name provides robust gains
-across FHE program types.
+CraterLake achieves very large speedups over the CPU implementations, ranging
+from 2,900$\times$ to 8,600$\times$. Speedups are similar across deep and
+shallow benchmarks, showing that CraterLake provides robust gains across FHE
+program types.
 
-\name achieves large speedups over F1+ on deep benchmarks, outperforming it by
-gmean 11.2$\times$ and up to 18.6$\times$.
-By contrast, \name and F1+ achieve comparable speeds on shallow benchmarks,
-with a gmean speedup of only 1.34$\times$.
-These stark differences demonstrate that \emph{prior FHE accelerators are efficient
-only on shallow computations, and falter on deep ones due to the limitations that we have discussed}.
+CraterLake achieves large speedups over F1+ on deep benchmarks, outperforming
+it by gmean 11.2$\times$ and up to 18.6$\times$. By contrast, CraterLke and F1+
+achieve comparable speeds on shallow benchmarks, with a gmean speedup of only
+1.34$\times$. These stark differences demonstrate that \emph{prior FHE
+accelerators are efficient only on shallow computations, and falter on deep
+ones due to the limitations that we have discussed}.
 
-On the MNIST shallow benchmarks, \name is slightly slower than F1+ because standard keyswitching
-is efficient in this range and \name spends a large fraction of~area~on~the CRB,
-which has low utilization at low $L$, whereas F1+ has higher 
-NTT, add, and multiply throughput.
-But the high speedups on deep programs show that most compute happens at high $L$,
-so \name optimizes for~the~common~case.
+On the MNIST shallow benchmarks, CraterLake is slightly slower than F1+ because
+standard keyswitching is efficient in this range and CraterLake spends a large
+fraction of~area~on~the CRB, which has low utilization at low $L$, whereas F1+
+has higher NTT, add, and multiply throughput. But the high speedups on deep
+programs show that most compute happens at high $L$, so CraterLake optimizes
+for~the~common~case.
 
 \subsection{Architectural Analysis}\label{sec:architecturalAnalysis}
 
-To understand these results in more depth, we examine \name's resource utilization and power consumption.
+To understand these results in more depth, we examine CraterLake's resource
+utilization and power consumption.
 
 \tblUtilization
 
 \paragraph{Utilization:}
-\autoref{tbl:utilization} reports the average utilization of FUs and main memory bandwidth
-for each application.
-FU utilization is reported as the fraction of cycles that FUs are consuming input values, averaged across all FUs.
-It reflects \emph{issue rate}---for example, a utilization of 66\% means that 10 out of the 15 FUs are consuming new inputs.
-%Note that FUs are pipelined, and some FUs are not fully utilized internally (e.g., $L<64$ leave some CRB pipelines idle).
-Bandwidth utilization is simply the fraction of cycles memory is active, e.g., 70\% utilization denotes an average bandwidth of 700\,GB/s.
+\autoref{tbl:utilization} reports the average utilization of FUs and main
+memory bandwidth for each application. FU utilization is reported as the
+fraction of cycles that FUs are consuming input values, averaged across all
+FUs. It reflects \emph{issue rate}---for example, a utilization of 66\% means
+that 10 out of the 15 FUs are consuming new inputs. Bandwidth utilization is
+simply the fraction of cycles memory is active, e.g., 70\% utilization denotes
+an average bandwidth of 700\,GB/s.
 
-Overall, \name achieves high utilization of both memory and compute, denoting a balanced system.
-Thanks to the CRB, \name's FU mix is balanced across all ciphertext sizes, so FU utilization is always
-high unless memory limits throughput. Some workloads, like unpacked bootstrapping,
-saturate on memory bandwidth, but most others see compute utilization near or above 50\%
-(near 100\% utilization is not achievable as all programs experience some memory-bound phases).
+Overall, CraterLake achieves high utilization of both memory and compute,
+denoting a balanced system. Thanks to the CRB, CraterLake's FU mix is balanced
+across all ciphertext sizes, so FU utilization is always high unless memory
+limits throughput. Some workloads, like unpacked bootstrapping, saturate on
+memory bandwidth, but most others see compute utilization near or above 50\%
+(near 100\% utilization is not achievable as all programs experience some
+memory-bound phases).
 
-By contrast, F1+'s utilization is much lower, especially on deep benchmarks, 
-where average FU utilization is 10\%,
-owing to its inadequate FU mix and lack of CRB.
+By contrast, F1+'s utilization is much lower, especially on deep benchmarks,
+where average FU utilization is 10\%, owing to its inadequate FU mix and lack
+of CRB.
 
 \figDataMovementAndPower
 
 \paragraph{Data movement:} \autoref{fig:dataMovement}
-breaks down memory traffic by keyswitch hint (KSH), inputs, and intermediate loads and stores.
-We see that deep benchmarks incur a manageable amount of intermediate traffic,
-while shallow benchmarks have a sufficiently low footprint to cause no eviction
-of intermediates.\footnote{For some of the shallow benchmarks from F1, the F1 paper~\cite{feldmann:micro21:f1} reports higher input traffic than \autoref{fig:dataMovement}.
-This is because F1's authors assumed plaintexts are the same size as ciphertexts
-(they are half the size of a ciphertext).}
+breaks down memory traffic by keyswitch hint (KSH), inputs, and intermediate
+loads and stores. We see that deep benchmarks incur a manageable amount of
+intermediate traffic, while shallow benchmarks have a sufficiently low
+footprint to cause no eviction of intermediates.\footnote{For some of the
+    shallow benchmarks from F1, the F1 paper~\cite{feldmann:micro21:f1} reports
+    higher input traffic than \autoref{fig:dataMovement}. This is because F1's
+    authors assumed plaintexts are the same size as ciphertexts (they are half
+the size of a ciphertext).}
 
-\paragraph{Power consumption.} \autoref{fig:power} shows the power
-breakdown for \name and the total power consumption for each benchmark.
-The figure includes both chip and HBM power.
-Power stays within a 320\,W envelope, and is higher for deep benchmarks,
-primarily due to higher FU/memory utilization and higher internal CRB utilization.
-FUs dominate power across benchmarks, consuming 50-80\%.
-This shows the importance of \name's FU energy optimizations,
-and demonstrates that its architecture is far more efficient:
-F1 was dominated by data movement energy, and F1+ consumes gmean 18$\times$
-more energy than \name on our deep benchmarks.
-%
-\name's efficiency and performance benefits yield a gmean 201$\times$
-improvement in performance per Joule over F1+.
-
-% dsm: Uncommented this, I hadn't noticed it was commented. This is literally EDP... it's a widely used metric because perfomance generally costs energy. That EDP >> Perf improvmeent is noteworthy. Is it just the product of both? Sure. Doesn't make it meaningless though.
-% alex: I don't think it makes sense to report this number --- it's just
-%       <gmean_speadup> * <gmean_energy improvement> = 12.3 x 18.7`. Both
-%       numbers are about 10x because we do 10x better bootstapping.
-%       Multiplying them is double counting.
-%       Dividing them gives a meaningful number---F1+ would consume
-%       18.7/12.3 = 1.5x more power than CL.
+\paragraph{Power consumption.}
+\autoref{fig:power} shows the power breakdown for CraterLake and the total
+power consumption for each benchmark. The figure includes both chip and HBM
+power. Power stays within a 320\,W envelope, and is higher for deep benchmarks,
+primarily due to higher FU/memory utilization and higher internal CRB
+utilization. FUs dominate power across benchmarks, consuming 50-80\%. This
+shows the importance of CraterLake's FU energy optimizations, and demonstrates
+that its architecture is far more efficient: F1 was dominated by data movement
+energy, and F1+ consumes gmean 18$\times$ more energy than CraterLake on our
+deep benchmarks. CraterLake's efficiency and performance benefits yield a gmean
+201$\times$ improvement in performance per Joule over F1+.
 
 \subsection{Sensitivity Studies}
 \label{sec:sensitivity}
 
 \figGmeanVsStorage
 
-\paragraph{On-chip storage:} \autoref{fig:gmeanVsStorage} shows \name's performance
-as register file grows from 100 to 350\,MB.
-Each line shows the performance of a different application,
-\emph{normalized to its performance at the default size, 256\,MB}.
+\paragraph{On-chip storage:}
+\autoref{fig:gmeanVsStorage} shows CraterLake's performance as register file
+grows from 100 to 350\,MB. Each line shows the performance of a different
+application, \emph{normalized to its performance at the default size, 256\,MB}.
 While shallow benchmarks are insensitive to storage size, most deep benchmarks
-suffer severely from a smaller register file, incurring slowdowns of up to 5.5$\times$.
-This shows that \name's large on-chip storage is crucial for deep benchmarks.
-Finally, adding more on-chip storage leads to diminishing returns.
+suffer severely from a smaller register file, incurring slowdowns of up to
+5.5$\times$. This shows that CraterLake's large on-chip storage is crucial for
+deep benchmarks. Finally, adding more on-chip storage leads to diminishing
+returns.
 
 
-\paragraph{Effect of \name's features:}
-\autoref{tbl:performanceBreakdown} shows the impact of our innovations by reporting the \emph{slowdown}
-of alternative configurations.
-\emph{KSHGen} omits the KSHGen FU and stores full KSHs in memory.
-This hurts performance noticeably, especially in deep benchmarks, by gmean 1.9$\times$.
+\paragraph{Effect of CraterLake's features:}
+\autoref{tbl:performanceBreakdown} shows the impact of our innovations by
+reporting the \emph{slowdown} of alternative configurations. \emph{KSHGen}
+omits the KSHGen FU and stores full KSHs in memory. This hurts performance
+noticeably, especially in deep benchmarks, by gmean 1.9$\times$.
 \emph{CRB/chain} omits the CRB and the vector chaining optimizations.
-Performance is even worse than for F1+, because the system becomes bottlenecked on RF ports
-and \name has
-% dsm: Not true, it has 1/4th the lanes but we have more FUs/lane
-%half as many lane groups as F1+ has compute clusters.
-50\% of the NTT and 40\% of the multiply/add throughput of F1+.
-\emph{Network} replaces \name's fixed transpose network and polynomial tiling design
-with F1+'s crossbars and residue polynomial tiling design.
-Performance is up to 2$\times$ worse \emph{even though the F1+ network is 16$\times$ larger},
-because residue polynomial tiling incurs 2.4$\times$ more traffic than \name's approach(\autoref{sec:comparison}).
+Performance is even worse than for F1+, because the system becomes bottlenecked
+on RF ports and CraterLake has 50\% of the NTT and 40\% of the multiply/add
+throughput of F1+. \emph{Network} replaces CraterLake's fixed transpose network
+and polynomial tiling design with F1+'s crossbars and residue polynomial tiling
+design. Performance is up to 2$\times$ worse \emph{even though the F1+ network
+is 16$\times$ larger}, because residue polynomial tiling incurs 2.4$\times$
+more traffic than CraterLake's approach(\autoref{sec:comparison}).
 
 \subsection{Performance vs.\ Target Security Level}
 \label{sec:moreSecurity}
 
-The benchmarks presented so far meet an 80-bit security level,
-which is often considered sufficient~\cite{feldmann:micro21:f1,halevi2021bootstrapping,halevi2018faster,izabachene2019practical,ji2019efficient}.
-We now analyze the impact of meeting higher levels of security:
-128-bit security, a commonly used target~\cite{albrecht:hesg18:standard,lee:2021:privacy,riazi:asplos20:heax}
-that can be efficiently achieved with $N$=64K,
-and 200-bit security, a very conservative target
-that requires using larger polynomials.
+The benchmarks presented so far meet an 80-bit security level, which is often
+considered
+sufficient~\cite{feldmann:micro21:f1,halevi2021bootstrapping,halevi2018faster,izabachene2019practical,ji2019efficient}.
+We now analyze the impact of meeting higher levels of security: 128-bit
+security, a commonly used
+target~\cite{albrecht:hesg18:standard,lee:2021:privacy,riazi:asplos20:heax}
+that can be efficiently achieved with $N$=64K, and 200-bit security, a very
+conservative target that requires using larger polynomials.
 
 \paragraph{128-bit security:}
-\autoref{tbl:securebenchmarks} shows \name's performance on our benchmarks when
-adjusted for 128-bit security (128-bit column), as
-well as the slowdown compared to performance for 80-bit security.
+\autoref{tbl:securebenchmarks} shows CraterLake's performance on our benchmarks
+when adjusted for 128-bit security (128-bit column), as well as the slowdown
+compared to performance for 80-bit security.
 
 \tblSecureBenchmarks
 
-To reach 128 bits of security with a polynomial degree of $N$=64K,
-we bootstrap twice as often as with 80 bits of security, i.e., target half
-the number of usable levels after bootstrapping. This allows using boosted
-keyswitching variants with a relatively small number of digits: we use 1-digit
-keyswitching for $L<$32, 2-digit
-keyswitching for 32$\leq L<$43, and 3-digit keyswitching for 43$\leq L$. As we
-bootstrap twice as often, we never go beyond $L$=51.
+To reach 128 bits of security with a polynomial degree of $N$=64K, we bootstrap
+twice as often as with 80 bits of security, i.e., target half the number of
+usable levels after bootstrapping. This allows using boosted keyswitching
+variants with a relatively small number of digits: we use 1-digit keyswitching
+for $L<$32, 2-digit keyswitching for 32$\leq L<$43, and 3-digit keyswitching
+for 43$\leq L$. As we bootstrap twice as often, we never go beyond $L$=51.
 
-\autoref{tbl:securebenchmarks} (left) shows that 128-bit security adds modest overheads:
-a 1.36$\times$ gmean slowdown, and a worst-case slowdown of 1.62$\times$.
-These overheads stem from the higher memory footprint of multi-digit keyswitching
-and the more frequent bootstrapping.
-Importantly, though bootstrapping is twice as frequent,
-slowdowns are below 2$\times$, because both bootstrapping and useful computation happen at lower $L$ values, lowering their cost.
-This is a concrete example of the tradeoff that \autoref{fig:bootstrappingFrequency} in \autoref{sec:deepChallenges} illustrates.
+\autoref{tbl:securebenchmarks} (left) shows that 128-bit security adds modest
+overheads: a 1.36$\times$ gmean slowdown, and a worst-case slowdown of
+1.62$\times$. These overheads stem from the higher memory footprint of
+multi-digit keyswitching and the more frequent bootstrapping. Importantly,
+though bootstrapping is twice as frequent, slowdowns are below 2$\times$,
+because both bootstrapping and useful computation happen at lower $L$ values,
+lowering their cost. This is a concrete example of the tradeoff that
+\autoref{fig:bootstrappingFrequency} in \autoref{sec:deepChallenges}
+illustrates.
 
 \paragraph{Beyond 128-bit security:}
-Effectively supporting significantly more than 128-bit security
-requires using larger polynomials. 
-Here, we evaluate a 200-bit security target, which requires doubling $N$ from 64K to 128K.
-Note that this security target is very conservative, and not used in FHE benchmarks;
-we use it to study performance over a wide range of secuity levels.
+Effectively supporting significantly more than 128-bit security requires using
+larger polynomials. Here, we evaluate a 200-bit security target, which requires
+doubling $N$ from 64K to 128K. Note that this security target is very
+conservative, and not used in FHE benchmarks; we use it to study performance
+over a wide range of secuity levels.
 
-\name as evaluated so far support $N$ up to 64K natively,
-but larger vectors would require multiple passes through FUs and forgo FU chaining.
-We thus evaluate a \name version that supports $N$ up to 128K natively.
-This requires modest hardware changes, chielfy \emph{(1)}
-the buffers in the CRB need to double, from 25$\,$MB to 50$\,$MB; and \emph{(2)}
-NTTs require an additional butterfly stage.
-These changes consume 31$\,$mm$^2$ of additional area,
-i.e., less than $7\%$ of chip area.
+CraterLake as evaluated so far support $N$ up to 64K natively, but larger
+vectors would require multiple passes through FUs and forgo FU chaining. We
+thus evaluate a CraterLake version that supports $N$ up to 128K natively. This
+requires modest hardware changes, chielfy \emph{(1)} the buffers in the CRB
+need to double, from 25$\,$MB to 50$\,$MB; and \emph{(2)} NTTs require an
+additional butterfly stage. These changes consume 31$\,$mm$^2$ of additional
+area, i.e., less than $7\%$ of chip area.
 
-\autoref{tbl:securebenchmarks} (right) reports the performance of deep benchmarks
-for 200-bit security and $N$=128K.
-Since
-$N$=128K ciphertexts have double the slots of $N$=64K ciphertexts, we normalize
-performance per element. This is because doubling $N$ allows doubling the number of slots (plaintext elements) per ciphertext,
-which enables more computations to happen in parallel.
-For example, consider the ResNet benchmark: starting from the original benchmark, which uses $N$=64K ciphertexts and performs one inference at a time,
-it is easy to construct a ResNet benchmark that uses $N$=128K and performs two inferences in parallel.
-In addition to doubling $N$, \name achieves a 200-bit security by using higher-digit keyswitching.
+\autoref{tbl:securebenchmarks} (right) reports the performance of deep
+benchmarks for 200-bit security and $N$=128K. Since $N$=128K ciphertexts have
+double the slots of $N$=64K ciphertexts, we normalize performance per element.
+This is because doubling $N$ allows doubling the number of slots (plaintext
+elements) per ciphertext, which enables more computations to happen in
+parallel. For example, consider the ResNet benchmark: starting from the
+original benchmark, which uses $N$=64K ciphertexts and performs one inference
+at a time, it is easy to construct a ResNet benchmark that uses $N$=128K and
+performs two inferences in parallel. In addition to doubling $N$, CraterLake
+achieves a 200-bit security by using higher-digit keyswitching.
 
-\autoref{tbl:securebenchmarks} shows that the 200-bit security target imposes 
-additional overheads, incurring a 2.6$\times$ gmean slowdown over 80-bit security,
-and a worst-case slowdown of 4.35$\times$.
-Most of these slowdown are caused by the fact that
-using $N$=128K doubles the footprint of ciphertexts and KSHs over $N$=64K.
-This limits reuse opportunities and adds off-chip traffic.
-While doubling the register file (to 512\,MB) would erase most of these overheads,
-it would add significant area.
-
-% axelf: Discussion of SP vs. FP
-% We modify all benchmarks to use \emph{densely packed} bootstrapping.
-% Implementation choices in most existing state-of-the-art FHE libraries force application programmers to split up their data across \emph{multiple} ciphertexts to avoid the performance penalty of bootstrapping ciphertexts with many slots.
-% For example, the base ResNet-20 implementation stores data in 64 separate ciphertexts each only encoding 64 values instead of a single ciphertext encoding 4096 values.
-% This algorithmic choice results in over 96\% of execution time being spent bootstrapping. By moving to deeper, more fully packed bootstrapping algorithms, we are able to reduce bootstrapping to 42\% of our CPU execution time and speed up our CPU implementation from 6.25 hours to 23 minutes (a $16 \times$ speedup).
-% Importantly, denser packing also benefits \name. For ResNet-20, denser packing allows us to reduce execution time from 2.3s to 264ms, and for logistic regression, it reduces execution time from 468ms to 121ms, resulting in $8.7 \times$ and $3.9 \times$ speedups respectively.
+\autoref{tbl:securebenchmarks} shows that the 200-bit security target imposes
+additional overheads, incurring a 2.6$\times$ gmean slowdown over 80-bit
+security, and a worst-case slowdown of 4.35$\times$. Most of these slowdown are
+caused by the fact that using $N$=128K doubles the footprint of ciphertexts and
+KSHs over $N$=64K. This limits reuse opportunities and adds off-chip traffic.
+While doubling the register file (to 512\,MB) would erase most of these
+overheads, it would add significant area.

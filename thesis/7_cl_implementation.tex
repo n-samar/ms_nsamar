@@ -2,30 +2,26 @@
 
 \tblGF
 
-\name's implementation parameters including the technology node, synthesis,
-SRAM design, and PHY estimates match those of F1
+CraterLake's implementation parameters including the technology node,
+synthesis, SRAM design, and PHY estimates match those of F1
 (\autoref{sec:f1implementation}).
 
-\autoref{tbl:GF12} shows \name's area and its breakdown by component.
-Overall, our \name configuration requires 472\,mm$^2$. % FIXME: And every other number below...
-FUs occupy 51\% of the area, with 41\% going to the register file,
-6\% to the two HBM2 PHYs,
-and 2\% to the on-chip interconnect.
-As we will see in the evaluation, this design stays within a power budget of 320\,W,
-in line with GPUs and server CPUs.
+\autoref{tbl:GF12} shows CraterLake's area and its breakdown by component.
+Overall, our CraterLake configuration requires 472\,mm$^2$. FUs occupy 51\% of
+the area, with 41\% going to the register file, 6\% to the two HBM2 PHYs, and
+2\% to the on-chip interconnect. As we will see in the evaluation, this design
+stays within a power budget of 320\,W, in line with GPUs and server CPUs.
 
-Finally, while these figures could be considered high,
-note that we are not using a leading-edge fabrication node:
-based on published logic and SRAM scaling factors~\cite{yeap:iedm19:tsmc-n5},
-on current TSMC 5\,nm technology,
-\name would consume a very modest
-157\,mm$^\textrm{2}$ area and 146\,W peak power.
+Finally, while these figures could be considered high, note that we are not
+using a leading-edge fabrication node: based on published logic and SRAM
+scaling factors~\cite{yeap:iedm19:tsmc-n5}, on current TSMC 5\,nm technology,
+CraterLake would consume a very modest 157\,mm$^\textrm{2}$ area and 146\,W
+peak power.
 
 \paragraph{Host communication:}
-We assume that \name is implemented as an accelerator.
-The needed CPU-accelerator bandwidth required to stream inputs and outputs
-in our benchmarks is 50\,GB/s on average and 130\,GB/s at most,
-so a commodity PCIe\,5 interface suffices to achieve full throughput.
-CPU-accelerator latency is not an issue, as these are bulk transfers
-and can be overlapped with computation.
+We assume that CraterLake is implemented as an accelerator. The needed
+CPU-accelerator bandwidth required to stream inputs and outputs in our
+benchmarks is 50\,GB/s on average and 130\,GB/s at most, so a commodity PCIe\,5
+interface suffices to achieve full throughput. CPU-accelerator latency is not
+an issue, as these are bulk transfers and can be overlapped with computation.
 

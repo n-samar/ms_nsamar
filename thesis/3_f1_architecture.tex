@@ -3,101 +3,102 @@
 \autoref{fig:f1arch} shows an overview of F1, which we derive from the insights in \autoref{sec:fhe_analysis}.
 
 \paragraph{Vector processing with specialized functional units:}
-F1 features wide-vector execution with functional units (FUs) tailored to 
-%all % dsm: We just said that there are some primitive ops we don;t implement, so saying all here is a bit jarring.
-primitive FHE operations.
-Specifically, F1 implements vector FUs for modular addition, modular multiplication, NTTs (forward and inverse in the same unit),
-and automorphisms.
-Because we leverage RNS representation, these FUs use a fixed, small arithmetic word size (32 bits in our implementation),
-avoiding wide arithmetic.
+F1 features wide-vector execution with functional units (FUs) tailored to
+primitive FHE operations. Specifically, F1 implements vector FUs for modular
+addition, modular multiplication, NTTs (forward and inverse in the same unit),
+and automorphisms. Because we leverage RNS representation, these FUs use a
+fixed, small arithmetic word size (32 bits in our implementation), avoiding
+wide arithmetic.
 
-%Following vector processing terminology,
-FUs process vectors of configurable \emph{length} $N$ using a fixed number of \emph{vector lanes} $E$.
-Our implementation uses $E=$128 lanes and supports power-of-two lengths $N$ from 1,024 to 16,384.
-This covers the common range of FHE polynomial sizes, so an RNS polynomial maps to a single vector.
-Larger polynomials (e.g., of 32K elements) can use multiple vectors.
+FUs process vectors of configurable \emph{length} $N$ using a fixed number of
+\emph{vector lanes} $E$. Our implementation uses $E=$128 lanes and supports
+power-of-two lengths $N$ from 1,024 to 16,384. This covers the common range of
+FHE polynomial sizes, so an RNS polynomial maps to a single vector. Larger
+polynomials (e.g., of 32K elements) can use multiple vectors.
 
-All FUs are \emph{fully pipelined}, so they achieve the same throughput of $E=$128 elements/cycle.
-FUs consume their inputs in contiguous chunks of $E$ elements in consecutive cycles.
-This is easy for element-wise operations, but hard for NTTs and automorphisms.
-\autoref{sec:FUs} details our novel FU implementations, including the first vector implementation of automorphisms.
-Our evaluation shows that these FUs achieve much higher performance than those of prior work.
-This is important because, as we saw in \autoref{sec:fhe_analysis},
-\emph{having fewer high-throughput FUs reduces parallelism and thus memory footprint}.
+All FUs are \emph{fully pipelined}, so they achieve the same throughput of
+$E=$128 elements/cycle. FUs consume their inputs in contiguous chunks of $E$
+elements in consecutive cycles. This is easy for element-wise operations, but
+hard for NTTs and automorphisms. \autoref{sec:FUs} details our novel FU
+implementations, including the first vector implementation of automorphisms.
+Our evaluation shows that these FUs achieve much higher performance than those
+of prior work. This is important because, as we saw in
+\autoref{sec:fhe_analysis}, \emph{having fewer high-throughput FUs reduces
+parallelism and thus memory footprint}.
 
 \paragraph{Compute clusters:}
-Functional units are grouped in \emph{compute clusters}, as \autoref{fig:f1arch} shows.
-Each cluster features several FUs (1 NTT, 1 automorphism, 2 multipliers, and 2 adders in our implementation)
-and a banked register file that can (cheaply) supply enough operands each cycle to keep all FUs busy.
-The chip has multiple clusters (16 in our implementation).
-
-% TODO(dsm): This may be a good place to explain the banking approach.
+Functional units are grouped in \emph{compute clusters}, as
+\autoref{fig:f1arch} shows. Each cluster features several FUs (1 NTT, 1
+automorphism, 2 multipliers, and 2 adders in our implementation) and a banked
+register file that can (cheaply) supply enough operands each cycle to keep all
+FUs busy. The chip has multiple clusters (16 in our implementation).
 
 \figFOneArch
 
-
 \paragraph{Memory system:}
-F1 features an explicitly managed memory hierarchy. As \autoref{fig:f1arch} shows,
-F1 features a large, heavily banked scratchpad (64\,MB across {16} banks in our implementation).
-The scratchpad interfaces with both high-bandwidth off-chip memory (HBM2 in our implementation)
-and with compute clusters through an on-chip network.
+F1 features an explicitly managed memory hierarchy. As \autoref{fig:f1arch}
+shows, F1 features a large, heavily banked scratchpad (64\,MB across {16} banks
+in our implementation). The scratchpad interfaces with both high-bandwidth
+off-chip memory (HBM2 in our implementation) and with compute clusters through
+an on-chip network.
 
-F1 uses decoupled data orchestration~\cite{pellauer:asplos19:buffets} to hide main memory latency.
-Scratchpad banks work autonomously, fetching data from main memory far ahead of its use.
-Since memory has relatively low bandwidth, off-chip data is always staged in scratchpads,
-and compute clusters do not access main memory directly.
+F1 uses decoupled data orchestration~\cite{pellauer:asplos19:buffets} to hide
+main memory latency. Scratchpad banks work autonomously, fetching data from
+main memory far ahead of its use. Since memory has relatively low bandwidth,
+off-chip data is always staged in scratchpads, and compute clusters do not
+access main memory directly.
 
-The on-chip network connecting scratchpad banks and compute clusters provides very high bandwidth,
-which is necessary because register files are small and achieve limited reuse.
-We implement a single-stage bit-sliced crossbar network~\cite{passas:tocaid12:crossbar} that provides full bisection bandwidth.
-Banks and the network have wide ports (512 bytes), so that a single scratchpad bank can send a vector to a compute unit
-at the rate it is consumed (and receive it at the rate it is produced).
-This avoids long staging of vectors at the register files.
+The on-chip network connecting scratchpad banks and compute clusters provides
+very high bandwidth, which is necessary because register files are small and
+achieve limited reuse. We implement a single-stage bit-sliced crossbar
+network~\cite{passas:tocaid12:crossbar} that provides full bisection bandwidth.
+Banks and the network have wide ports (512 bytes), so that a single scratchpad
+bank can send a vector to a compute unit at the rate it is consumed (and
+receive it at the rate it is produced). This avoids long staging of vectors at
+the register files.
 
 \paragraph{Static scheduling:}
-Because FHE programs are completely regular, F1 adopts a \emph{static, exposed microarchitecture}:
-all components have fixed latencies, which are exposed to the compiler.
-The compiler is responsible for scheduling operations and data transfers in the appropriate cycles to prevent
-structural or data hazards.
-%---hardware includes no mechanisms for dynamic arbitration among conflicting requests,
-%stalling, or bypassing.
-This is in the style of VLIW processors~\cite{fisher:isca83:very}.
+Because FHE programs are completely regular, F1 adopts a \emph{static, exposed
+microarchitecture}: all components have fixed latencies, which are exposed to
+the compiler. The compiler is responsible for scheduling operations and data
+transfers in the appropriate cycles to prevent structural or data hazards. This
+is in the style of VLIW processors~\cite{fisher:isca83:very}.
 
-Static scheduling simplifies logic throughout the chip. For example, FUs need no stalling logic;
-register files and scratchpad banks need no dynamic arbitration to handle conflicts;
-and the on-chip network uses simple switches that change their configuration independently over time,
-without the buffers and arbiters of packet-switched networks.
+Static scheduling simplifies logic throughout the chip. For example, FUs need
+no stalling logic; register files and scratchpad banks need no dynamic
+arbitration to handle conflicts; and the on-chip network uses simple switches
+that change their configuration independently over time, without the buffers
+and arbiters of packet-switched networks.
 
-Because memory accesses do have a variable latency, we assume the worst-case latency,
-and buffer data that arrives earlier %in the memory controller
-(note that, because we access large chunks of data,
-e.g., 64\,KB, this worst-case latency is not far from the average).
+Because memory accesses do have a variable latency, we assume the worst-case
+latency, and buffer data that arrives earlier (note that, because we access
+large chunks of data, e.g., 64\,KB, this worst-case latency is not far from the
+average).
 
 \paragraph{Distributed control:}
-Though static scheduling is the hallmark of VLIW, F1's implementation is quite different:
-rather than having a single stream of instructions with many operations each, in
-F1 each component has an \emph{independent instruction stream}.  % nikola: what does component mean here?
-This is possible because F1 does not have any control flow: though FHE programs may have loops,
-we unroll them to avoid all branches, and compile programs into linear sequences of instructions.
+Though static scheduling is the hallmark of VLIW, F1's implementation is quite
+different: rather than having a single stream of instructions with many
+operations each, in F1 each component has an \emph{independent instruction
+stream}. This is possible because F1 does not have any control flow: though FHE
+programs may have loops, we unroll them to avoid all branches, and compile
+programs into linear sequences of instructions.
 
-This approach may appear costly. But vectors are very long, so each instruction encodes a lot of work and this overhead is minimal. Moreover, this enables a compact instruction format, which encodes a single operation followed by the number of cycles
-to wait until running the next instruction. 
-This encoding avoids the low utilization of VLIW instructions, which leave many operation slots empty.
-Each FU, register file, network switch, scratchpad bank, and memory controller has its own instruction stream,
-which a control~unit~fetches in small blocks and distributes to components.
-Overall, instruction fetches consume less than 0.1\% of memory traffic.
+This approach may appear costly. But vectors are very long, so each instruction
+encodes a lot of work and this overhead is minimal. Moreover, this enables a
+compact instruction format, which encodes a single operation followed by the
+number of cycles to wait until running the next instruction. This encoding
+avoids the low utilization of VLIW instructions, which leave many operation
+slots empty. Each FU, register file, network switch, scratchpad bank, and
+memory controller has its own instruction stream, which a control~unit~fetches
+in small blocks and distributes to components. Overall, instruction fetches
+consume less than 0.1\% of memory traffic.
 
-% dsm: I'm still unconvinced about having this here;
-% FIXME(dsm): That 1993 paper is far from the first one to propose an element-partitioned design; take a look at Krste's thesis, there's a much much earlier (70s or early 80s) IBM machine doing this. Regardless, that is arcana; I'd just cite Krste's thesis and say it's an \emph{element-partitioned} design.
-\paragraph{Register file (RF) design:} Each cluster in F1 requires 10 read ports and 6 write ports to keep all FUs busy.
-To enable this cheaply, we use an 8-banked \emph{element-partitioned} register file design~\cite{asanovic:ucb98:vector}
-that leverages long vectors:
-each vector is striped across banks, and each FU cycles through all banks over time, using a single bank each cycle.
-By staggering the start of each vector operation, FUs access different banks each cycle.
-This avoids multiporting, requires a simple RF-FU interconnect, and performs within 5\%
-of an ideal infinite-ported RF.
-
-
-%enable all units to operate in parallel. This means register files must be banked, but connecting 10 RF bank ports with the FUs poses power and scheduling issues. We address this by using the RF design proposed in~\cite{awaga:micro93:mu}; here, the vectors of a ciphertext are stored in RF banks one vector per bank in a round-robin fashion; each FU is connected to a single RF port each cycle and the assignment between FUs and RF banks is rotated cyclically on each cycle. This means that each FU will have to wait up to 10 cycles to start reading its input. \axelf{worth mentioning that operations take tens to hundreds of cycles for a sense of scale?} 
-%Therefore, this design 1) uses a simple interconnect between RFs and FUs and 2) guarantees no bank conflicts at a cost of the added 10 cycle latency; we notice this tradeoff is ideal for FHE because the static dataflow graph allows the scheduler to effectively manage the added latency: performance on benchmarks is within 5\% of an ideal infinite-port RF and 2.5$\times$ better than a crossbar-connected 4-read/2-write port RF.
-
+\paragraph{Register file (RF) design:}
+Each cluster in F1 requires 10 read ports and 6 write ports to keep all FUs
+busy. To enable this cheaply, we use an 8-banked \emph{element-partitioned}
+register file design~\cite{asanovic:ucb98:vector} that leverages long vectors:
+each vector is striped across banks, and each FU cycles through all banks over
+time, using a single bank each cycle. By staggering the start of each vector
+operation, FUs access different banks each cycle. This avoids multiporting,
+requires a simple RF-FU interconnect, and performs within 5\% of an ideal
+infinite-ported RF.

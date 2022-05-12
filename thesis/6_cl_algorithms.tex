@@ -1,17 +1,18 @@
 \section{Compiler}\label{sec:algorithmicInsights}
 \label{sec:compiler}
 
-\name's compiler's are similar to those of F1's compiler: it uses high-level
-programs as inputs, and seeks to minimize and decouple off-chip data movement,
-which are critical. However, \name's compiler is substantially simpler and
-achieves higher utilization. This is because \name has a simpler interface than
-F1: \name exposes a single set of wide-vector functional units, whereas F1
-organizes narrower FUs into several independent compute clusters and has two
-levels of on-chip storage (per-cluster register files and a shared scratchpad).
-Thus, F1's compiler must distribute a single homomorphic operation among
-multiple clusters, and must often overlap many homomorphic operations. This
-distributed design creates complex scheduling problems, e.g., trading off load
-balance and utilization for reuse, which \name's architecture obviates.
+CraterLake's compiler's are similar to those of F1's compiler: it uses
+high-level programs as inputs, and seeks to minimize and decouple off-chip data
+movement, which are critical. However, CraterLake's compiler is substantially
+simpler and achieves higher utilization. This is because CraterLake has a
+simpler interface than F1: CraterLake exposes a single set of wide-vector
+functional units, whereas F1 organizes narrower FUs into several independent
+compute clusters and has two levels of on-chip storage (per-cluster register
+files and a shared scratchpad). Thus, F1's compiler must distribute a single
+homomorphic operation among multiple clusters, and must often overlap many
+homomorphic operations. This distributed design creates complex scheduling
+problems, e.g., trading off load balance and utilization for reuse, which
+CraterLake's architecture obviates.
 
 The compiler first translates each homomorphic operation into a sequence of
 simpler operations on ciphertext polynomials. To achieve high utilization, the

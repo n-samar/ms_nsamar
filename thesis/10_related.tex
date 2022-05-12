@@ -11,20 +11,20 @@ These designs target FPGAs and rely on a host processor;
 accelerated small primitives like NTTs, and were dominated by host-FPGA
 communication. State-of-the-art accelerators execute a full homomorphic
 multiplication independently: Roy et al.~\cite{roy:hpca19:fpga-he} accelerate
-B/FV multiplication by 13$\times$ over a CPU;
-HEAWS~\cite{turan:tc20:heaws} accelerates B/FV multiplication, and uses it to
-speed a simple benchmark by 5$\times$; and HEAX~\cite{riazi:asplos20:heax}
-accelerates CKKS multiplication and keyswitching by up to 200$\times$. These
-designs suffer high data movement (e.g., HEAX does not reuse keyswitch hints)
-and use fixed pipelines with relatively low-throughput FUs.
+B/FV multiplication by 13$\times$ over a CPU; HEAWS~\cite{turan:tc20:heaws}
+accelerates B/FV multiplication, and uses it to speed a simple benchmark by
+5$\times$; and HEAX~\cite{riazi:asplos20:heax} accelerates CKKS multiplication
+and keyswitching by up to 200$\times$. These designs suffer high data movement
+(e.g., HEAX does not reuse keyswitch hints) and use fixed pipelines with
+relatively low-throughput FUs.
 
 We have shown that accelerating FHE programs requires a different approach:
-data movement becomes the key constraint, requiring new techniques
-to extract reuse {across} homomorphic operations;
-and fixed pipelines cannot support the operations of even a single benchmark.
-Instead, F1 and CraterLake achieves flexibility and high performance by exploiting
-wide-vector execution with high-throughput FUs.
-This lets F1 and CraterLake execute not only full applications, but different FHE schemes.
+data movement becomes the key constraint, requiring new techniques to extract
+reuse {across} homomorphic operations; and fixed pipelines cannot support the
+operations of even a single benchmark. Instead, F1 and CraterLake achieves
+flexibility and high performance by exploiting wide-vector execution with
+high-throughput FUs. This lets F1 and CraterLake execute not only full
+applications, but different FHE schemes.
 
 
 \paragraph{HE-MPC accelerators are hampered by communication:}
@@ -40,7 +40,7 @@ traffic, which dominates performance; yet, the above accelerators do not
 consider this traffic. CHOCO~\cite{vanderhagen:arxiv21:choco} shows that, even
 after accelerating client operations, communication costs dominate.
 
-By dramatically accelerating bootstrapping, \name eliminates the high
+By dramatically accelerating bootstrapping, CraterLake eliminates the high
 communication costs of HE-MPC and shallow HE designs. To avoid bootstrapping,
 these prior approaches require the \emph{client} to receive, reencrypt, and
 resend ciphertexts that have exhausted their multiplicative budgets. In our
@@ -48,7 +48,7 @@ benchmarks, avoiding each bootstrapping would require transferring over 13\,MB
 between client and server (as the client must resend the ciphertext with a
 reasonable noise budget). Even if we ignore client computation and network
 latency, on a 100\,Mbps connection this would require over 1 \emph{second} per
-ciphertext. By contrast, \name bootstraps this ciphertext in 3.9\,ms,
+ciphertext. By contrast, CraterLake bootstraps this ciphertext in 3.9\,ms,
 256$\times$ faster. Bootstrapping also allows the client to send narrow inputs
 (e.g., with 32 instead of 1,500 bits per coefficient), which the server can
 bootstrap before computation. This greatly reduces encryption and network
@@ -64,6 +64,6 @@ automorphisms efficiently, and their on-chip memories are too small to enable
 sufficient reuse (\autoref{fig:gmeanVsStorage}), despite their use of HBM.
 Specifically, state-of-the-art GPU approaches carefully tune algorithms to
 achieve high off- and on-chip bandwidth utilization~\cite{jung2021over};
-however, \cite{jung2021over} is 200$\times$ slower than \name. This shows that
-\name's high reuse is crucial: to achieve the same throughput as \name, a GPU
+however, \cite{jung2021over} is 200$\times$ slower than CraterLake. This shows that
+CraterLake's high reuse is crucial: to achieve the same throughput as CraterLake, a GPU
 would need over 100\,TB/s of memory bandwidth.

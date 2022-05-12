@@ -1,144 +1,108 @@
 \section{Architecture Overview}\label{sec:overview}
 
-\autoref{fig:overview} shows an overview of the \name architecture.
-We first explain its key elements, and then explain why this is the right
-architecture for FHE by considering design alternatives.
-
-% dsm: Logical view: ops/FUs, datatypes (vectors, lanes), FU pipelining/chaining, memory system, and control / static scheduling. ONly then do we do the physical view.
+\autoref{fig:overview} shows an overview of the CraterLake architecture. We first
+explain its key elements, and then explain why this is the right architecture
+for FHE by considering design alternatives.
 
 \subsection{Logical Organization}
 
 \paragraph{Vector FUs and data types:}
-\name is a vector processor with specialized functional units (FUs) tailored to FHE operations.
-\name includes fast vector FUs for modular additions, modular multiplications, NTTs, and automorphisms,
-which are adapted from F1~\cite{feldmann:micro21:f1}.
-In addition, \name contributes two novel FUs:
-a Change-RNS-Base unit (CRB) that accelerates the bulk of boosted keyswitching,
-and a Keyswitch hint generator (KSHGen) that generates half of each keyswitch
-hint on the fly, reducing memory traffic and on-chip storage.
+CraterLake is a vector processor with specialized functional units (FUs)
+tailored to FHE operations. CraterLake includes fast vector FUs for modular
+additions, modular multiplications, NTTs, and automorphisms, which are adapted
+from F1. In addition, CraterLake contributes two novel FUs: a Change-RNS-Base
+unit (CRB) that accelerates the bulk of boosted keyswitching, and a Keyswitch
+hint generator (KSHGen) that generates half of each keyswitch hint on the fly,
+reducing memory traffic and on-chip storage.
 
 \figOverview
 
-\name implements a \emph{single} set of vector FUs
-that process vectors of a \emph{configurable length} $N$,
-which can be any power of 2 from 2,048 to 65,536.
-Each vector represents one residue polynomial, so vector elements
-have a fixed, narrow width (28 bits in our implementation).
-\name has a large number of \emph{vector lanes} $E$, 2,048 in our implementation.
-All FUs are \emph{fully pipelined}, consuming and producing $E$=2,048 elements/cycle.
-Each vector is fed to an FU in $N/E$ consecutive cycles.
+CraterLake implements a \emph{single} set of vector FUs that process vectors of
+a \emph{configurable length} $N$, which can be any power of 2 from 2,048 to
+65,536. Each vector represents one residue polynomial, so vector elements have
+a fixed, narrow width (28 bits in our implementation). CraterLake has a large
+number of \emph{vector lanes} $E$, 2,048 in our implementation. All FUs are
+\emph{fully pipelined}, consuming and producing $E$=2,048 elements/cycle. Each
+vector is fed to an FU in $N/E$ consecutive cycles.
 
-% nikola: A ciphertext at Nmax, Lmax: 2 * 64*1024 * 60 * 28 = 26.25 MB
-% 256 / 26.25 = 9.75 ciphertexts on chip (close enough to 10)
 \paragraph{Memory system:}
-\name's on-chip storage is organized as a single-level \emph{256\,MB} register
-file shared by all FUs.
-While this amount of storage might appear excessive, it fits \emph{just 10
-ciphertexts} at the largest parameters \name targets ($\Nmax$=64K, $\Lmax$=60),
-and smaller register files severely limit performance, as we show in
-\autoref{sec:sensitivity}.
-The register file uses an \emph{element-partitioned}
+CraterLake's on-chip storage is organized as a single-level \emph{256\,MB}
+register file shared by all FUs. While this amount of storage might appear
+excessive, it fits \emph{just 10 ciphertexts} at the largest parameters
+CraterLake targets ($\Nmax$=64K, $\Lmax$=60), and smaller register files
+severely limit performance, as we show in \autoref{sec:sensitivity}. The
+register file uses an \emph{element-partitioned}
 design~\cite{asanovic:ucb98:vector} to efficiently emulate 12 read and write
-ports.
-Still, this is only half of the 24 input ports of our FUs.
-% alex: 5x2 (adders) + 5x2 (mult) + 1x1 (crb) + 2x1 (NTT) + 1x1 (auto).
-We bridge this gap by allowing FUs to be \emph{chained} to form multi-FU pipelines
-that execute more complex operations.
+ports. Still, this is only half of the 24 input ports of our FUs. We bridge
+this gap by allowing FUs to be \emph{chained} to form multi-FU pipelines that
+execute more complex operations.
 
-\name uses high-bandwidth main memory (HBM2E in our implementation).
-Memory controllers interface directly with register file banks.
-The system uses decoupled data orchestration~\cite{pellauer:asplos19:buffets} to hide memory latency:
-memory transfers are performed independently of compute operations,
+CraterLake uses high-bandwidth main memory (HBM2E in our implementation).
+Memory controllers interface directly with register file banks. The system uses
+decoupled data orchestration~\cite{pellauer:asplos19:buffets} to hide memory
+latency: memory transfers are performed independently of compute operations,
 staging ciphertexts in the register file ahead of their use.
 
-
 \paragraph{Static control:}
-\name hardware is \emph{statically scheduled} to leverage the regularity of FHE operations.
-All operations have a fixed latency, and the compiler is responsible for scheduling
-all operations and memory transfers to respect all data dependencies.
-This avoids the need for hardware to implement any dynamic control
-mechanisms, like backpressure or stalling logic, and enables \name to support
-very wide vector FUs with minimal control plane overheads.
+CraterLake hardware is \emph{statically scheduled} to leverage the regularity
+of FHE operations. All operations have a fixed latency, and the compiler is
+responsible for scheduling all operations and memory transfers to respect all
+data dependencies. This avoids the need for hardware to implement any dynamic
+control mechanisms, like backpressure or stalling logic, and enables CraterLake
+to support very wide vector FUs with minimal control plane overheads.
 
 \subsection{Physical Organization}
 \label{sec:tiling}
 Implementing an $E$=2,048-lane vector processor naively would result in
-prohibitive on-chip traffic.
-\name addresses this by splitting its lanes into $G$=8 \emph{lane groups}.
-Each lane group is $E_G$=256 elements wide and occupies a physically distinct region
-of the chip, as \autoref{fig:overview} shows.
-As lane groups contain both FU lanes and register file banks, the majority of
-data movement can be performed locally within each group.
+prohibitive on-chip traffic. CraterLake addresses this by splitting its lanes
+into $G$=8 \emph{lane groups}. Each lane group is $E_G$=256 elements wide and
+occupies a physically distinct region of the chip, as \autoref{fig:overview}
+shows. As lane groups contain both FU lanes and register file banks, the
+majority of data movement can be performed locally within each group.
 
 Splitting lanes into groups is challenging because NTTs and
 
-% HACK(dsm): Fix bad break
 \noindent automorphisms have all-to-all dependencies between vector elements,
-requiring communication among lane groups.
-Luckily, F1~\cite{feldmann:micro21:f1} showed that these
-dependencies can be mapped to \emph{transposes} (one per NTT and two
-per automorphism).
-But F1's implementation of transposes does not scale to this many lanes.
-To address this challenge, we contribute a new transpose implementation that
-performs all data movement between lane groups
-through a simple \emph{fixed permutation network}.
-Supporting \name's compute throughput requires this network to have a
-total bandwidth of $4E$ elements per cycle (29\,TB/s).
-% nikola + alex: calculation for a single network:
-% 28 bits/elem * 2048*7/8 elems/cycle * 10^9 cycles/second * 1/(8*10^12) TB/bit = 6.272 TB/s
-% across four networks: 4 * 6.272 = 25.088 TB/s
-% The formula doesn't include the 7/8 factor and produces 28.672 TB/S
+requiring communication among lane groups. Luckily, F1 showed that these
+dependencies can be mapped to \emph{transposes} (one per NTT and two per
+automorphism). But F1's implementation of transposes does not scale to this
+many lanes. To address this challenge, we contribute a new transpose
+implementation that performs all data movement between lane groups through a
+simple \emph{fixed permutation network}. Supporting \name's compute throughput
+requires this network to have a total bandwidth of $4E$ elements per cycle
+(29\,TB/s).
 
 \subsection{Comparison to Prior Work}
 \label{sec:comparison}
 
-% \paragraph{On-chip storage:}
-% Homomorphic operations experience dependencies both across all elements
-% of the same residue polynomial (due to NTTs and automorphisms) and across
-% tntify the impact the size of the register file has on performance in
-% \autoref{sec:sensitivity}.
-% he same element of all residue polynomials (due the CRB)
-% Storing intermediate results off-chip is not feasible as matching \name's
-% compute throughput would require 26\,TB/s of off-chip bandwidth, an order
-% of magnitude more than what's available.
-% \name avoids this by using a large register file that is capable of holding
-% several full ciphertexts at a time.
+As CraterLake implements a single set of $E$=2,048-lane FUs, all of its lane
+groups operate in tandem on different parts of the \emph{same} residue
+polynomial. The only operations that require communication among lane groups
+are NTTs and automorphisms, which need $E$ and $2E$ elements per cycle of
+bandwidth, respectively (\autoref{sec:network}). This is at most 29\,TB/s for
+the 2 NTTs and 1 automorphism unit in \name; each homomorphic multiplication
+and rotation transfer $8NL$ and $10NL$ words among lane groups, respectively.
 
-As \name implements a single set of $E$=2,048-lane FUs, all of its lane groups
-operate in tandem on different parts of the \emph{same} residue polynomial.
-The only operations that require communication among lane groups are NTTs and automorphisms,
-which need $E$ and $2E$ elements per cycle of bandwidth, respectively (\autoref{sec:network}).
-This is at most 29\,TB/s for the 2 NTTs and 1 automorphism unit in \name;
-each homomorphic multiplication and rotation transfer $8NL$ and $10NL$ words among lane groups, respectively.
-% alex: for homomorphic rotate; mults are 8NL
+In contrast, prior work implements multiple independent \emph{compute clusters}
+(analogous to our lane groups), and assigns all elements of each residue
+polynomial to a compute cluster~\cite{riazi:asplos20:heax,feldmann:micro21:f1}.
+This makes each NTT and automorphism local to a cluster, but each keyswitch
+requires all-to-all communication of residue polynomials at a rate of $GE$
+elements per cycle, where $G$ is the number of clusters; in total, each
+homomorphic operation transfers $3GNL$ words among clusters. Thus, this
+approach scales poorly. Specifically, for $G$=8 (as we use in \name), it
+requires double the peak bandwidth of our approach (57\,TB/s), and incurs over
+2.4$\times$ more traffic per homomorphic operation. More importantly, this
+approach requires a complex network between clusters, 16$\times$ larger than
+our fixed permutation network (\autoref{sec:methodology}).
 
-In contrast, prior work implements multiple independent \emph{compute clusters} (analogous to our lane groups),
-and assigns all elements of each residue polynomial to a compute cluster~\cite{riazi:asplos20:heax,feldmann:micro21:f1}.
-This makes each NTT and automorphism local to a cluster, but
-each keyswitch requires all-to-all communication of residue polynomials at a rate of $GE$ elements per cycle,
-where $G$ is the number of clusters;
-in total, each homomorphic operation transfers $3GNL$ words among clusters.
-%an all-to-all broadcast of $G \cdot E$ elements per cycle during
-%\verb!changeRNSBase()! (\autoref{listing:boostedKeyswitching}).
-Thus, this approach scales poorly.
-Specifically, for $G$=8 (as we use in \name), it requires double the peak
-% alex: it is _exactly_ double; the off-by-one is due to rounding
-bandwidth of our approach (57\,TB/s), and incurs over 2.4$\times$ more
-traffic per homomorphic operation.
-% alex: it's 2.4x per rotate and 3x per multiply.
-% dsm: For revision; adding to hammer the point, and because it is space-neutral due to breaks
-More importantly, this approach requires a complex network between clusters,
-16$\times$ larger than our fixed permutation network (\autoref{sec:methodology}).
-
-Additionally, having all lane groups operate in lockstep reduces on-chip storage requirements,
-as we can dedicate the whole chip to a single homomorphic operation at a time.
-By contrast, using compute clusters well often requires overlapping multiple homomorphic operations,
-which adds to footprint.
-%In contrast, if each lane group operated independently, on-chip storage requirements would
-%increase by $G\times$.
+Additionally, having all lane groups operate in lockstep reduces on-chip
+storage requirements, as we can dedicate the whole chip to a single homomorphic
+operation at a time. By contrast, using compute clusters well often requires
+overlapping multiple homomorphic operations, which adds to footprint.
 
 Finally, our approach makes the compiler's job easier: it only needs to decide
-on a single polynomial operation to run at a time, instead of needing to orchestrate
-for parallelism by scheduling multiple operations across clusters. 
+on a single polynomial operation to run at a time, instead of needing to
+orchestrate for parallelism by scheduling multiple operations across clusters.
 This keeps the compiler simple and utilization high.
 
