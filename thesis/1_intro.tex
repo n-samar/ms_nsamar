@@ -45,7 +45,7 @@ be addressed with hardware acceleration: \emph{if a specialized FHE accelerator
 provides large speedups over software execution, it can bridge most of this
 performance gap and enable new use cases.}
 
-\section{General FHE Opportunities and Challenges}
+\section{Challenges of FHE Acceleration}
 \label{sec:general}
 
 For an FHE accelerator to be broadly useful, it should be programmable, i.e.,
@@ -63,13 +63,14 @@ We identify three key characteristics of FHE that drive our architectures:
 
 \noindent \textbf{\emph{(1) Complex operations on long vectors:}}
 FHE encodes information using very large vectors, several thousand elements
-long, and processes them using modular arithmetic. Therefore, an FHE accelerator should employs \emph{vector
-processing} with \emph{wide functional units} tailored to FHE operations to
-achieve large speedups. The challenge is that two key operations on these
-vectors, the Number-Theoretic Transform (NTT) and automorphisms, are not
-element-wise and require complex dataflows that are hard to implement as vector
-operations. To tackle these challenges, we specialize the NTT units and present
-the first vector implementation of an automorphism functional unit.
+long, and processes them using modular arithmetic. Therefore, an FHE
+accelerator can employ \emph{vector processing} with \emph{wide functional
+units} tailored to FHE operations to achieve large speedups. The challenge is
+that two key operations on these vectors, the Number-Theoretic Transform (NTT)
+and automorphisms, are not element-wise and require complex dataflows that are
+hard to implement as vector operations. To tackle these challenges, we
+specialize the NTT units and present the first vector implementation of an
+automorphism functional unit.
 
 \noindent \textbf{\emph{(2) Regular computation:}}
 FHE programs are dataflow graphs of arithmetic operations on vectors. All
@@ -94,7 +95,7 @@ the bottleneck for most FHE programs. Therefore, the primary goal of an FHE
 accelerator should be to
 minimize data movement. To that end, we design our accelerators to:
 \begin{compactenum}
-\item Use a large and explicitly managed on-chip scratchpad.
+\item Use a large and explicitly managed on-chip storage.
 \item Decouple data movement. This allows us to hide access latencies by
     loading data far ahead of its use.
 \item Focus on maximizing operand reuse when scheduling operations. This reduces
@@ -203,7 +204,16 @@ addresses F1's shortcomings by contributing:
     concurrent operations with few register ports.
 \end{compactitem}
 
-We evaluate CraterLake on a broad range of FHE benchmarks, including programs
+We implement the main components of F1 and CraterLake in RTL and synthesize
+them in a commercial 14nm/12nm process. F1's area budget is modest
+(151\,mm$^2$) and delivers good performance, but is insufficient for deep FHE
+benchmarks. CraterLake, a 472\,mm$^2$ chip, is sufficient to effectively
+accelerate unbounded depth FHE programs. We evaluate both accelerators using
+cycle-accurate simulation running complete FHE applications.
+
+F1 shows gmean 5,400$\times$ speedup on shallow benchmarks over
+state-of-the-art CPU baselines. Aside from these shallow benchmarks, we
+evaluated CraterLake on a broad range of FHE benchmarks, including programs
 with high multiplicative depth that require bootstrapping. CraterLake
 outperforms a scaled-up and improved version of F1, by gmean 11.2$\times$ on
 these deep computations, and is 4,600$\times$ faster than a 32-core CPU. These
@@ -211,11 +221,3 @@ speedups enable new use cases for FHE. For example, deep neural networks like
 ResNet take 23 minutes per inference on the CPU, whereas \name achieves 250
 \emph{milliseconds} per inference, enabling real-time private deep learning.
 
-We implement the main components of F1 and CraterLake in RTL and synthesize
-them in a commercial 14nm/12nm process. We evaluate both accelerators using
-cycle-accurate simulation running complete FHE applications.
-
-While F1's area budget is modest (151\,mm$^2$) and delivers good performance,
-we will show it is insufficient for deep FHE benchmarks. By proposing
-CraterLake, we show that a 472\,mm$^2$ chip is sufficient to effectively
-accelerate unbounded depth FHE programs.
