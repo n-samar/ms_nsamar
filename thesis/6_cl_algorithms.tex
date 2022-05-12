@@ -1,38 +1,37 @@
 \section{Compiler}\label{sec:algorithmicInsights}
 \label{sec:compiler}
 
-CraterLake's compiler's are similar to those of F1's compiler: it uses
-high-level programs as inputs, and seeks to minimize and decouple off-chip data
-movement, which are critical. However, CraterLake's compiler is substantially
-simpler and achieves higher utilization. This is because CraterLake has a
-simpler interface than F1: CraterLake exposes a single set of wide-vector
-functional units, whereas F1 organizes narrower FUs into several independent
-compute clusters and has two levels of on-chip storage (per-cluster register
-files and a shared scratchpad). Thus, F1's compiler must distribute a single
-homomorphic operation among multiple clusters, and must often overlap many
-homomorphic operations. This distributed design creates complex scheduling
-problems, e.g., trading off load balance and utilization for reuse, which
-CraterLake's architecture obviates.
+CraterLake's compiler is similar to that of F1: it uses high-level programs as
+inputs, and seeks to minimize and decouple off-chip data movement, which are
+critical. However, CraterLake's compiler is both simpler and achieves higher
+utilization. This is because CraterLake has a simpler interface than F1:
+CraterLake exposes a single set of wide-vector functional units, whereas F1
+organizes narrower FUs into several independent compute clusters and has two
+levels of on-chip storage (per-cluster register files and a shared scratchpad).
+Thus, F1's compiler must distribute a single homomorphic operation among
+multiple clusters, and must often overlap many homomorphic operations. This
+distributed design creates complex scheduling problems, e.g., trading off load
+balance and utilization for reuse, which CraterLake's architecture obviates.
 
-The compiler first translates each homomorphic operation into a sequence of
-simpler operations on ciphertext polynomials. To achieve high utilization, the
-compiler implements keyswitching as a sequence of up to five FU pipelines,
-leveraging vector chaining (\autoref{sec:keyswitchingPipeline}). Thus, each
-keyswitching operation is expressed as a sequence of up to five complex
-operations. All other ciphertext polynomial computations are translated to
-individual multiplication, addition, and automorphism operations, which use a
-single FU and read and write to the register file.
+CraterLake's compiler first translates each homomorphic operation into a
+sequence of simpler operations on ciphertext polynomials. To achieve high
+utilization, the compiler implements keyswitching as a sequence of up to five
+FU pipelines, leveraging vector chaining (\autoref{sec:keyswitchingPipeline}).
+Thus, each keyswitching operation is expressed as a sequence of up to five
+complex operations. All other ciphertext polynomial computations are translated
+to individual multiplication, addition, and automorphism operations, which use
+a single FU and read and write to the register file.
 
 The compiler then schedules memory accesses and compute operations
 cycle-by-cycle. Off-chip loads are scheduled greedily: any time the memory is
 free, the scheduler traverses operations in order and fetches the first operand
 that it finds~is off-chip. If this operand requires evicting a live value,
-that~value is written back first. We follow Belady's MIN~\cite{belady1966study}
-and evict~the operand reused the furthest. The load is deferred if the victim
-operand is used earlier than the loaded operand, or if the loaded operand would
-have to be evicted before its use. Each operation is then scheduled on the
-earliest cycle where its input operands and its FU (or FUs for keyswitch
-pipelines) are available.
+that~value is written back first. Following the approach in F1, we follow
+Belady's MIN~\cite{belady1966study} and evict the operand reused the furthest.
+The load is deferred if the victim operand is used earlier than the loaded
+operand, or if the loaded operand would have to be evicted before its use. Each
+operation is then scheduled on the earliest cycle where its input operands and
+its FU (or FUs for keyswitch pipelines) are available.
 
 This procedure produces a cycle-by-cycle schedule of all operations and data
 transfers. This schedule is then transformed into the configuration streams for

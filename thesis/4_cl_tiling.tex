@@ -29,7 +29,7 @@ vector is fed to an FU in $N/E$ consecutive cycles.
 CraterLake's on-chip storage is organized as a single-level \emph{256\,MB}
 register file shared by all FUs. While this amount of storage might appear
 excessive, it fits \emph{just 10 ciphertexts} at the largest parameters
-CraterLake targets ($\Nmax$=64K, $\Lmax$=60), and smaller register files
+CraterLake targets ($\Nmax = 64K$, $\Lmax = 60$), and smaller register files
 severely limit performance, as we show in \autoref{sec:sensitivity}. The
 register file uses an \emph{element-partitioned}
 design~\cite{asanovic:ucb98:vector} to efficiently emulate 12 read and write
@@ -68,7 +68,7 @@ dependencies can be mapped to \emph{transposes} (one per NTT and two per
 automorphism). But F1's implementation of transposes does not scale to this
 many lanes. To address this challenge, we contribute a new transpose
 implementation that performs all data movement between lane groups through a
-simple \emph{fixed permutation network}. Supporting \name's compute throughput
+simple \emph{fixed permutation network}. Supporting CraterLake's compute throughput
 requires this network to have a total bandwidth of $4E$ elements per cycle
 (29\,TB/s).
 
@@ -80,7 +80,7 @@ groups operate in tandem on different parts of the \emph{same} residue
 polynomial. The only operations that require communication among lane groups
 are NTTs and automorphisms, which need $E$ and $2E$ elements per cycle of
 bandwidth, respectively (\autoref{sec:network}). This is at most 29\,TB/s for
-the 2 NTTs and 1 automorphism unit in \name; each homomorphic multiplication
+the 2 NTTs and 1 automorphism unit in CraterLake; each homomorphic multiplication
 and rotation transfer $8NL$ and $10NL$ words among lane groups, respectively.
 
 In contrast, prior work implements multiple independent \emph{compute clusters}
@@ -90,7 +90,7 @@ This makes each NTT and automorphism local to a cluster, but each keyswitch
 requires all-to-all communication of residue polynomials at a rate of $GE$
 elements per cycle, where $G$ is the number of clusters; in total, each
 homomorphic operation transfers $3GNL$ words among clusters. Thus, this
-approach scales poorly. Specifically, for $G$=8 (as we use in \name), it
+approach scales poorly. Specifically, for $G=8$ (as we use in CraterLake), it
 requires double the peak bandwidth of our approach (57\,TB/s), and incurs over
 2.4$\times$ more traffic per homomorphic operation. More importantly, this
 approach requires a complex network between clusters, 16$\times$ larger than

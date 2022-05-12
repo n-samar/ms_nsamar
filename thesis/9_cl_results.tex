@@ -116,7 +116,7 @@ sufficient~\cite{feldmann:micro21:f1,halevi2021bootstrapping,halevi2018faster,iz
 We now analyze the impact of meeting higher levels of security: 128-bit
 security, a commonly used
 target~\cite{albrecht:hesg18:standard,lee:2021:privacy,riazi:asplos20:heax}
-that can be efficiently achieved with $N$=64K, and 200-bit security, a very
+that can be efficiently achieved with $N =64K$, and 200-bit security, a very
 conservative target that requires using larger polynomials.
 
 \paragraph{128-bit security:}
@@ -130,8 +130,8 @@ To reach 128 bits of security with a polynomial degree of $N$=64K, we bootstrap
 twice as often as with 80 bits of security, i.e., target half the number of
 usable levels after bootstrapping. This allows using boosted keyswitching
 variants with a relatively small number of digits: we use 1-digit keyswitching
-for $L<$32, 2-digit keyswitching for 32$\leq L<$43, and 3-digit keyswitching
-for 43$\leq L$. As we bootstrap twice as often, we never go beyond $L$=51.
+for $L< 32$, 2-digit keyswitching for $32 \leq L< 43$, and 3-digit keyswitching
+for $43 \leq L$. As we bootstrap twice as often, we never go beyond $L =51$.
 
 \autoref{tbl:securebenchmarks} (left) shows that 128-bit security adds modest
 overheads: a 1.36$\times$ gmean slowdown, and a worst-case slowdown of
@@ -146,7 +146,7 @@ illustrates.
 \paragraph{Beyond 128-bit security:}
 Effectively supporting significantly more than 128-bit security requires using
 larger polynomials. Here, we evaluate a 200-bit security target, which requires
-doubling $N$ from 64K to 128K. Note that this security target is very
+doubling $N$ from $64K$ to $128K$. Note that this security target is very
 conservative, and not used in FHE benchmarks; we use it to study performance
 over a wide range of secuity levels.
 
@@ -154,8 +154,8 @@ CraterLake as evaluated so far support $N$ up to 64K natively, but larger
 vectors would require multiple passes through FUs and forgo FU chaining. We
 thus evaluate a CraterLake version that supports $N$ up to 128K natively. This
 requires modest hardware changes, chielfy \emph{(1)} the buffers in the CRB
-need to double, from 25$\,$MB to 50$\,$MB; and \emph{(2)} NTTs require an
-additional butterfly stage. These changes consume 31$\,$mm$^2$ of additional
+need to double, from 26.25$\,$MB to 52.5$\,$MB; and \emph{(2)} NTTs require an
+additional butterfly stage. These changes consume 27.4\,mm$^2$ of additional
 area, i.e., less than $7\%$ of chip area.
 
 \autoref{tbl:securebenchmarks} (right) reports the performance of deep
@@ -165,14 +165,14 @@ This is because doubling $N$ allows doubling the number of slots (plaintext
 elements) per ciphertext, which enables more computations to happen in
 parallel. For example, consider the ResNet benchmark: starting from the
 original benchmark, which uses $N$=64K ciphertexts and performs one inference
-at a time, it is easy to construct a ResNet benchmark that uses $N$=128K and
+at a time, it is easy to construct a ResNet benchmark that uses $N =128K$ and
 performs two inferences in parallel. In addition to doubling $N$, CraterLake
 achieves a 200-bit security by using higher-digit keyswitching.
 
 \autoref{tbl:securebenchmarks} shows that the 200-bit security target imposes
 additional overheads, incurring a 2.6$\times$ gmean slowdown over 80-bit
 security, and a worst-case slowdown of 4.35$\times$. Most of these slowdown are
-caused by the fact that using $N$=128K doubles the footprint of ciphertexts and
-KSHs over $N$=64K. This limits reuse opportunities and adds off-chip traffic.
+caused by the fact that using $N =128K$ doubles the footprint of ciphertexts and
+KSHs over $N =64K$. This limits reuse opportunities and adds off-chip traffic.
 While doubling the register file (to 512\,MB) would erase most of these
 overheads, it would add significant area.

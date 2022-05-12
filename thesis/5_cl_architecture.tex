@@ -9,8 +9,8 @@ and energy~(\autoref{sec:bitwidth}).
 
 \subsection{Change-RNS-Base (CRB) Unit}\label{sec:crb}
 
-As \autoref{sec:keyswitching} discussed, the CRB unit encapsulates the bulk of
-operations in keyswitching. The~CRB unit~(\autoref{fig:crb}) consists of many
+As \autoref{sec:boostedKeyswitching} discussed, the CRB unit encapsulates the bulk of
+operations in keyswitching. The CRB unit~(\autoref{fig:crb}) consists of many
 parallel multiply-and-accumulate pipelines that spatially unroll the inner loop
 of \verb!changeRNSBase()! (\autoref{listing:boostedKeyswitching}). The CRB unit
 exploits the high internal reuse in \verb!changeRNSBase()! to allow much higher
@@ -47,7 +47,7 @@ As half of each keyswitch hint (KSH) is pseudo-random, it can be generated on
 the fly from a small seed, halving KSH storage and bandwidth. While this
 optimization has been previously implemented in
 software~\cite{halevi:2020:design}, we propose the first hardware
-Keyswitch-Hint Generator (KSHGen).
+keyswitch hint generator (KSHGen).
 
 The KSHGen generates numbers uniformly distributed modulo some prime by
 sampling random bits from a cryptographic
@@ -162,7 +162,7 @@ CarterLake improves F1's design in two ways: First, since multiplier area and
 power scale \emph{quadratically} with bitwidth, CarterLake adopts a narrower,
 28-bit datapath (F1 uses 32 bits). We cannot reduce bitwidth any further
 because then there would not be enough NTT-friendly moduli to support the deep
-benchmarks \name targets (we need 2$\Lmax$=120 small moduli). Second, we
+benchmarks \name targets (we need $2\Lmax = 120$ small moduli). Second, we
 pipeline each multiplier to its energy-optimal point.
 
 Together, these approaches improve area per bit by 1.6$\times$ and energy per
