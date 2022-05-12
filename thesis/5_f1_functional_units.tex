@@ -6,7 +6,7 @@ first vectorized automorphism unit (\autoref{sec:automorphism}), the first
 fully-pipelined flexible NTT unit (\autoref{sec:fourStepNTT}), and a new
 simplified modular multiplier adapted to FHE (\autoref{sec:modMult}).
 
-\subsection{Automorphism unit}\label{sec:automorphism}
+\subsection{Automorphism Unit}\label{sec:automorphism}
 
 \figFOneAutomorphism
 
@@ -108,7 +108,7 @@ work: it uses standard SRAM memory, so it is dense without requiring complex
 custom SRAMs; it is fully pipelined; and it works for a wide range of
 dimensions.
 
-\subsection{Four-step NTT unit}\label{sec:fourStepNTT}
+\subsection{Four-Step NTT Unit}\label{sec:fourStepNTT}
 
 There are many ways to implement NTTs in hardware: an NTT is like an
 FFT~\cite{cooley:moc65:algorithm} but with a butterfly that uses modular
@@ -172,7 +172,7 @@ fully-pipelined four-step NTT unit, improving NTT performance by 1,600$\times$
 over the state of the art (\autoref{sec:perf}).
 
 
-\subsection{Optimized modular multiplier}\label{sec:modMult}
+\subsection{Optimized Modular Multiplier}\label{sec:modMult}
 \tblFOneModMult
 
 Modular multiplication computes $a\cdot b \textrm{ mod } q$. This is the most

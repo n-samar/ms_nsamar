@@ -142,7 +142,7 @@ Moreover, F1's speedups over the CPU are even larger than in full benchmarks.
 This is because microbenchmarks are pure compute, and thus miss the data
 movement bottlenecks of FHE programs.
 
-\subsection{Architectural analysis}
+\subsection{Architectural Analysis}
 
 To gain more insights into these results, we now analyze F1's data movement,
 power consumption, and compute.
@@ -187,7 +187,7 @@ maintain high compute intensity. The highest FU utilization happens at the end
 of the benchmark and is caused by processing the final (fully connected) layer,
 which is highly parallel and already has all inputs available on-chip.
 
-\subsection{Sensitivity studies}
+\subsection{Sensitivity Studies}
 \label{sec:sensitivity}
 
 \tblFOneSensitivity

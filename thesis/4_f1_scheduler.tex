@@ -62,7 +62,7 @@ instructions, meaning that register allocation algorithms simply could not
 scale to our required sizes~\cite{barany:odes2011:register,
 xu:sigplan2007:tetris, touati:ijpp2005:register, berson:pact1993:ursa}.
 
-\subsection{Translating the program to a dataflow graph}
+\subsection{Translating the Program to a Dataflow Graph}
 \label{sec:programming}
 
 We implement a high-level domain-specific language (DSL) for writing F1
@@ -103,7 +103,7 @@ aspect of the FHE implementation in the DSL: programs encode the desired noise
 budget ($L=16$ in our example), as the compiler does not automate noise
 management.
 
-\subsection{Compiling homomorphic operations}
+\subsection{Compiling Homomorphic Operations}
 
 The first compiler phase works at the level of the homomorphic operations
 provided by the DSL. It clusters operations to improve reuse, and translates
@@ -138,7 +138,7 @@ choice depends on $L$, the amount of keyswitch reuse, and load on FUs. The
 compiler leverages knowledge of operation order to estimate these and choose
 the right variant.
 
-\subsection{Scheduling data transfers}
+\subsection{Scheduling Data Transfers}
 \label{sec:datatransfers}
 
 The second compiler phase consumes an instruction-level dataflow graph and
@@ -169,7 +169,7 @@ replacement policy~\cite{belady1966study}. Evictions of dirty data add stores
 to the dataflow graph. When evicting a value, we add spill (either dirty or
 clean) and fill instructions to our dataflow graph.
 
-\subsection{Cycle-level scheduling}
+\subsection{Cycle-Level Scheduling}
 
 Finally, the cycle-level scheduler takes in the data movement schedule produced
 by the previous phase, and schedules all operations for all components
