@@ -1,6 +1,7 @@
-\section{F1 Architecture}\label{sec:arch}
+\section{F1 Architecture}\label{sec:f1_arch}
 
-\autoref{fig:f1arch} shows an overview of F1, which we derive from the insights in \autoref{sec:fhe_analysis}.
+\autoref{fig:f1arch} shows an overview of F1, which we derive from the insights
+in \autoref{sec:fhe_analysis}.
 
 \paragraph{Vector processing with specialized functional units:}
 F1 features wide-vector execution with functional units (FUs) tailored to
@@ -17,11 +18,11 @@ FHE polynomial sizes, so an RNS polynomial maps to a single vector. Larger
 polynomials (e.g., of 32K elements) can use multiple vectors.
 
 All FUs are \emph{fully pipelined}, so they achieve the same throughput of
-$E=$128 elements/cycle. FUs consume their inputs in contiguous chunks of $E$
+$E=128$ elements/cycle. FUs consume their inputs in contiguous chunks of $E$
 elements in consecutive cycles. This is easy for element-wise operations, but
-hard for NTTs and automorphisms. \autoref{sec:FUs} details our novel FU
+hard for NTTs and automorphisms. \autoref{sec:f1_fus} details our novel FU
 implementations, including the first vector implementation of automorphisms.
-Our evaluation shows that these FUs achieve much higher performance than those
+F1's evaluation shows that these FUs achieve much higher performance than those
 of prior work. This is important because, as we saw in
 \autoref{sec:fhe_analysis}, \emph{having fewer high-throughput FUs reduces
 parallelism and thus memory footprint}.

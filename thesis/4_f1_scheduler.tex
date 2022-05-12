@@ -1,4 +1,4 @@
-\section{Scheduling Data and Computation}\label{sec:scheduler}
+\section{Scheduling Data and Computation}\label{sec:f1_scheduler}
 
 We now describe F1's software stack, focusing on the new static scheduling
 algorithms needed to use hardware well.
@@ -112,10 +112,10 @@ them down to instructions.
 \paragraph{Ordering} homomorphic operations seeks to maximize the reuse of
 keyswitch hints, which is crucial to reduce data movement
 (\autoref{sec:fhe_analysis}). For instance, the program in \autoref{listing:mv}
-uses 15 different sets of keyswitch hint matrices: one for the multiplies (line
+uses 15 different sets of keyswitch hints: one for the multiplies (line
 12), and a different one for \emph{each} of the rotations (line 8). If this
 program was run sequentially as written, it would cycle through all 15
-keyswitching hints (which total 480\,MB, exceeding on-chip storage) four times,
+keyswitch hints (which total 480\,MB, exceeding on-chip storage) four times,
 achieving no reuse. Clearly, it is better to reorder the computation to perform
 all four multiplies, and then all four \texttt{Rotate(X, 1)}, and so on. This
 reuses each keyswitch hint four times.
@@ -133,23 +133,24 @@ where every instruction is tagged with a priority that reflects its global
 order.
 
 The compiler exploits algorithmic choice. Specifically, there are multiple
-implementations of keyswitching (\autoref{sec:fhe_analysis}), and the right
-choice depends on $L$, the amount of keyswitch reuse, and load on FUs. The
-compiler leverages knowledge of operation order to estimate these and choose
-the right variant.
+implementations of keyswitching (\autoref{sec:fhe_analysis},
+\autoref{sec:boostedKeyswitching}), and the right choice depends on $L$, the
+amount of keyswitch reuse, and load on FUs. The compiler leverages knowledge of
+operation order to estimate these and choose the right variant.
 
 \subsection{Scheduling Data Transfers}
 \label{sec:datatransfers}
 
-The second compiler phase consumes an instruction-level dataflow graph and
-produces an approximate schedule that includes data transfers decoupled from
-computation, minimizes off-chip data transfers, and achieves good parallelism.
-This requires solving an interdependent problem: when to bring a value into the
-scratchpad and which one to replace depends on the computation schedule; and to
-prevent stalls, the computation schedule depends on which values are in the
-scratchpad. To solve this problem, this scheduler uses a simplified model of
-the machine: it does not consider on-chip data movement, and simply treats all
-functional units as being directly connected to the scratchpad.
+The second phase of F1's compiler consumes an instruction-level dataflow graph
+and produces an approximate schedule that includes data transfers decoupled
+from computation, minimizes off-chip data transfers, and achieves good
+parallelism. This requires solving an interdependent problem: when to bring a
+value into the scratchpad and which one to replace depends on the computation
+schedule; and to prevent stalls, the computation schedule depends on which
+values are in the scratchpad. To solve this problem, this scheduler uses a
+simplified model of the machine: it does not consider on-chip data movement,
+and simply treats all functional units as being directly connected to the
+scratchpad.
 
 The scheduler is greedy, scheduling one instruction at a time. It considers
 instructions ready if their inputs are available in the scratchpad, and follows

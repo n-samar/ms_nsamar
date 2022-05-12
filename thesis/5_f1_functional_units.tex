@@ -1,5 +1,5 @@
 \section{Functional Units}
-\label{sec:FUs}
+\label{sec:f1_fus}
 
 In this section, we describe F1's novel functional units. These include the
 first vectorized automorphism unit (\autoref{sec:automorphism}), the first
@@ -12,15 +12,15 @@ simplified modular multiplier adapted to FHE (\autoref{sec:modMult}).
 
 Because F1 uses $E$ vector lanes, each residue polynomial is stored and
 processed as $G$ groups, or \emph{chunks}, of $E$ elements each ($N=G\cdot E$).
-An automorphism $\sigma_k$ maps the element at index $i$ to index $ki \textrm{
+An automorphism $\sigma_k$ maps the element at index $i$ to index $k\cdot i \textrm{
 mod } N$; there are $N$ automorphisms total, two for each odd $k < N$
 (\autoref{sec:fhe_operation}). The key challenge in designing an automorphism
 unit is that these permutations are hard to vectorize: we would like this unit
-to consume and produce $E=$128 elements/cycle, but the vectors are much longer,
-with $N$ up to 16\,K, and elements are permuted across different chunks.
+to consume and produce $E=128$ elements/cycle, but the vectors are much longer,
+with $N$ up to $16K$;w, and elements are permuted across different chunks.
 Moreover, we must support variable $N$ \emph{and} all automorphisms.
 
-Standard solutions fail: a 16\,K$\times$16\,K crossbar is much too large; a
+Standard solutions fail: a $16K\times16K$ crossbar is much too large; a
 scalar approach, like reading elements in sequence from an SRAM, is too slow
 (taking $N$ cycles); and using banks of SRAM to increase throughput runs into
 frequent bank conflicts: each automorphism ``spreads''~elements with a
@@ -39,7 +39,7 @@ different permutations, but with the same row/column structure.
 
 \figFOneautfu
 
-Our automorphism unit, shown in \autoref{fig:f1aut_fu}, uses this insight to be
+F1's automorphism unit, shown in \autoref{fig:f1aut_fu}, uses this insight to be
 both vectorized (consuming $E=128$ elements/cycle) and fully pipelined. Given a
 residue polynomial of $N=G\cdot E$ elements, the automorphism unit first
 applies the column permutation to each $E$-element input. Then, it feeds this
@@ -57,7 +57,7 @@ crossbars for the $E$-element permute row and column operations.
 \figFOneQuadrantSwap
 
 \paragraph{Transpose unit:}
-Our \textit{quadrant-swap transpose} unit transposes an $E \times E$ (e.g.,
+F1's \textit{quadrant-swap transpose} unit transposes an $E \times E$ (e.g.,
 $128\times 128$) matrix by recursively decomposing it into quadrants and
 exploiting the identity
 
@@ -75,7 +75,7 @@ exploiting the identity
 
 The basic building block is a $K \times K$ \textit{quadrant-swap} unit, which
 swaps quadrants \texttt{B} and \texttt{C}, as shown in
-\autoref{fig:f1quadrantSwap}(left). Operationally, the quadrant swap procedure
+\autoref{fig:f1quadrantSwap} (left). Operationally, the quadrant swap procedure
 consists of three steps, each taking $K/2$ cycles:
 \begin{compactenum}
 \item Cycle \texttt{i} in the first step reads \texttt{A[i]} and \texttt{C[i]}
@@ -112,10 +112,10 @@ dimensions.
 
 There are many ways to implement NTTs in hardware: an NTT is like an
 FFT~\cite{cooley:moc65:algorithm} but with a butterfly that uses modular
-multipliers. We implement $N$-element NTTs (from 1K to 16K) as a composition of
-smaller $E$=128-element NTTs, since implementing a full 16K-element NTT
-datapath is prohibitive. The challenge is that standard approaches result in
-memory access patterns that are hard to vectorize.
+multipliers. We implement $N$-element NTTs (from $1K$ to $16K$) as a
+composition of smaller $E$=128-element NTTs, since implementing a full
+$16K$-element NTT datapath is prohibitive. The challenge is that standard
+approaches result in memory access patterns that are hard to vectorize.
 
 \figFOneFourStepNTT
 
@@ -164,12 +164,12 @@ the Twiddle SRAM contents to do the post\hyp{}mul\-ti\-pli\-ca\-tion necessary
 to implement an inverse NCN in the first NTT (which is DIT); and we use the
 inverse NCN imple\-men\-ta\-tion via DIF NTT for the second NTT.
 
-The NTT unit is large: each of the 128-element NTTs requires $E(\log
-(E)-1)/2$=384 multipliers, and the full unit uses 1024 multipliers. But its
+The NTT unit is large: each of the 128-element NTTs requires $E \log
+(E)/2=448$ multipliers, and the full unit uses $1024$ multipliers. But its
 high throughput improves performance over many low-throughput NTTs
 (\autoref{sec:evaluation}). This is the first implementation of a
-fully-pipelined four-step NTT unit, improving NTT performance by 1,600$\times$
-over the state of the art (\autoref{sec:perf}).
+fully-pipelined four-step NTT unit, improving NTT performance by $1,600\times$
+over the state-of-the-art (\autoref{sec:perf}).
 
 
 \subsection{Optimized Modular Multiplier}\label{sec:modMult}
@@ -189,4 +189,4 @@ mutliplier stage from~\cite{mert:euromicro19:design}; this reduces area by 19\%
 and power by 30\% (\autoref{tbl:f1modMult}). The additional restriction on $q$
 is acceptable because FHE requires at most 10s of
 moduli~\cite{gentry:crypto2012:homomorphic}, and our approach allows for
-6,186~prime~moduli.
+$6186$ prime moduli.
