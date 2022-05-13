@@ -132,11 +132,10 @@ amount of intermediates. The end result is an instruction-level dataflow graph
 where every instruction is tagged with a priority that reflects its global
 order.
 
-The compiler exploits algorithmic choice. Specifically, there are multiple
-implementations of keyswitching (\autoref{sec:fhe_analysis},
-\autoref{sec:boostedKeyswitching}), and the right choice depends on $L$, the
-amount of keyswitch reuse, and load on FUs. The compiler leverages knowledge of
-operation order to estimate these and choose the right variant.
+The compiler exploits algorithmic choice. For example, in F1, the right choice
+between the boosted and standard keyswitching algorithm depends on $L$, the
+amount of keyswitch hint reuse, and load on FUs. The compiler leverages
+knowledge of operation order to estimate these and choose the right variant.
 
 \subsection{Scheduling Data Transfers}
 \label{sec:datatransfers}

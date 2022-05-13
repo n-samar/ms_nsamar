@@ -76,8 +76,6 @@ for realism. We also parallelize the CPU version so it can effectively use all
 available cores. DB Lookup is both deep and wide, so running it on F1 incurs
 substantial off-chip data movement.
 
-\addtocounter{table}{1}
-\tblFOneMicrobenchmark
 
 \subparagraph{Bootstrapping:} We evaluate bootstrapping benchmarks for BGV and
 CKKS. Bootstrapping takes an $L=1$ ciphertext with an exhausted noise budget
@@ -109,7 +107,6 @@ against HEAX~\cite{riazi:asplos20:heax}, the fastest prior accelerator.
 
 \tblFOneBenchmark
 
-
 \paragraph{Benchmarks:}
 \autoref{tbl:f1benchmark} compares the performance of F1 and the CPU on full
 benchmarks. It reports execution time in milliseconds for each program (lower
@@ -125,6 +122,8 @@ and a single inference on the more realistic LoLa-CIFAR network takes \emph{20
 minutes}. F1 brings this down to 241 \emph{milliseconds}, making real-time deep
 learning inference practical: when offloading inferences to a server, this time
 is comparable to the roundtrip latency between server and client.
+
+\tblFOneMicrobenchmark
 
 \paragraph{Microbenchmarks:}
 \autoref{tbl:f1microbenchmark} compares the performance of F1, the CPU, and

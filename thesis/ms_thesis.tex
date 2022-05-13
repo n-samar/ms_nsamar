@@ -116,6 +116,24 @@ results (\autoref{sec:f1_evaluation}).
 \input{6_f1_results}
 \let\cleardoublepage\clearpage % fram stackoverflow: https://stackoverflow.com/questions/491904/how-do-i-remove-blank-pages-coming-between-two-chapters-in-appendix
 
+\section{Summary}
+
+F1 tackles this challenge, accelerating full FHE computations by over 3-4
+orders of magnitude. This enables new use cases for FHE, like secure real-time
+deep learning inference.
+
+F1 is the first FHE accelerator that is programmable, i.e., capable of
+executing full FHE programs. In contrast to prior accelerators, which build
+fixed pipelines tailored to specific FHE schemes and parameters, F1 introduces
+a more effective design approach: it accelerates the \emph{primitive}
+computations shared by higher-level operations using novel high\hyp{}throughput
+functional units, and hardware and compiler are co-designed to minimize data
+movement, the key bottleneck. This flexibility makes \name broadly useful: the
+same hardware can accelerate all operations within a program, arbitrary FHE
+programs, and even multiple FHE schemes. In short, our key contribution is to
+show that, for FHE, we can achieve ASIC-level performance without sacrificing
+programmability.
+
 \chapter{CraterLake: An Accelerator for Efficient Unbounded Computation on Encrypted Data}\label{ch:craterlake}
 
 In this chapter, we present CraterLake, the first FHE accelerator that enables
@@ -139,6 +157,20 @@ scheduler (\autoref{sec:compiler}) implementation
 \input{7_cl_implementation}
 \input{8_cl_methodology}
 \input{9_cl_results}
+
+\section{Summary}
+
+For widespread adoption of FHE, accelerators must efficiently support deep
+computations. CraterLake is the first accelerator to achieve this. By adopting
+state-of-the-art algorithms and using them to design CraterLake, we target a
+new regime of FHE not explored by prior approaches. Through new architectural
+and compiler techniques, CraterLake addresses the overheads of deep
+computations and provides an order-of-magnitude speedups over prior
+accelerators, which scale poorly to the accelerator sizes required to process
+very large ciphertexts, and are inefficient on the algorithms needed by deep
+computations. As a result, CraterLake enables new applications for FHE, such as
+real-time inference using deep neural networks like ResNet or LSTMs.
+
 \input{10_related}
 \input{11_conclusion}
 

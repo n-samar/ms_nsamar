@@ -27,11 +27,10 @@ fall short. \autoref{sec:fhe_analysis} performs an \emph{architectural
 analysis} of standard keyswitching, a representative FHE kernel to reveal
 acceleration opportunities. \autoref{sec:deepChallenges} introduces the
 specific challenges of deep computation and explains why supporting operations
-on very large ciphertexts (up to 25\,MB) is critical for performance on deep
+on very large ciphertexts (of about 25\,MB) is critical for deep
 benchmarks. \autoref{sec:boostedKeyswitching} describes boosted keyswitching, a
 keyswitching algorithm needed for the large ciphertexts in deep computation.
-Finally, \autoref{sec:boostedSecurity} presents the performance-security
-trade-offs of boosted keyswitching. For concreteness, we \emph{introduce FHE
+ For concreteness, we \emph{introduce FHE
 using the CKKS scheme}, and briefly discuss other FHE schemes in
 \autoref{sec:fhe_others}.
 
@@ -45,7 +44,7 @@ operations and dependences are known in advance, and data-dependent branching
 is impossible.
 
 In FHE, unencrypted (plaintext) data values are always \emph{vectors}; in
-CKKS~\cite{brakerski:toct14:leveled}, each vector consists of $N/2$ fixed-point
+CKKS~\cite{brakerski:toct14:leveled}, each vector consists of fixed-point
 complex numbers. CKKS provides three operations on these vectors: element-wise
 \emph{addition}, element-wise \emph{multiplication}, and vector
 \emph{rotations}.
@@ -211,14 +210,14 @@ CKKS uses three noise management techniques in tandem: \emph{rescaling},
 
 \paragraph{Rescaling} changes the ciphertext from modulus~$Q$ to a modulus~$Q'
 < Q$, which reduces the noise proportionately. Rescaling is usually applied
-after each homomorphic multiplication, to reduce its noise blowup. This implies
-that ciphertexts with 512-bit coefficients have a multiplicative budget of
-about 16, assuming the rescale trims 32 bits. Rescaling not only trims noise
-but also makes computation more efficient over time, as narrower coefficients
-are cheaper to operate on. Ciphertexts run out of multiplicative depth when
-their coefficients become too narrow to support further operations (e.g., 32
-bits). In CKKS, the specific number of bits to drop per operation is not fixed,
-but depends on the precision that the application requires.
+after each homomorphic multiplication, to reduce its noise blowup. For example,
+if a ciphertext has 512-bit coefficients and rescaling trims 32 bits, the
+multiplicative budget is about 16. Rescaling not only trims noise but also
+makes computation more efficient over time, as narrower coefficients are
+cheaper to operate on. Ciphertexts run out of multiplicative depth when their
+coefficients become too narrow to support further operations (e.g., 32 bits).
+In CKKS, the specific number of bits to drop per operation is not fixed, but
+depends on the precision that the application requires.
 
 \paragraph{Modulo switching} has similar computation costs and effects to
 rescaling: it reduces ciphertext noise by narrowing its modulus. However,
@@ -255,7 +254,9 @@ budget, then bootstrapping is applied to refresh the ciphertext. For example,
 in our LSTM benchmark, computation starts with a multiplicative budget of 57
 and bootstrapping consumes the highest 35 levels (in red in
 \autoref{fig:bootstrapping}), leaving 22 levels for application computation (in
-blue in \autoref{fig:bootstrapping}).
+blue in \autoref{fig:bootstrapping}). How many levels should be budgeted for
+application computation per bootstrap presents a complex tradeoff that is
+discussed in detail in \autoref{sec:deepChallenges}.
 
 \section{Algorithmic Insights and Optimizations}\label{sec:algoInsights}
 \label{sec:fhe_optimizations}
@@ -271,11 +272,9 @@ $N$\hyp{}coefficient polynomial as input and returns an $N$\hyp{}element vector
 representing the input in the \textit{NTT domain}. Polynomial multiplication
 can be performed as element-wise multiplication in the NTT domain.
 Specifically,
-
 \begin{equation*}
     NTT(\mathfrak{a}\mathfrak{b}) = NTT(\mathfrak{a}) \odot NTT(\mathfrak{b}),
 \end{equation*}
-
 where $\odot$ denotes component-wise multiplication. (For this relation to hold
 with $N$\hyp{}point NTTs, a \emph{negacyclic}
 NTT~\cite{lyubashevsky:tact10:ideal} must be used (\autoref{sec:fourStepNTT}).)
@@ -287,7 +286,6 @@ implementations often store polynomials in the NTT domain rather than in their
 coefficient form \emph{across operations}, further reducing the number of NTTs.
 This is possible because the NTT is a linear transformation, so additions and
 automorphisms can also be performed in the NTT domain:
-
 \begin{align*}
     NTT(\sigma_k(\mathfrak{a})) &= \sigma_k(NTT(\mathfrak{a})) \\
     NTT(\mathfrak{a} + \mathfrak{b}) &= NTT(\mathfrak{a}) + NTT(\mathfrak{b})
@@ -479,7 +477,7 @@ synthetic programs.
 \figBootstrappingFrequency
 
 As we will see, F1 does not support ciphertexts this large, because \emph{(1)}
-it was designed to support ciphertexts up to $N=16K$, a polynomial degree that
+it is designed to support ciphertexts up to $N=16K$, a polynomial degree that
 does not provide enough security for ciphertexts at the multiplicative budgets
 required for deep FHE; and \emph{(2)} it is optimized for standard
 keyswitching, not boosted keyswitching. For example, F1 \emph{becomes
@@ -506,13 +504,8 @@ bandwidth and on-chip storage.
 
 As mentioned in \autoref{sec:drawbacks} and \autoref{sec:fhe_analysis}, F1 and
 prior accelerators are optimized for the \emph{standard} keyswitching
-algorithm, which is inefficient for the large ciphertexts we've shown are
-needed in \autoref{sec:deepChallenges}. Boosted keyswitching was originally
-proposed by Gentry et al.~\cite[Section 3.1]{gentry:crypto2012:homomorphic}. In
-fact, there are multiple variants of this algorithm~\cite[Section
-5.3.4]{halevi2020helib}, that we will collectively refer to as boosted
-keyswitching. FHE libraries targeting deep computations use boosted
-keyswitching~\cite{gentry:crypto2012:homomorphic,halevi2020helib,heaan,mouchet2020lattigo}.
+algorithm, which is inefficient for the large ciphertexts that deep FHE needs
+(\autoref{sec:deepChallenges}).
 
 The key innovation in boosted keyswitching is to expand the input polynomial to
 use wider coefficients. This simplifies the keyswitch hints and its application
@@ -654,8 +647,8 @@ tradeoffs. For instance, whereas CKKS supports fixed-point complex number
 plaintexts, BGV~\cite{brakerski:toct14:leveled} supports integers modulo a prime.
 
 B/FV~\cite{brakerski:crypto12:fully,fan:iacr12:somewhat} supports modular
-arithmetic similar to BGV. However, it encodes plaintexts in a way that makes
-modulus switching before homomorphic multiplication unnecessary, thus easing
+integers, similarly to BGV. However, it encodes plaintexts in a way that makes
+modulus switching on homomorphic multiplication unnecessary, thus easing
 programming (but forgoing the efficiency gains of modulo switching). And
 GSW~\cite{gentry:crypto13:homomorphic} features reduced, asymmetric noise
 growth under homomorphic multiplication, but encrypts a small amount of
