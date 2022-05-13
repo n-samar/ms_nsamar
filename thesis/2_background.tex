@@ -16,25 +16,24 @@ Brakerski-Gentry-Vaikuntanathan.}~Though these schemes differ in how they
 encrypt plaintexts, they all use the same data type for ciphertexts:
 polynomials where each coefficient is an integer modulo $Q$. This commonality
 makes it possible to build a single accelerator that supports multiple FHE
-schemes; CraterLake and F1 both support CKKS and BGV.
+schemes; F1 and CraterLake both support CKKS, BGV, and GSW.
 
 We describe FHE in a layered fashion: \autoref{sec:fhe_mapping} introduces
-FHE's intreface, i.e., its programming model and operations;
+FHE's intreface, i.e., its programming model and operations.
 \autoref{sec:fhe_operation} describes how FHE operations are
-\emph{implemented}; \autoref{sec:fhe_optimizations} presents implementation
-\emph{optimizations}; \autoref{sec:drawbacks} discusses how prior work falls
-short; \autoref{sec:fhe_analysis} performs an \emph{architectural analysis} of
-standard keyswitching, a representative FHE kernel to reveal acceleration
-opportunities; \autoref{sec:deepChallenges} introduces the specific challenges
-of deep computation and explains why supporting operations on very large
-ciphertexts (up to 25\,MB) is critical for performance on deep benchmarks;
-\autoref{sec:boostedKeyswitching} describes boosted keyswitching, a
-keyswitching algorithm that scales much better than the standard version to
-large ciphertexts necessary for deep computation; \autoref{sec:boostedSecurity}
-presents the performance-security trade-offs of boosted keyswitching.
-
-For concreteness, we \emph{introduce FHE using the CKKS scheme}, and briefly
-discuss other FHE schemes in \autoref{sec:fhe_others}.
+\emph{implemented}. \autoref{sec:fhe_optimizations} presents implementation
+\emph{optimizations}. \autoref{sec:drawbacks} discusses how prior accelerators
+fall short. \autoref{sec:fhe_analysis} performs an \emph{architectural
+analysis} of standard keyswitching, a representative FHE kernel to reveal
+acceleration opportunities. \autoref{sec:deepChallenges} introduces the
+specific challenges of deep computation and explains why supporting operations
+on very large ciphertexts (up to 25\,MB) is critical for performance on deep
+benchmarks. \autoref{sec:boostedKeyswitching} describes boosted keyswitching, a
+keyswitching algorithm needed for the large ciphertexts in deep computation.
+Finally, \autoref{sec:boostedSecurity} presents the performance-security
+trade-offs of boosted keyswitching. For concreteness, we \emph{introduce FHE
+using the CKKS scheme}, and briefly discuss other FHE schemes in
+\autoref{sec:fhe_others}.
 
 \section{FHE Interface}
 \label{sec:fhe_mapping}
@@ -81,43 +80,42 @@ and inputs to keep the model private, or use unencrypted weights, which does
 not protect the model but keeps inputs and inferences
 private~\cite{brutzkus:icml19:low}.
 
-\section{CKKS Implementation}
+\section{FHE Implementation}
 \label{sec:fhe_operation}
 
-We now describe how CKKS represents and processes encrypted data (ciphertexts).
-The implementation of each computation on ciphertext data is called a
-\emph{homomorphic operation}. For example, the \emph{homomorphic
+We now describe how encrypted data (ciphertexts) is represented and processed
+in FHE schemes. The implementation of each computation on ciphertext data is
+called a \emph{homomorphic operation}. For example, the \emph{homomorphic
 multiplication} of two ciphertexts yields another ciphertext that, when
-decrypted, is the element-wise multiplication of the encrypted plaintexts.
+decrypted, is the element-wise multiplication of the encrypted plaintexts. For
+concreteness, we introduce FHE using the CKKS scheme, and briefly discuss other
+FHE schemes in \autoref{sec:fhe_others}.
 
-\paragraph{Data types:}
-CKKS encodes each \emph{plaintext vector} of fixed-point complex numbers as a
-\emph{plaintext polynomial} with~$N$ coefficients modulo some prime $t$.
-We denote the plaintext space as~$R_t$, so
-
-\[\mathfrak{a} = a_0 + a_1x + ... + a_{N-1}x^{N-1} \in R_t\]
-
-is a plaintext polynomial. Each plaintext polynomial is encrypted into a ciphertext
-consisting of two \emph{ciphertext polynomials} of $N$ integer coefficients modulo some $Q \gg
-t$. Each ciphertext polynomial is a member of $R_Q$.
-
-\paragraph{Encryption and decryption:}
-Though encryption and decryption are performed by the client (so an FHE
-accelerator need not accelerate them), they are useful to understand. In CKKS,
-the \textit{secret key} is a polynomial $\mathfrak{s} \in R_Q$. To encrypt a
-plaintext $\mathfrak{m} \in R_t$, one samples a uniformly random $\mathfrak{a}
-\in R_Q$, an \emph{error} (or \emph{noise}) $\mathfrak{e} \in R_Q$ with small
-entries, and computes the ciphertext $ct$ as
+\paragraph{Encryption:} A ciphertext holds an encrypted vector of plaintext values.
+To create a ciphertext, the vector of plaintext values is first encoded, or \emph{packed},
+in a polynomial; this polynomial is then \emph{encrypted}.
+CKKS packs a plaintext vector of $ n = N/2$ complex fixed-point numbers
+into a degree-$(N-1)$ polynomial:
 
 \begin{equation*}
-  ct = (\mathfrak{a}, \mathfrak{b} = \mathfrak{a}\mathfrak{s} + t \mathfrak{e} + \mathfrak{m}).
+    (c_0, c_1, ..., c_n) \xmapsto{pack} \mathfrak{m} = k_0 + k_1x + ... + k_{N-1}x^{N-1} %\in R_q
 \end{equation*}
 
-Ciphertext $ct = (\mathfrak{a}, \mathfrak{b})$ is decrypted by recovering
-$\mathfrak{e}' = t\mathfrak{e} + \mathfrak{m} = \mathfrak{b} - \mathfrak{a}
-\mathfrak{s} \bmod{Q}$, and then recovering $\mathfrak{m} = \mathfrak{e}' \bmod
-t$.  Decryption is correct as long as~$\mathfrak{e}'$ does not ``wrap around''
-modulo~$Q$, i.e., its coefficients have magnitude less than~$Q/2$.
+$\mathfrak{m}$ is then encrypted into a ciphertext. Each ciphertext consists of
+$\mathfrak{ct}_0, \mathfrak{ct}_1$---two \emph{ciphertext polynomials}
+with coefficients modulo a \emph{ciphertext modulus} $Q$.
+Specifically, we encrypt $\mathfrak{m}$
+under a \emph{secret key} $\mathfrak{s}$
+by sampling a uniformly random $\mathfrak{a}$
+and a small \emph{error} $\mathfrak{e}$ ($\mathfrak{s}$, $\mathfrak{a}$, and $\mathfrak{e}$ are also polynomials):
+\begin{equation*}
+    \mathfrak{m} \xmapsto{encrypt} \mathfrak{ct} = (\mathfrak{ct}_0, \mathfrak{ct}_1) = (\mathfrak{a}, \mathfrak{a}\cdot\mathfrak{s}+\mathfrak{e}+\mathfrak{m})
+\end{equation*}
+
+The above process produces a \emph{fully-packed} ciphertext, i.e., one
+that encodes as many plaintext values as possible. It is possible
+(though almost always less efficient) to pack~fewer~values,
+producing a partially packed or unpacked (single-element) ciphertext.
 
 The security of any encryption scheme relies on the ciphertexts not revealing
 anything about the value of the plaintext (or the secret key). Without adding
@@ -128,13 +126,13 @@ assumptions)~\cite{lyubashevsky:tact10:ideal}.
 
 As we will see, homomorphic operations on ciphertexts increase their noise, so
 we can only perform a limited number of operations before the resulting noise
-becomes too large and makes decryption fail.  We later describe
-\emph{rescaling} (\autoref{sec:noisemgmt}), an important operation that keeps
-ciphertext noise growth in check. We will also describe bootstrapping
-(\autoref{sec:deepChallenges}), a special FHE algorithm that enables computing
-FHE programs of arbitrarily high multiplicative depth.
+becomes too large and makes decryption fail.  In \autoref{sec:noisemgmt} we
+describe techniques to keep this noise growth in check.
 
 \subsection{Homomorphic operations}
+
+CKKS supports the following homomorphic operations: element-wise additions,
+element-wise multiplications, and cyclic rotations.
 
 \paragraph{\\Homomorphic addition} of ciphertexts
 $ct_0 = (\mathfrak{a}_{0}, \mathfrak{b}_{0})$ and
@@ -196,20 +194,20 @@ That is, the automorphism permutation of the ciphertext coefficients induces a
 cyclic vector rotation of the plaintext vector encrypted by that ciphertext.
 
 
-\subsection{Managing Noise by Rescaling}
+\subsection{Managing Noise}
 \label{sec:noisemgmt}
 
-As mentioned above, FHE ciphertexts include some
-\emph{noise} or \emph{error} to ensure
-cryptographic privacy~\cite{lyubashevsky:tact10:ideal}. Noise compounds during
-homomorphic operations, which adds overheads. Noise increases primarily during
-ciphertext multiplications; each ciphertext can tolerate only a fixed amount of
-noise before decryption becomes impossible. Therefore, we say that the
-\emph{multiplicative depth} a ciphertext can tolerate is the ciphertext's
-\emph{multiplicative budget}.
+As mentioned above, FHE ciphertexts include some \emph{noise} or \emph{error}
+to ensure cryptographic privacy~\cite{lyubashevsky:tact10:ideal}. Noise
+compounds during homomorphic operations, which adds overheads. Noise increases
+primarily during ciphertext multiplications; each ciphertext can tolerate only
+a fixed amount of noise before decryption becomes impossible. Therefore, we say
+that the \emph{multiplicative depth} a ciphertext can tolerate is the
+ciphertext's \emph{multiplicative budget}.
 
-CKKS uses two noise management techniques in tandem: \emph{bootstrapping}
-(discussed in \autoref{sec:deepChallenges}) and \emph{rescaling}.
+CKKS uses two noise management techniques in tandem: \emph{rescaling} and
+\emph{bootstrapping}.
+
 
 \paragraph{Rescaling} changes the ciphertext from modulus~$Q$ to a
 modulus~$Q' < Q$, which reduces the noise proportionately. Rescaling is
@@ -236,6 +234,21 @@ quickly results in vectors so large that they cannot fit on-chip. Overall,
 ciphertext size grows quadratically with multiplicative budget, and compute
 cost cubically (inducing linear and quadratic overheads per plaintext element,
 respectively).
+
+
+\figBootstrapping
+
+\paragraph{Bootstrapping} is a procedure that refreshes the multiplicative
+budget of a ciphertext. Bootstrapping enables computations of arbitrary
+depth by separating them into regions of limited depth.
+
+\autoref{fig:bootstrapping} illustrates a typical evolution of a ciphertext's
+multiplicative budget during execution of a program: computation proceeds until
+the ciphertext runs out of budget, then bootstrapping is applied to refresh the
+ciphertext. For example, in our LSTM benchmark, computation starts with a
+multiplicative budget of 57 and bootstrapping consumes the highest 35 levels
+(in red in \autoref{fig:bootstrapping}), leaving 22 levels for application
+computation (in blue in \autoref{fig:bootstrapping}).
 
 \section{Algorithmic Insights and Optimizations}\label{sec:algoInsights}
 \label{sec:fhe_optimizations}
@@ -311,9 +324,10 @@ that limit algorithmic diversity.
 Most of these systems achieve limited speedups, about 10$\times$ over software
 baselines. HEAX~\cite{riazi:asplos20:heax} achieves larger speedups
 (200$\times$ vs.\ a single core). But since it is an FPGA implementation,
-HEAX's speedups aren't large enough for it to face memory bandwidth bottlenecks---a
-key issue our accelerators tackle. Further, HEAX builds a fixed hardware pipeline
-for \emph{standard keyswitching} (\autoref{sec:fhe_analysis}), a keyswitching
+HEAX's speedups aren't large enough for it to face memory bandwidth
+bottlenecks---a key issue our accelerators tackle. Further, HEAX achieves these
+speedups by overspecializing: it builds a fixed hardware pipeline for
+\emph{standard keyswitching} (\autoref{sec:fhe_analysis}), a keyswitching
 algorithm that does not scale well to large ciphertexts.
 
 \section{Standard Keyswitching}
@@ -325,15 +339,15 @@ operation, which is expensive and takes the majority of work in all our
 benchmarks.
 
 We focus on standard keyswitching in this section, a keyswitching algorithm
-that is the focus of F1 and prior work. In \autoref{sec:deepChallenges} we will
-motivate the need for large ciphertexts to support deep computation. We will
-then explain in \autoref{sec:boostedKeyswitching} why standard keyswitching
-works poorly for large ciphertexts and present \emph{boosted keyswitching}: a
-keyswitching algorithm that scales better to large ciphertexts necessary for
-deep FHE.
+that is the focus of F1 and prior accelerators. In \autoref{sec:deepChallenges}
+we will motivate the need for large ciphertexts to support deep computation. We
+will then explain in \autoref{sec:boostedKeyswitching} why standard
+keyswitching works poorly for large ciphertexts and present \emph{boosted
+keyswitching}: a keyswitching algorithm needed for the large ciphertexts used
+in deep FHE.
 
-Nonetheless, standard keyswitching is somewhat easier to present and the
-insights from this section still hold for boosted keyswitching.
+Nonetheless, standard keyswitching is somewhat easier to present and most of
+the insights from this section still hold for boosted keyswitching.
 
 \autoref{listing:keyswitch} shows an implementation of standard keyswitching.
 Standard keyswitching takes three inputs: a polynomial \texttt{x}, and two
@@ -407,79 +421,66 @@ low-throughput ones.
 Programmable FHE accelerators must support a wide range of parameters, both $N$
 (polynomial/vector sizes) and $L$ (number of residue polynomials, i.e., number
 of word-sized prime factors of $Q$). While $N$ is generally fixed for a single
-program, $L$ changes dynamically during execution of each program.
+program, $L$ changes dynamically during the execution of each program.
 
 \section{Challenges of Deep FHE Computation}
 \label{sec:deepChallenges}
 
-% nsamar: this needs to be deduplicated from noise management section above
-As mentioned in \autoref{sec:noisemgmt}, we say that the \emph{multiplicative
-depth} a ciphertext can tolerate is the ciphertext's \emph{multiplicative
-budget}.
+As mentioned in \autoref{sec:noisemgmt}, FHE schemes
+limit the overheads of deep computation through a procedure called
+bootstrapping that refreshes the multiplicative budget of a ciphertext.
+Bootstrapping enables computations of arbitrary depth by separating them into
+regions of limited depth. But bootstrapping is an expensive and deep
+computation, so it should happen infrequently.
 
-A high multiplicative depth computation can be supported by simply using
-ciphertexts with sufficiently high multiplicative budgets, but this adds major
-overheads. Specifically, as mentioned in \autoref{sec:noisemgmt} ciphertext
-size grows quadratically with multiplicative budget, and compute cost cubically
-(inducing linear and quadratic overheads per plaintext element, respectively).
-
-
-\paragraph{Bootstrapping:} FHE schemes limit the overheads of deep computation
-through a procedure called bootstrapping that refreshes the multiplicative
-budget of a ciphertext. Bootstrapping enables computations of arbitrary depth
-by separating them into regions of limited depth. But
-bootstrapping is an expensive and deep computation, so it should happen
-infrequently.
-
-\figBootstrapping
-
-\autoref{fig:bootstrapping} illustrates a typical evolution of a ciphertext's
-multiplicative budget during execution of a program: computation proceeds until
-the ciphertext runs out of budget, then bootstrapping is applied to refresh the
-ciphertext. For example, in our LSTM benchmark, computation starts with a
-multiplicative budget of 57 and bootstrapping consumes the highest 35 levels
-(in red in \autoref{fig:bootstrapping}), leaving 22 levels for application
-computation (in blue in \autoref{fig:bootstrapping}).
+We now analyze the ciphertext sizes (i.e., multiplicative budgets) needed for
+effective deep computation. We will show that F1 and prior accelerators do not
+effectively support large enough ciphertexts.
 
 \paragraph{Ciphertext sizes needed for deep FHE:}
-We now show that CraterLake supports the ciphertext sizes required for deep FHE, and
-why F1 and prior work fall short. \autoref{fig:bootstrappingFrequency} reports the
-cost per homomorphic operation (in scalar multiplies per homomorphic multiply,
-$y$-axis) of two deep programs, as a function of the maximum ciphertext size
-used ($x$-axis). This determines bootstrapping frequency: using larger
-ciphertexts requires less frequent bootstrapping.
-\autoref{fig:bootstrappingFrequency} also breaks down cost by that used for
-application computation (blue) and bootstrapping (red).
+\autoref{fig:bootstrappingFrequency} reports the cost per homomorphic operation
+(in scalar multiplies per homomorphic multiply, $y$-axis) of two deep programs,
+as a function of the maximum ciphertext size used ($x$-axis). This determines
+bootstrapping frequency: using larger ciphertexts requires less frequent
+bootstrapping. \autoref{fig:bootstrappingFrequency} also breaks down cost by
+that used for application computation (blue) and bootstrapping (red).
 
 The left plot is for a serial chain of multiplies, the worst case for
 bootstrapping cost, as the amount of computation between bootstrappings is
 minimal. Consequently, bootstrapping cost dominates. By contrast, the right
 plot is for a very wide graph with 100 multiplies per level, which converge to
 a single output after each level. This allows boostrapping to be amortized
-across many operations, a best-case scenario.
+across many operations, a best-case scenario. We set the ciphertext polynomial degree
+to $N=64K$ in order for the ciphertexts to have sufficient security at the
+multiplicative budgets required for bootstrapping (\autoref{sec:noisemgmt}).
 
 Crucially, the optimal choice of maximum ciphertext size (shown with a black
-dot) is in a narrow range for both extremes, between 20\,MB (right) and 26\,MB
+dot) is in a narrow range for both extremes, between the multiplicative budgets
+of $L=46$ or 20\,MB when $N=64K$ (right), and $L=60$ or 26\,MB when $N=64K$
 (left). This is because \emph{both} application computation and bootstrapping
 become more expensive with ciphertext size, so regardless of which dominates,
 once bootstrapping is infrequent enough, moving to larger ciphertexts only
 hurts performance.
 
-Thus, 20--26\,MB max ciphertexts are the sweet spot for most deep programs,
-which fall between these extremes. In practice, bootstrapping placement is
+Thus, multiplicative budgets of $L=46$ to $L=60$, i.e., 20--26\,MB ciphertexts
+are the sweet spot for most deep programs, which fall between these extremes.
+In practice, bootstrapping placement is
 NP-hard~\cite{benhamouda2017optimization}, because real FHE programs are not as
 regular. But all our benchmarks show a similar tradeoff curve to these
 synthetic programs.
 
 \figBootstrappingFrequency
 
-\emph{F1 and prior FHE accelerators cannot efficiently support ciphertexts this
-large}. For example, F1~\cite{feldmann:micro21:f1} \emph{becomes inefficient
-past 2\,MB}. Prior accelerators~\cite{riazi:asplos20:heax} are limited to even
-smaller values. This is insufficient to run even bootstrapping itself.
-(Although F1 supports \emph{unpacked} bootstrapping of ciphertexts that encode
-only a single element, this is $>$1,000$\times$ slower per element and thus
-impractical for full applications, as \autoref{sec:results} shows.)
+As we will see, F1 does not support ciphertexts this large, because \emph{(1)}
+it was designed to support ciphertexts up to $N=16K$, a polynomial degree that
+does not provide enough security for ciphertexts at the multiplicative budgets
+required for deep FHE; and \emph{(2)} it is optimized for standard
+keyswitching, not boosted keyswitching. For example, F1 \emph{becomes
+inefficient past 2\,MB}. Prior accelerators~\cite{riazi:asplos20:heax} are
+limited to even smaller values. This is insufficient to run even bootstrapping
+itself. (Although F1 supports \emph{unpacked} bootstrapping of ciphertexts that
+encode only a single element, this is $>$1,000$\times$ slower per element and
+thus impractical for full applications, as \autoref{sec:results} shows.)
 
 As we will see in \autoref{sec:architecture}, scaling to large ciphertexts
 necessary for deep computation is not merely a matter of scaling up hardware;
@@ -496,14 +497,14 @@ bandwidth and on-chip storage.
 
 \figKScompare
 
-As mentioned in \autoref{sec:fhe_analysis} and \autoref{sec:drawbacks}, F1 and
+As mentioned in \autoref{sec:drawbacks} and \autoref{sec:fhe_analysis}, F1 and
 prior accelerators are optimized for the \emph{standard} keyswitching
-algorithm, which is inefficient for large ciphertexts. Boosted keyswitching
-was originally proposed by Gentry et al.~\cite[Section
-3.1]{gentry:crypto2012:homomorphic}. In fact, there are multiple variants of
-this algorithm~\cite[Section 5.3.4]{halevi2020helib}, that we will collectively
-refer to as boosted keyswitching. FHE libraries targeting deep
-computations use boosted
+algorithm, which is inefficient for the large ciphertexts we've shown are
+needed in \autoref{sec:deepChallenges}. Boosted keyswitching was originally
+proposed by Gentry et al.~\cite[Section 3.1]{gentry:crypto2012:homomorphic}. In
+fact, there are multiple variants of this algorithm~\cite[Section
+5.3.4]{halevi2020helib}, that we will collectively refer to as boosted
+keyswitching. FHE libraries targeting deep computations use boosted
 keyswitching~\cite{gentry:crypto2012:homomorphic,halevi2020helib,heaan,mouchet2020lattigo}.
 
 The key innovation in boosted keyswitching is to expand the input polynomial to

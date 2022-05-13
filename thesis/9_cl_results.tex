@@ -59,11 +59,7 @@ of CRB.
 breaks down memory traffic by keyswitch hint (KSH), inputs, and intermediate
 loads and stores. We see that deep benchmarks incur a manageable amount of
 intermediate traffic, while shallow benchmarks have a sufficiently low
-footprint to cause no eviction of intermediates.\footnote{For some of the
-    shallow benchmarks from F1, the F1 paper~\cite{feldmann:micro21:f1} reports
-    higher input traffic than \autoref{fig:dataMovement}. This is because F1's
-    authors assumed plaintexts are the same size as ciphertexts (they are half
-the size of a ciphertext).}
+footprint to cause no eviction of intermediates.
 
 \paragraph{Power consumption.}
 \autoref{fig:power} shows the power breakdown for CraterLake and the total
@@ -112,7 +108,7 @@ more traffic than CraterLake's approach(\autoref{sec:comparison}).
 
 The benchmarks presented so far meet an 80-bit security level, which is often
 considered
-sufficient~\cite{feldmann:micro21:f1,halevi2021bootstrapping,halevi2018faster,izabachene2019practical,ji2019efficient}.
+sufficient~\cite{halevi2021bootstrapping,halevi2018faster,izabachene2019practical,ji2019efficient}.
 We now analyze the impact of meeting higher levels of security: 128-bit
 security, a commonly used
 target~\cite{albrecht:hesg18:standard,lee:2021:privacy,riazi:asplos20:heax}

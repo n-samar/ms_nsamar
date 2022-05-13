@@ -85,7 +85,7 @@ and rotation transfer $8NL$ and $10NL$ words among lane groups, respectively.
 
 In contrast, prior work implements multiple independent \emph{compute clusters}
 (analogous to our lane groups), and assigns all elements of each residue
-polynomial to a compute cluster~\cite{riazi:asplos20:heax,feldmann:micro21:f1}.
+polynomial to a compute cluster~\cite{riazi:asplos20:heax}.
 This makes each NTT and automorphism local to a cluster, but each keyswitch
 requires all-to-all communication of residue polynomials at a rate of $GE$
 elements per cycle, where $G$ is the number of clusters; in total, each

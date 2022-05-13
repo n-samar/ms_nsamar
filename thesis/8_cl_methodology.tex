@@ -82,7 +82,7 @@ ciphertext that packs a single element. This makes it shallower ($L{\leq}23$)
 and less computationally demanding, but performance per slot is a lot worse
 than fully packed bootstrapping. Thus, it isn't used much in practice. We
 include it because it is the bootstrapping benchmark used in
-F1~\cite{feldmann:micro21:f1}.
+F1.
 
 \paragraph{Compared systems:}
 We compare CraterLake with a CPU system. We use a 32-core, 64-thread, 3.5\,GHz
@@ -93,7 +93,7 @@ baseline (\autoref{sec:f1_methodology}) as we chose the baselines to match the
 area and power budgets of the respective accelerators.
 
 We also compare performance to prior accelerators, in particular to
-F1~\cite{feldmann:micro21:f1}. For fairness, we evaluate \emph{F1+}, a version
+F1. For fairness, we evaluate \emph{F1+}, a version
 of F1 that is scaled to a 256\,MB 32-bank scratchpad, 32 compute clusters with
 256 lanes each, and 1\,MB register file per cluster. This makes F1+ have the
 same or higher throughput on basic operations as CraterLake. However, F1+ takes
