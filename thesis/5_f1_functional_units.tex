@@ -60,7 +60,6 @@ crossbars for the $E$-element permute row and column operations.
 F1's \textit{quadrant-swap transpose} unit transposes an $E \times E$ (e.g.,
 $128\times 128$) matrix by recursively decomposing it into quadrants and
 exploiting the identity
-
 \begin{equation*}
   \left[ \begin{array}{c|c}
       \texttt{A} & \texttt{B}\\
@@ -185,7 +184,7 @@ multiplier~\cite{montgomery:mom85:modular} within NTTs can be improved by
 leveraging the fact that the possible values of modulus $q$ are restricted by
 the number of elements the NTT is applied to. We notice that if we only select
 moduli $q_i$, such that $q_i = -1 \textrm{ mod } 2^{16}$, we can remove a
-mutliplier stage from~\cite{mert:euromicro19:design}; this reduces area by 19\%
+multiplier stage from~\cite{mert:euromicro19:design}; this reduces area by 19\%
 and power by 30\% (\autoref{tbl:f1modMult}). The additional restriction on $q$
 is acceptable because FHE requires at most 10s of
 moduli~\cite{gentry:crypto2012:homomorphic}, and our approach allows for

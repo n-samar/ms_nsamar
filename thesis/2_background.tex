@@ -19,7 +19,7 @@ makes it possible to build a single accelerator that supports multiple FHE
 schemes; F1 and CraterLake both support CKKS, BGV, and GSW.
 
 We describe FHE in a layered fashion: \autoref{sec:fhe_mapping} introduces
-FHE's intreface, i.e., its programming model and operations.
+FHE's interface, i.e., its programming model and operations.
 \autoref{sec:fhe_operation} describes how FHE operations are
 \emph{implemented}. \autoref{sec:fhe_optimizations} presents implementation
 \emph{optimizations}. \autoref{sec:drawbacks} discusses how prior accelerators
@@ -40,7 +40,7 @@ using the CKKS scheme}, and briefly discuss other FHE schemes in
 FHE programs are \emph{dataflow graphs}: directed acyclic graphs where nodes
 are operations and edges represent data values. Data values are inputs,
 outputs, or intermediate values consumed by one or more operations. All
-operations and dependences are known in advance, and data-dependent branching
+operations and dependencies are known in advance, and data-dependent branching
 is impossible.
 
 In FHE, unencrypted (plaintext) data values are always \emph{vectors}; in
@@ -454,7 +454,7 @@ The left plot is for a serial chain of multiplies, the worst case for
 bootstrapping cost, as the amount of computation between bootstrappings is
 minimal. Consequently, bootstrapping cost dominates. By contrast, the right
 plot is for a very wide graph with 100 multiplies per level, which converge to
-a single output after each level. This allows boostrapping to be amortized
+a single output after each level. This allows bootstrapping to be amortized
 across many operations, a best-case scenario. We set the ciphertext polynomial degree
 to $N=64K$ in order for the ciphertexts to have sufficient security at the
 multiplicative budgets required for bootstrapping (\autoref{sec:noisemgmt}).
@@ -610,7 +610,7 @@ In $d$-digit keyswitching,
 \item The input polynomial is expanded by a factor $d/(1+d)$;
 \item Keyswitch hint footprint is proportional to $1+d$; and
 \item Compute operations outside of \texttt{changeRNSBase} also increase, e.g.,
-    multipications grow by a factor $1+d$; however, this is a minor effect,
+    multiplications grow by a factor $1+d$; however, this is a minor effect,
     because \texttt{changeRNSBase} dominates the number of operations
     (\autoref{tbl:opBalance}), and the total number of operations within
     \texttt{changeRNSBase} does not grow with the number of digits.

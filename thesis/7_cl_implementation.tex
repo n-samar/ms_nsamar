@@ -2,9 +2,16 @@
 
 \tblGF
 
-CraterLake's implementation parameters including the technology node,
-synthesis, SRAM design, and PHY estimates match those of F1
-(\autoref{sec:f1_implementation}).
+We implement CraterLake's components in RTL, and synthesized them in a
+commercial 14/12nm process using state-of-the-art tools. These include a
+commercial SRAM compiler that we use for register file banks.
+
+We target a configuration with area and power budgets similar to a
+modern GPU or server CPU. This design requires careful optimizations to limit
+power. We target 1\,GHz frequency for most components, and pipeline them to
+their energy-optimal points, using high-Vt cells and clock gating. Register
+file banks run double-pumped at 2\,GHz. This enables using single-ported
+SRAMs while serving up to two accesses per cycle and bank.
 
 \autoref{tbl:GF12} shows CraterLake's area and its breakdown by component.
 Overall, our CraterLake configuration requires 472\,mm$^2$. FUs occupy 51\% of

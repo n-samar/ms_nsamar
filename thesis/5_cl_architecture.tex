@@ -1,4 +1,4 @@
-\section{Microarchitecture}\label{sec:architecture}
+\section{CraterLake Microarchitecture}\label{sec:architecture}
 
 This section introduces \name's novel FUs, CRB (\autoref{sec:crb}) and KSHGen
 (\autoref{sec:prg}); presents the transpose network needed by NTT and
@@ -9,12 +9,14 @@ and energy~(\autoref{sec:bitwidth}).
 
 \subsection{Change-RNS-Base (CRB) Unit}\label{sec:crb}
 
+\figCRB
+
 As \autoref{sec:boostedKeyswitching} discussed, the CRB unit encapsulates the bulk of
 operations in keyswitching. The CRB unit~(\autoref{fig:crb}) consists of many
 parallel multiply-and-accumulate pipelines that spatially unroll the inner loop
 of \verb!changeRNSBase()! (\autoref{listing:boostedKeyswitching}). The CRB unit
 exploits the high internal reuse in \verb!changeRNSBase()! to allow much higher
-thorughput than independent multipliers and adders communicating through the
+throughput than independent multipliers and adders communicating through the
 register file. This is the same insight behind DNN accelerators like the
 TPU~\cite{jouppi:isca17:tpu} and Tensor Cores in
 GPUs~\cite{choquette2021nvidia}.
@@ -30,8 +32,6 @@ We size the CRB unit to handle the largest ciphertexts that we find in deep
 applications, $\Nmax$=64K and $\Lmax$=60. This results in 60 parallel pipelines
 with 27\,MB of total buffers. Smaller ciphertexts leave some of the CRB
 pipelines unused.
-
-\figCRB
 
 The CRB unit is by far CraterLake's largest FU: it consists of 120K scalar
 multipliers and adders, consuming 34\% of on-chip area. Despite its size, the
@@ -158,8 +158,8 @@ efficient multiplier design is crucial. RNS moduli $q_i$ must come from a set
 of restricted, \emph{NTT-friendly} primes. F1's FHE-specific multipliers
 exploit this to simplify logic.
 
-CarterLake improves F1's design in two ways: First, since multiplier area and
-power scale \emph{quadratically} with bitwidth, CarterLake adopts a narrower,
+CraterLake improves F1's design in two ways: First, since multiplier area and
+power scale \emph{quadratically} with bitwidth, CraterLake adopts a narrower,
 28-bit datapath (F1 uses 32 bits). We cannot reduce bitwidth any further
 because then there would not be enough NTT-friendly moduli to support the deep
 benchmarks \name targets (we need $2\Lmax = 120$ small moduli). Second, we

@@ -173,7 +173,7 @@ clean) and fill instructions to our dataflow graph.
 
 Finally, the cycle-level scheduler takes in the data movement schedule produced
 by the previous phase, and schedules all operations for all components
-considering all resource constraints and data dependences. This phase
+considering all resource constraints and data dependencies. This phase
 distributes computation across clusters and manages their register files and
 all on-chip transfers. Importantly, this scheduler is fully constrained by its
 input schedule's off-chip data movement. It does not add loads or stores in

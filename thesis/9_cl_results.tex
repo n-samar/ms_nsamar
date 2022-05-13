@@ -2,6 +2,8 @@
 
 \subsection{Performance}
 
+\tblBenchmarks
+
 \autoref{tbl:benchmarks} compares the performance of CraterLake, CPU, and F1+
 on deep and shallow benchmarks. It shows execution times and CraterLake's
 speedups over the CPU and F1+.
@@ -12,7 +14,7 @@ shallow benchmarks, showing that CraterLake provides robust gains across FHE
 program types.
 
 CraterLake achieves large speedups over F1+ on deep benchmarks, outperforming
-it by gmean 11.2$\times$ and up to 18.6$\times$. By contrast, CraterLke and F1+
+it by gmean 11.2$\times$ and up to 18.6$\times$. By contrast, CraterLake and F1+
 achieve comparable speeds on shallow benchmarks, with a gmean speedup of only
 1.34$\times$. These stark differences demonstrate that \emph{prior FHE
 accelerators are efficient only on shallow computations, and falter on deep
@@ -88,6 +90,7 @@ suffer severely from a smaller register file, incurring slowdowns of up to
 deep benchmarks. Finally, adding more on-chip storage leads to diminishing
 returns.
 
+\tblPerformanceBreakdown
 
 \paragraph{Effect of CraterLake's features:}
 \autoref{tbl:performanceBreakdown} shows the impact of our innovations by
@@ -101,7 +104,7 @@ throughput of F1+. \emph{Network} replaces CraterLake's fixed transpose network
 and polynomial tiling design with F1+'s crossbars and residue polynomial tiling
 design. Performance is up to 2$\times$ worse \emph{even though the F1+ network
 is 16$\times$ larger}, because residue polynomial tiling incurs 2.4$\times$
-more traffic than CraterLake's approach(\autoref{sec:comparison}).
+more traffic than CraterLake's approach (\autoref{sec:comparison}).
 
 \subsection{Performance vs.\ Target Security Level}
 \label{sec:moreSecurity}
@@ -144,12 +147,12 @@ Effectively supporting significantly more than 128-bit security requires using
 larger polynomials. Here, we evaluate a 200-bit security target, which requires
 doubling $N$ from $64K$ to $128K$. Note that this security target is very
 conservative, and not used in FHE benchmarks; we use it to study performance
-over a wide range of secuity levels.
+over a wide range of security levels.
 
 CraterLake as evaluated so far support $N$ up to 64K natively, but larger
 vectors would require multiple passes through FUs and forgo FU chaining. We
 thus evaluate a CraterLake version that supports $N$ up to 128K natively. This
-requires modest hardware changes, chielfy \emph{(1)} the buffers in the CRB
+requires modest hardware changes, chiefly \emph{(1)} the buffers in the CRB
 need to double, from 26.25$\,$MB to 52.5$\,$MB; and \emph{(2)} NTTs require an
 additional butterfly stage. These changes consume 27.4\,mm$^2$ of additional
 area, i.e., less than $7\%$ of chip area.

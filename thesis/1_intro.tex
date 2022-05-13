@@ -74,8 +74,8 @@ existing vector processors and GPUs achieve limited speedups for FHE.
 
 \noindent \textbf{\emph{(2) Regular computation:}}
 FHE programs are dataflow graphs of arithmetic operations on vectors. All
-operations and their dependences are known ahead of time (since data is
-encrypted, branches or dependences determined by runtime values are
+operations and their dependencies are known ahead of time (since data is
+encrypted, branches or dependencies determined by runtime values are
 impossible). An accelerator can exploit this by adopting \emph{static
 scheduling}: in the style of Very Long Instruction Word (VLIW) processors, all
 components have fixed latencies and the compiler is in charge of scheduling
@@ -110,15 +110,14 @@ accelerators to:
 FHE is a young and quickly developing field. As a result, there is abundant
 diversity in proposed schemes and algorithms. For example, keyswitching
 (\autoref{sec:fhe_analysis}, \autoref{sec:boostedKeyswitching}), a key FHE
-kernel, has many variants with diverse performance-security tradeoffs
-(\autoref{sec:boostedSecurity}). An effective FHE accelerator needs to support
-all these algorithms well, and be flexible enough to adapt to future advances
-in the field.
+kernel, has many variants with diverse performance-security tradeoffs. An
+effective FHE accelerator needs to support all these algorithms well, and be
+flexible enough to adapt to future advances in the field.
 
 \section{Contributions}
 \label{sec:contributions}
 
-This thesis presens two FHE accelerators: F1 and CraterLake. We first introduce
+This thesis presents two FHE accelerators: F1 and CraterLake. We first introduce
 F1, the first \emph{programmable} FHE accelerator. Then we explain why deep FHE
 computations require operating in a different regime from what F1 can
 effectively support. Finally, we present how CraterLake overcomes these issues,
@@ -128,19 +127,19 @@ depth}.
 \paragraph{F1} is a wide-vector processor with novel functional units deeply
 specialized to FHE primitives, such as modular arithmetic, number-theoretic
 transforms, and automorphisms. F1 is a multicore architecture, with compute
-logic organized into 16 identical clusters connected by an on-chip network.
-This organization provides so much compute throughput that data movement
-becomes the key bottleneck. Thus, F1 is primarily designed to minimize data
-movement. Hardware provides an explicitly managed memory hierarchy and
-mechanisms to decouple data movement from execution. A novel compiler leverages
-these mechanisms to maximize reuse and schedule off-chip and on-chip data
-movement.
+logic organized into multiple identical compute clusters connected by an
+on-chip network. This organization provides so much compute throughput that
+data movement becomes the key bottleneck. Thus, F1 is primarily designed to
+minimize data movement. Hardware provides an explicitly managed memory
+hierarchy and mechanisms to decouple data movement from execution. A novel
+compiler leverages these mechanisms to maximize reuse and schedule off-chip and
+on-chip data movement.
 
 F1 is the first FHE accelerator that is programmable, i.e., capable of executing
 full FHE programs. In contrast to prior accelerators, which build fixed pipelines
 tailored to specific FHE schemes and parameters, F1 introduces a more effective
 design approach: it accelerates the \emph{primitive} computations shared by
-higher-level operations unisng novel high-throughpuh functional units.
+higher-level operations using novel high-throughput functional units.
 
 We implement the main components of F1 in RTL and synthesize them in a
 commercial 14nm/12nm process. With a modest area budget of 151\,mm$^2$, our F1
@@ -158,17 +157,17 @@ ASIC-level performance without sacrificing programmability.
 designing F1 while addressing its major drawback: namely, F1 is efficient only
 on a limited subset of simple FHE computations---those of \emph{shallow
 multiplicative depth}. For example, F1 can run neural network inference
-efficiently only for networks with few layers (3-6), but it cannot accelerate
-state-of-the-art deep neural networks (DNNs) with tens to hundreds of layers.
-
+efficiently only for networks with few layers (3-6), but it becomes inefficient
+when running state-of-the-art deep neural networks (DNNs) with tens to hundreds
+of layers.
 This is because deep FHE programs require large ciphertexts and scalable
 algorithms that F1 is not designed for (\autoref{sec:deepChallenges}).
 
 To tackle this challenge, we introduce the \emph{CraterLake} architecture
 (\autoref{ch:craterlake}), the first FHE accelerator
 that achieves high performance on unbounded FHE programs. CraterLake builds on
-many of F1's key insights: specilized vector functional units, static
-scheduling, and a focus on data movement. However, CraterLake succesfully
+many of F1's key insights: specialized vector functional units, static
+scheduling, and a focus on data movement. However, CraterLake successfully
 addresses F1's shortcomings by contributing:
 \begin{compactitem}
 \item A new extremely wide (2,048 lanes) vector \emph{uniprocessor}
@@ -185,12 +184,12 @@ addresses F1's shortcomings by contributing:
 \item The change RNS base (CRB) unit, a new functional unit that encapsulates
     the bulk of operations in keyswitching, improving efficiency and
     enabling high utilization across ciphertexts of all sizes. CraterLake also
-    contributes the keyswith hint generator (KSHGen), a new functional unit
+    contributes the keyswitch hint generator (KSHGen), a new functional unit
     that generates half of the required auxiliary data on the fly (reducing
     overheads from 52\,MB to 26\,MB), saving on-chip storage and memory
     bandwidth.
-\item A vector chaining technique that builds long FU pipelines to enable many
-    concurrent operations with few register ports.
+\item A vector chaining technique that builds long functional units pipelines
+    to enable many concurrent operations with few register ports.
 \end{compactitem}
 
 We evaluate CraterLake through a combination of simulation and RTL synthesis
@@ -203,9 +202,10 @@ To evaluate CraterLake, we use a broad range of FHE benchmarks, including
 programs with high multiplicative depth that require packed bootstrapping, an
 FHE algorithm critical to deep computation which the original F1 accelerator
 cannot support without losing orders of magnitude of performance
-(\autoref{sec:deepChallenges}). CraterLke outperforms a scaled-up and improved
+(\autoref{sec:deepChallenges}). CraterLake outperforms a scaled-up and improved
 version of F1, by gmean 11.2$\times$ on these deep computations, and is
-4,600$\times$ faster than a 32-core CPU. These speedups enable new use cases
-for FHE. For example, deep neural networks like ResNet take 23 minutes per
-inference on the CPU, whereas CraterLake achieves 250 \emph{milliseconds} per
-inference, enabling real-time private deep learning.
+4,600$\times$ faster than a 32-core CPU, which has a similar area and power
+budget. These speedups enable new use cases for FHE. For example, deep neural
+networks like ResNet take 23 minutes per inference on the CPU, whereas
+CraterLake achieves 250 \emph{milliseconds} per inference, enabling real-time
+private deep learning.

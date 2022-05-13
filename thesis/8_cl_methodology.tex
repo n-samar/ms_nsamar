@@ -35,7 +35,6 @@ multiplicatively deep and requires 50 bootstrappings per inference.
 implementation~\cite{lee:2021:privacy} of the ResNet-20 DNN. We benchmark an
 inference on a single~encrypted~image.
 
-\tblBenchmarksAndPerformanceBreakdown
 
 \noindent \emph{\textbf{(3) Logistic regression}}
 uses the HELR algorithm~\cite{han:aaai19:logistic}, which is based on CKKS. We
@@ -80,9 +79,8 @@ their max $L$ is between 4 and 8.
 Finally, we also benchmark \emph{unpacked bootstrapping}, which bootstraps a
 ciphertext that packs a single element. This makes it shallower ($L{\leq}23$)
 and less computationally demanding, but performance per slot is a lot worse
-than fully packed bootstrapping. Thus, it isn't used much in practice. We
-include it because it is the bootstrapping benchmark used in
-F1.
+than fully packed bootstrapping. Thus, it isn't used much in practice. Note
+that this is the bootstrapping algorithm used in F1's evaluation.
 
 \paragraph{Compared systems:}
 We compare CraterLake with a CPU system. We use a 32-core, 64-thread, 3.5\,GHz
