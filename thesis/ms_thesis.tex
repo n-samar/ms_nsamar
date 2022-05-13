@@ -92,20 +92,41 @@
 \input{1_intro}
 \input{2_background}
 
-\chapter{F1: A Fast and Programmable Architecture for Computation on Encrypted Data}
+\chapter{F1: A Fast and Programmable Accelerator for Computation on Encrypted Data}
 
-In this chapter, we present F1's architecture (\autoref{sec:f1_arch}),
-scheduler (\autoref{sec:f1_scheduler}), functional units
-(\autoref{sec:f1_fus}), and results (\autoref{sec:f1_evaluation}).
+In this chapter, we present F1, the first FHE accelerator that is
+programm\-able, i.e., capable of executing full FHE programs. F1 builds on an
+in-depth architectural analysis of the characteristics of FHE computations that
+reveals acceleration opportunities. F1 is a wide-vector processor with novel
+functional units deeply specialized to FHE primitives, such as modular
+arithmetic, number-theoretic transforms, and structured permutations. This
+organization provides so much compute throughput that data movement becomes the
+key bottleneck. Thus, F1 is primarily designed to minimize data movement.
+Hardware provides an explicitly managed memory hierarchy and mechanisms to
+decouple data movement from execution. A novel compiler leverages these
+mechanisms to maximize reuse and schedule off-chip and on-chip data movement.
+
+We will describe F1's architecture (\autoref{sec:f1_arch}), scheduler
+(\autoref{sec:f1_scheduler}), functional units (\autoref{sec:f1_fus}), and
+results (\autoref{sec:f1_evaluation}).
 
 \input{3_f1_architecture}
 \input{4_f1_scheduler}
 \input{5_f1_functional_units}
 \input{6_f1_results}
 \let\cleardoublepage\clearpage % fram stackoverflow: https://stackoverflow.com/questions/491904/how-do-i-remove-blank-pages-coming-between-two-chapters-in-appendix
+
 \chapter{CraterLake: An Accelerator for Efficient Unbounded Computation on Encrypted Data}\label{ch:craterlake}
 
-In this chapter, we present an architectural overview of CraterLake
+In this chapter, we present CraterLake, the first FHE accelerator that enables
+FHE programs of \emph{unbounded} size (i.e., unbounded multiplicative depth).
+Such computations require very large ciphertexts (tens of MBs each) and
+different algorithms that prior work does not support well. To tackle this
+challenge, CraterLake introduces a new hardware architecture that efficiently
+scales to very~large ciphertexts, novel functional units to accelerate key
+kernels, and new algorithms and compiler techniques to reduce data movement.
+
+We will present an architectural overview of CraterLake
 (\autoref{sec:overview}); we then discuss its microarchitecture
 (\autoref{sec:architecture}); (\autoref{sec:architecture}), compiler and
 scheduler (\autoref{sec:compiler}) implementation

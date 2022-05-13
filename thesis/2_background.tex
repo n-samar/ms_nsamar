@@ -83,13 +83,13 @@ private~\cite{brutzkus:icml19:low}.
 \section{FHE Implementation}
 \label{sec:fhe_operation}
 
-We now describe how encrypted data (ciphertexts) is represented and processed
-in FHE schemes. The implementation of each computation on ciphertext data is
-called a \emph{homomorphic operation}. For example, the \emph{homomorphic
-multiplication} of two ciphertexts yields another ciphertext that, when
-decrypted, is the element-wise multiplication of the encrypted plaintexts. For
-concreteness, we introduce FHE using the CKKS scheme, and briefly discuss other
-FHE schemes in \autoref{sec:fhe_others}.
+We now describe how encrypted data (i.e., a ciphertext) is represented and
+processed in FHE schemes. The implementation of each computation on ciphertext
+data is called a \emph{homomorphic operation}. For example, the
+\emph{homomorphic multiplication} of two ciphertexts yields another ciphertext
+that, when decrypted, is the element-wise multiplication of the encrypted
+plaintexts. For concreteness, we introduce FHE using the CKKS scheme, and
+briefly discuss other FHE schemes in \autoref{sec:fhe_others}.
 
 \paragraph{Encryption:} A ciphertext holds an encrypted vector of plaintext values.
 To create a ciphertext, the vector of plaintext values is first encoded, or \emph{packed},
@@ -120,8 +120,8 @@ producing a partially packed or unpacked (single-element) ciphertext.
 The security of any encryption scheme relies on the ciphertexts not revealing
 anything about the value of the plaintext (or the secret key). Without adding
 the noise term $\mathfrak{e}$, the original message $\mathfrak{m}$ would be
-recoverable from $ct$ via simple Gaussian elimination. Including the noise term
-entirely hides the plaintext (under cryptographic
+recoverable from $\mathfrak{ct}$ via simple Gaussian elimination. Including the
+noise term entirely hides the plaintext (under cryptographic
 assumptions)~\cite{lyubashevsky:tact10:ideal}.
 
 As we will see, homomorphic operations on ciphertexts increase their noise, so
@@ -205,50 +205,57 @@ a fixed amount of noise before decryption becomes impossible. Therefore, we say
 that the \emph{multiplicative depth} a ciphertext can tolerate is the
 ciphertext's \emph{multiplicative budget}.
 
-CKKS uses two noise management techniques in tandem: \emph{rescaling} and
-\emph{bootstrapping}.
+CKKS uses three noise management techniques in tandem: \emph{rescaling},
+\emph{modulo switching} and \emph{bootstrapping}.
 
 
-\paragraph{Rescaling} changes the ciphertext from modulus~$Q$ to a
-modulus~$Q' < Q$, which reduces the noise proportionately. Rescaling is
-usually applied after each homomorphic multiplication, to reduce its noise
-blowup.
-This implies that ciphertexts with
-512-bit coefficients have a multiplicative budget of about 16, assuming the rescale
-trims 32 bits. Rescaling not only trims noise but also makes computation more
-efficient over time, as narrower coefficients are cheaper to operate on.
-Ciphertexts run out of multiplicative depth when their coefficients become too
-narrow to support further operations (e.g., 32 bits). In CKKS, the specific
-number of bits to drop per operation is not fixed, but depends on the precision
-that the application requires.
+\paragraph{Rescaling} changes the ciphertext from modulus~$Q$ to a modulus~$Q'
+< Q$, which reduces the noise proportionately. Rescaling is usually applied
+after each homomorphic multiplication, to reduce its noise blowup. This implies
+that ciphertexts with 512-bit coefficients have a multiplicative budget of
+about 16, assuming the rescale trims 32 bits. Rescaling not only trims noise
+but also makes computation more efficient over time, as narrower coefficients
+are cheaper to operate on. Ciphertexts run out of multiplicative depth when
+their coefficients become too narrow to support further operations (e.g., 32
+bits). In CKKS, the specific number of bits to drop per operation is not fixed,
+but depends on the precision that the application requires.
 
-This all implies that having ciphertexts with high multiplicative budgets
-requires wide coefficients and a large ciphertext modulus $Q$. Moreover, wide
-coefficients induce a second hurdle: they force the use of larger vectors. This
-is because, for security, $N/\log Q$ must be above a certain threshold. For
-instance, for 80-bit security, a multiplicative budget of 16 requires $Q$ of
-about 512 bits and $N$=16K (i.e., 2\,MB per ciphertext), and a multiplicative
-budget of 32 requires $Q$ of about 1,024 bits and $N$=32K (i.e., 8\,MB per
-ciphertext). Though larger vectors can pack more plaintext elements, this
-quickly results in vectors so large that they cannot fit on-chip. Overall,
-ciphertext size grows quadratically with multiplicative budget, and compute
-cost cubically (inducing linear and quadratic overheads per plaintext element,
-respectively).
+\paragraph{Modulo switching} has similar computation costs and effects to
+rescaling: it reduces ciphertext noise by narrowing its modulus. However,
+modulo switching does this without changing the underlying plaintext values,
+whereas rescaling has a side-effect of dividing the underlying plaintexts by
+$Q/Q'$. This division is desirable for CKKS, because CKKS implements
+fixed-point arithmetic which requires a division to adjust the fixed-point
+after multiplications. While CKKS uses both modulo switching and rescaling,
+schemes that support only integer operations, like
+BGV~\cite{brakerski:toct14:leveled}, do not use rescaling.
+
+Rescaling and modulo switching imply that having ciphertexts with high
+multiplicative budgets requires wide coefficients and a large ciphertext
+modulus $Q$. Moreover, wide coefficients induce a second hurdle: they force the
+use of larger vectors. This is because, for security, $N/\log Q$ must be above
+a certain threshold. For instance, for 80-bit security, a multiplicative budget
+of 16 requires $Q$ of about 512 bits and $N$=16K (i.e., 2\,MB per ciphertext),
+and a multiplicative budget of 32 requires $Q$ of about 1,024 bits and $N$=32K
+(i.e., 8\,MB per ciphertext). Though larger vectors can pack more plaintext
+elements, this quickly results in vectors so large that they cannot fit
+on-chip. Overall, ciphertext size grows quadratically with multiplicative
+budget, and compute cost cubically (inducing linear and quadratic overheads per
+plaintext element, respectively).
 
 
 \figBootstrapping
 
 \paragraph{Bootstrapping} is a procedure that refreshes the multiplicative
-budget of a ciphertext. Bootstrapping enables computations of arbitrary
-depth by separating them into regions of limited depth.
-
-\autoref{fig:bootstrapping} illustrates a typical evolution of a ciphertext's
-multiplicative budget during execution of a program: computation proceeds until
-the ciphertext runs out of budget, then bootstrapping is applied to refresh the
-ciphertext. For example, in our LSTM benchmark, computation starts with a
-multiplicative budget of 57 and bootstrapping consumes the highest 35 levels
-(in red in \autoref{fig:bootstrapping}), leaving 22 levels for application
-computation (in blue in \autoref{fig:bootstrapping}).
+budget of a ciphertext. Bootstrapping enables computations of arbitrary depth
+by separating them into regions of limited depth. \autoref{fig:bootstrapping}
+illustrates a typical evolution of a ciphertext's multiplicative budget during
+execution of a program: computation proceeds until the ciphertext runs out of
+budget, then bootstrapping is applied to refresh the ciphertext. For example,
+in our LSTM benchmark, computation starts with a multiplicative budget of 57
+and bootstrapping consumes the highest 35 levels (in red in
+\autoref{fig:bootstrapping}), leaving 22 levels for application computation (in
+blue in \autoref{fig:bootstrapping}).
 
 \section{Algorithmic Insights and Optimizations}\label{sec:algoInsights}
 \label{sec:fhe_optimizations}
@@ -509,11 +516,11 @@ keyswitching~\cite{gentry:crypto2012:homomorphic,halevi2020helib,heaan,mouchet20
 
 The key innovation in boosted keyswitching is to expand the input polynomial to
 use wider coefficients. This simplifies the keyswitch hints and its application
-compared to standard keyswitching. However, in contrast to standard
-keyswitching, boosted keyswitching variants differ in how much they expand the
-input, which introduces a tradeoff between performance and security. We first
-analyze the most efficient variant (which expands the input the most), then
-discuss the performance and security tradeoffs of different variants.
+compared to standard keyswitching. Boosted keyswitching variants differ in how
+much they expand the input, which introduces a tradeoff between performance and
+security. We first analyze the most efficient variant (which expands the input
+the most), then discuss the performance and security tradeoffs of different
+variants.
 
 \autoref{fig:ksCompare} compares the memory footprint and compute cost
 (measured in scalar multiplications) of standard and boosted keyswitching as a
@@ -524,7 +531,7 @@ but costs grow much more quickly with $L$ for standard keyswitching.
 In particular, keyswitch hints are the size of two ciphertexts in the boosted
 algorithm. This footprint reduction is the most important. For instance, at
 $N$=64K and $L$=60, a keyswitch hint takes 52.5\,MB instead of 1.7\,GB for the
-standard algorithm. This enables holding KSHs on-chip and allows for high
+standard algorithm. This enables holding keyswitch hints on-chip and allows for high
 reuse. \autoref{fig:ksCompare} also shows that boosted keyswitching reduces
 computational costs across the range of multiplicative budget.
 
@@ -576,11 +583,11 @@ $O(\log N)$ multiplies and adds.
 F1 and previous accelerators cannot perform boosted keyswitching efficiently
 because they are designed to execute all multiplies and adds separately,
 resulting in an overwhelming amount of register port pressure. However, the
-bulk of these operations take place in \verb!changeRNSBase()!
+bulk of these operations takes place in \verb!changeRNSBase()!
 (\autoref{tbl:opBalance}), and are structured as sequence of multiply and
 accumulate operations
 (\autoref{listing:boostedKeyswitching})~\cite{bajard:2016:full}. CraterLake
-exploits this by introducing a novel \verb!changeRNSBase()! functional unit,
+exploits this by introducing a novel change-RNS-base functional unit,
 \emph{CRB}, that buffers the intermediate sums and thereby reduces the register
 file pressure \emph{by a factor of $L$} (i.e., up to 60$\times$).
 
@@ -590,7 +597,7 @@ then be discarded. CraterLake exploits this by building \emph{configurable
 pipelines} of functional units, further reducing register file reads and writes
 (\autoref{sec:keyswitchingPipeline}).
 
-\section{Performance-Security Tradeoffs in Boosted Keyswitching}
+\subsection{Performance-Security Tradeoffs in Boosted Keyswitching}
 \label{sec:boostedSecurity}
 
 As \autoref{sec:noisemgmt} explained, the security level of FHE depends on
@@ -644,20 +651,16 @@ elsewhere; we also show how to achieve higher security levels, e.g., 128 bits
 
 We have so far focused on CKKS, but other FHE schemes provide different
 tradeoffs. For instance, whereas CKKS supports fixed-point complex number
-plaintexts, BGV supports integers modulo a prime.
+plaintexts, BGV~\cite{brakerski:toct14:leveled} supports integers modulo a prime.
 
-B/FV~\cite{brakerski:crypto12:fully,fan:iacr12:somewhat} encodes plaintexts in
-a way that makes modulus switching---an operation similar to CKKS's
-rescaling---before homomorphic multiplication unnecessary, thus easing
+B/FV~\cite{brakerski:crypto12:fully,fan:iacr12:somewhat} supports modular
+arithmetic similar to BGV. However, it encodes plaintexts in a way that makes
+modulus switching before homomorphic multiplication unnecessary, thus easing
 programming (but forgoing the efficiency gains of modulo switching). And
 GSW~\cite{gentry:crypto13:homomorphic} features reduced, asymmetric noise
 growth under homomorphic multiplication, but encrypts a small amount of
 information per ciphertext (not a full $N/2$-element vector).
 
-Because F1 accelerates primitive operations rather than full homomorphic
-operations, it supports BGV, CKKS, and GSW with the same hardware, since they
-use the same primitives. And even though CraterLake is more tightly coupled to
-the implementation of FHE schemes than F1, it can accelerate both BGV and CKKS,
-as these schemes are computationally almost identical. Accelerating B/FV would
+F1 and CraterLake both support CKKS, BGV, and GSW. Accelerating B/FV would
 require some other primitives, so, though adding support for them would not be
 too difficult, our current implementation does not target it.
