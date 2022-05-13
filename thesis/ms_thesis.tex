@@ -84,13 +84,13 @@
 
 \begin{document}
 
-\include{cover}
+\input{cover}
 
 \pagestyle{plain}
 
-\include{contents}
-\include{1_intro}
-\include{2_background}
+\input{contents}
+\input{1_intro}
+\input{2_background}
 
 \chapter{F1}
 
@@ -98,11 +98,11 @@ In this chapter, we present F1's architecture (\autoref{sec:f1_arch}),
 scheduler (\autoref{sec:f1_scheduler}), functional units
 (\autoref{sec:f1_fus}), and results (\autoref{sec:f1_evaluation}).
 
-\include{3_f1_architecture}
-\include{4_f1_scheduler}
-\include{5_f1_functional_units}
-\include{6_f1_results}
-
+\input{3_f1_architecture}
+\input{4_f1_scheduler}
+\input{5_f1_functional_units}
+\input{6_f1_results}
+\let\cleardoublepage\clearpage % fram stackoverflow: https://stackoverflow.com/questions/491904/how-do-i-remove-blank-pages-coming-between-two-chapters-in-appendix
 \chapter{CraterLake}\label{ch:craterlake}
 
 In this chapter, we present an architectural overview of CraterLake
@@ -112,14 +112,14 @@ scheduler (\autoref{sec:compiler}) implementation
 (\autoref{sec:implementation}), experimental methodology
 (\autoref{sec:methodology}), and results (\autoref{sec:results}).
 
-\include{4_cl_tiling}
-\include{5_cl_architecture}
-\include{6_cl_algorithms}
-\include{7_cl_implementation}
-\include{8_cl_methodology}
-\include{9_cl_results}
-\include{10_related}
-\include{11_conclusion}
+\input{4_cl_tiling}
+\input{5_cl_architecture}
+\input{6_cl_algorithms}
+\input{7_cl_implementation}
+\input{8_cl_methodology}
+\input{9_cl_results}
+\input{10_related}
+\input{11_conclusion}
 
 \begin{singlespacing}
 \bibliographystyle{IEEEtranS} % order references by author name
