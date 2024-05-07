@@ -5,6 +5,7 @@
 *.out
 *.pdf
 *.pyc
+!figures/figures.pdf
 auto_header.tex
 metadata.txt
 doc_data.txt
